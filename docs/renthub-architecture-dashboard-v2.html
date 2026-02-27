@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RentHub — System Architecture Specification v2.1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #111318;
+    --surface2: #181c24;
+    --border: #1e2330;
+    --accent: #4f8ef7;
+    --accent2: #7c3aed;
+    --accent3: #10b981;
+    --accent4: #f59e0b;
+    --accent5: #ef4444;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --tag-bg: #1a2035;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10, 12, 16, 0.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    height: 52px;
+    overflow-x: auto;
+    gap: 2px;
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 16px;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+    margin-right: 28px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .nav-logo span { color: var(--text); }
+
+  nav button {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 4px 12px;
+    cursor: pointer;
+    border-radius: 6px;
+    white-space: nowrap;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  nav button:hover { color: var(--text); background: var(--surface); }
+  nav button.active { color: var(--accent); background: rgba(79,142,247,0.1); }
+
+  main { max-width: 1240px; margin: 0 auto; padding: 36px 24px 80px; }
+
+  .section { display: none; animation: fadeIn 0.25s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .page-header { margin-bottom: 36px; }
+  .page-header h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 28px; letter-spacing: -1px; color: var(--text); margin-bottom: 6px; }
+  .page-header p { color: var(--muted); font-size: 14px; max-width: 640px; }
+
+  .section-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 32px 0 14px;
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-blue   { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .badge-green  { background: rgba(16,185,129,0.15); color: var(--accent3); }
+  .badge-amber  { background: rgba(245,158,11,0.15); color: var(--accent4); }
+  .badge-purple { background: rgba(124,58,237,0.15); color: var(--accent2); }
+  .badge-red    { background: rgba(239,68,68,0.15); color: var(--accent5); }
+  .badge-teal   { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); display: flex; align-items: center; gap: 10px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; padding: 10px 14px; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+  td { padding: 11px 14px; border-bottom: 1px solid rgba(30,35,48,0.5); color: var(--text); font-size: 13px; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.015); }
+  td .mono { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--accent); }
+  td .dim { color: var(--muted); font-size: 12px; }
+
+  .stat-tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+  }
+  .stat-tile .label { color: var(--muted); font-size: 11px; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; font-family: 'DM Mono', monospace; }
+  .stat-tile .value { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 26px; color: var(--text); }
+  .stat-tile .sub { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+  .flow-chain { display: flex; align-items: center; flex-wrap: wrap; gap: 0; margin: 14px 0; }
+  .flow-node { background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 9px 14px; font-size: 13px; color: var(--text); white-space: nowrap; }
+  .flow-arrow { color: var(--muted); padding: 0 8px; font-size: 16px; }
+  .flow-node.highlight { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.08); }
+  .flow-node.success { border-color: var(--accent3); color: var(--accent3); background: rgba(16,185,129,0.08); }
+  .flow-node.warn { border-color: var(--accent4); color: var(--accent4); background: rgba(245,158,11,0.08); }
+
+  .arch-layer { display: flex; align-items: stretch; margin-bottom: 8px; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .arch-label { background: var(--surface2); padding: 14px 16px; width: 140px; flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; border-right: 1px solid var(--border); }
+  .arch-content { padding: 14px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: var(--surface); flex: 1; }
+  .tech-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--tag-bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; font-size: 13px; color: var(--text); font-weight: 500; }
+
+  .module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+  .module-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 16px; transition: border-color 0.2s; }
+  .module-card:hover { border-color: rgba(79,142,247,0.4); }
+  .module-card h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 13px; color: var(--text); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .module-card ul { list-style: none; }
+  .module-card ul li { color: var(--muted); font-size: 12px; padding: 3px 0 3px 16px; position: relative; }
+  .module-card ul li::before { content: '›'; position: absolute; left: 4px; color: var(--accent); }
+
+  .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-box { width: 18px; height: 18px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; margin-top: 2px; cursor: pointer; transition: all 0.2s; }
+  .check-box.done { background: rgba(16,185,129,0.2); border: 1px solid var(--accent3); color: var(--accent3); }
+  .check-box.todo { background: rgba(100,116,139,0.1); border: 1px solid var(--border); color: transparent; }
+  .check-box.todo:hover { border-color: var(--muted); }
+  .checklist-text { flex: 1; }
+  .checklist-text strong { display: block; font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .checklist-text span { color: var(--muted); font-size: 12px; }
+
+  /* ROLE CARDS */
+  .role-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .role-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; color: var(--text); margin-bottom: 4px; }
+  .platform { color: var(--muted); font-size: 12px; margin-bottom: 14px; font-family: 'DM Mono', monospace; }
+  .perm-list { list-style: none; }
+  .perm-list li { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; color: var(--muted); }
+  .perm-list li span { color: var(--text); }
+
+  /* ENTITY */
+  .entity-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 12px; }
+  .entity-header { background: rgba(79,142,247,0.08); border-bottom: 1px solid var(--border); padding: 10px 16px; font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--accent); display: flex; align-items: center; justify-content: space-between; }
+  .entity-fields { padding: 4px 0; }
+  .entity-field { display: grid; grid-template-columns: 170px 120px 1fr; gap: 8px; padding: 7px 16px; font-size: 12px; border-bottom: 1px solid rgba(30,35,48,0.5); }
+  .entity-field:last-child { border-bottom: none; }
+  .field-name { font-family: 'DM Mono', monospace; color: var(--text); }
+  .field-type { font-family: 'DM Mono', monospace; color: var(--accent4); }
+  .field-note { color: var(--muted); }
+
+  /* API ENDPOINTS */
+  .endpoint-group { margin-bottom: 24px; }
+  .endpoint-group-label { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; padding-left: 4px; }
+  .endpoint { display: flex; align-items: flex-start; gap: 12px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); margin-bottom: 5px; font-size: 13px; transition: border-color 0.15s; }
+  .endpoint:hover { border-color: rgba(79,142,247,0.3); }
+  .method { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px; width: 52px; text-align: center; flex-shrink: 0; margin-top: 1px; }
+  .method-get    { background: rgba(16,185,129,0.15); color: var(--accent3); }
+  .method-post   { background: rgba(79,142,247,0.15); color: var(--accent); }
+  .method-patch  { background: rgba(245,158,11,0.15); color: var(--accent4); }
+  .method-delete { background: rgba(239,68,68,0.15); color: var(--accent5); }
+  .ep-path { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); flex: 1; }
+  .ep-desc { color: var(--muted); font-size: 12px; flex: 1.2; }
+  .ep-auth { font-family: 'DM Mono', monospace; font-size: 10px; flex-shrink: 0; padding: 2px 8px; border-radius: 4px; }
+  .ep-auth.admin    { background: rgba(124,58,237,0.15); color: var(--accent2); }
+  .ep-auth.landlord { background: rgba(79,142,247,0.12); color: var(--accent); }
+  .ep-auth.tenant   { background: rgba(16,185,129,0.12); color: var(--accent3); }
+  .ep-auth.public   { background: rgba(100,116,139,0.12); color: var(--muted); }
+  .ep-auth.any      { background: rgba(245,158,11,0.12); color: var(--accent4); }
+
+  /* GAMEPLAN */
+  .gp-module { margin-bottom: 32px; }
+  .gp-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px 10px 0 0; cursor: pointer; user-select: none; }
+  .gp-header:hover { border-color: rgba(79,142,247,0.3); }
+  .gp-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; color: var(--text); flex: 1; }
+  .gp-body { border: 1px solid var(--border); border-top: none; border-radius: 0 0 10px 10px; overflow: hidden; }
+  .gp-row { display: grid; grid-template-columns: 52px 220px 1fr 100px 100px; gap: 12px; align-items: center; padding: 10px 16px; border-bottom: 1px solid rgba(30,35,48,0.5); font-size: 13px; }
+  .gp-row:last-child { border-bottom: none; }
+  .gp-row:hover { background: rgba(255,255,255,0.015); }
+  .gp-head { background: var(--bg); display: grid; grid-template-columns: 52px 220px 1fr 100px 100px; gap: 12px; padding: 8px 16px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--border); }
+  .gp-path { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--text); }
+  .gp-note { color: var(--muted); font-size: 12px; }
+  .gp-phase { text-align: center; }
+  .gp-who { text-align: center; }
+  .phase-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 4px; }
+  .p1 { background: var(--accent3); }
+  .p2 { background: var(--accent); }
+  .p3 { background: var(--accent4); }
+  .p4 { background: var(--accent2); }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 32px; }
+  .timeline::before { content: ''; position: absolute; left: 10px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .phase { position: relative; margin-bottom: 28px; }
+  .phase::before { content: ''; position: absolute; left: -26px; top: 14px; width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--border); background: var(--bg); }
+  .phase-1::before { background: var(--accent3); border-color: var(--accent3); }
+  .phase-2::before { background: var(--accent); border-color: var(--accent); }
+  .phase-3::before { background: var(--accent4); border-color: var(--accent4); }
+  .phase-4::before { background: var(--accent2); border-color: var(--accent2); }
+  .phase-label { margin-bottom: 10px; }
+  .phase-items { list-style: none; }
+  .phase-items li { color: var(--muted); font-size: 13px; padding: 4px 0 4px 16px; position: relative; }
+  .phase-items li::before { content: '›'; position: absolute; left: 4px; color: var(--accent); }
+
+  @media print { nav { position: relative; } .section { display: block !important; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Rent<span>Hub</span></div>
+  <button class="active" onclick="show('overview', this)">Overview</button>
+  <button onclick="show('architecture', this)">Architecture</button>
+  <button onclick="show('database', this)">Database</button>
+  <button onclick="show('api', this)">API Spec</button>
+  <button onclick="show('gameplan', this)">API Gameplan</button>
+  <button onclick="show('security', this)">Security</button>
+  <button onclick="show('testing', this)">Testing</button>
+  <button onclick="show('deployment', this)">Deployment</button>
+  <button onclick="show('roadmap', this)">Roadmap</button>
+</nav>
+
+<main>
+
+<!-- ======================== OVERVIEW ======================== -->
+<div id="overview" class="section active">
+  <div class="page-header">
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px; flex-wrap:wrap;">
+      <h1>RentHub SaaS</h1>
+      <span class="badge badge-blue">v2.1</span>
+      <span class="badge badge-amber">Planning & Architecture</span>
+      <span class="badge badge-green">2026-02-19</span>
+    </div>
+    <p>A multi-tenant SaaS platform for small-to-medium landlords to manage properties, tenants, leases, billing, and add-on utilities — with a tenant-facing mobile portal and e-payment integration.</p>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:24px;">
+    <div class="stat-tile" style="border-top:2px solid var(--accent);">
+      <div class="label">User Roles</div>
+      <div class="value">2+3</div>
+      <div class="sub">UserRole: ADMIN|USER · UserType: 3 types</div>
+    </div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent2);">
+      <div class="label">DB Tables</div>
+      <div class="value">20</div>
+      <div class="sub">15 core + 4 add-on + RefreshToken</div>
+    </div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent3);">
+      <div class="label">API Endpoints</div>
+      <div class="value">60+</div>
+      <div class="sub">Across 11 modules, 4 phases</div>
+    </div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent4);">
+      <div class="label">Launch Phases</div>
+      <div class="value">4</div>
+      <div class="sub">Core → Dashboard → Payments → Mobile</div>
+    </div>
+  </div>
+
+  <div class="section-title">North Star</div>
+  <div class="card" style="border-left: 3px solid var(--accent);">
+    <div style="font-size:16px; font-weight:500; color:var(--text); line-height:1.7; margin-bottom:16px;">
+      "A simple platform that helps small landlords track tenants, payments, and occupancy — so they always know who owes rent — and tenants can see and pay their bills in one place."
+    </div>
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <span class="badge badge-blue">Multi-tenant SaaS</span>
+      <span class="badge badge-green">Property Management</span>
+      <span class="badge badge-purple">E-Payment (Dragonpay)</span>
+      <span class="badge badge-amber">Subscription Model</span>
+      <span class="badge badge-teal">Add-on Billing (WiFi, Utilities)</span>
+    </div>
+  </div>
+
+  <div class="section-title">Auth Model — Two-Layer Design</div>
+  <div class="card" style="margin-bottom:20px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px; flex-wrap:wrap;">
+      <div>
+        <div style="font-family:'DM Mono',monospace; font-size:11px; color:var(--accent4); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">UserRole — JWT Auth Layer</div>
+        <table>
+          <tbody>
+            <tr><td class="mono">ADMIN</td><td class="dim">Platform superuser. Accesses /admin/* routes.</td></tr>
+            <tr><td class="mono">USER</td><td class="dim">All non-admin users. Scoped further by UserType.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace; font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:10px;">UserType — App Routing Layer</div>
+        <table>
+          <tbody>
+            <tr><td class="mono">SYSTEM_ADMIN</td><td class="dim">Paired with ADMIN · controls platform</td></tr>
+            <tr><td class="mono">LANDLORD</td><td class="dim">Paired with USER · manages properties</td></tr>
+            <tr><td class="mono">TENANT</td><td class="dim">Paired with USER · views/pays bills</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div style="background:var(--bg); border-radius:8px; padding:14px 16px; margin-top:16px; font-family:'DM Mono',monospace; font-size:12px; color:var(--muted); line-height:1.8;">
+      Login → JWT contains { role, userType } → RolesGuard checks role → UserTypeGuard checks userType → Client routes: SYSTEM_ADMIN→/admin · LANDLORD→/landlord · TENANT→/tenant
+    </div>
+  </div>
+
+  <div class="section-title">User Roles & Platforms</div>
+  <div class="grid-2">
+    <div class="role-card">
+      <div class="role-name">🛡️ System Admin</div>
+      <div class="platform">Web only · role: ADMIN · userType: SYSTEM_ADMIN</div>
+      <ul class="perm-list">
+        <li>📊 <span>Global platform dashboard</span></li>
+        <li>🏢 <span>Manage Property Groups & Landlords</span></li>
+        <li>💳 <span>Subscription Plans & Billing</span></li>
+        <li>👥 <span>User management, roles, permissions</span></li>
+        <li>📋 <span>Audit trail & platform reports</span></li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-name">🏠 Landlord / Staff</div>
+      <div class="platform">Web + Mobile · role: USER · userType: LANDLORD · orgRole: OWNER|ADMIN|STAFF</div>
+      <ul class="perm-list">
+        <li>📈 <span>Organization dashboard (income, occupancy)</span></li>
+        <li>🏗️ <span>Manage Properties, Units & Add-ons</span></li>
+        <li>👤 <span>Manage Tenants & Leases</span></li>
+        <li>💰 <span>Track payments, confirm cash, view add-on bills</span></li>
+        <li>⚡ <span>Enter utility meter readings</span></li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-name">🧑 Tenant</div>
+      <div class="platform">Mobile (primary) · role: USER · userType: TENANT</div>
+      <ul class="perm-list">
+        <li>🏠 <span>View current unit & next due date</span></li>
+        <li>📄 <span>View itemized bills (rent + add-ons)</span></li>
+        <li>💳 <span>Pay via cash (photo) or e-payment</span></li>
+        <li>🧾 <span>Download digital receipts</span></li>
+        <li>👤 <span>Profile & address management</span></li>
+      </ul>
+    </div>
+    <div class="role-card">
+      <div class="role-name">🔮 Future: Marketplace</div>
+      <div class="platform">Public-facing · Explore feature · Phase 4</div>
+      <ul class="perm-list">
+        <li>🔍 <span>Browse available properties & units</span></li>
+        <li>📍 <span>Search by location, price, type</span></li>
+        <li>📨 <span>Send inquiry or rental application</span></li>
+        <li>📊 <span>Property analytics for landlords</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:28px;">Core Data Hierarchy</div>
+  <div class="card">
+    <div class="flow-chain">
+      <div class="flow-node highlight">PropertyGroup</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Property</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Unit</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Lease</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node success">Payment</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Transactions</div>
+    </div>
+    <div class="flow-chain">
+      <div class="flow-node">Unit</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node warn">UnitAddonCatalog</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node warn">UnitAddon</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node warn">LeaseAddonBill</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node warn">UtilityReading (METERED)</div>
+    </div>
+    <div style="color:var(--muted); font-size:12px; margin-top:8px;">All data scoped by <span style="color:var(--accent); font-family:'DM Mono',monospace;">property_group_id</span> · Landlord A never sees Landlord B's data · Soft deletes via <span style="color:var(--accent); font-family:'DM Mono',monospace;">deleted_at</span></div>
+  </div>
+
+  <div class="section-title">Key System Triggers</div>
+  <table>
+    <thead><tr><th>Event</th><th>Entity</th><th>State Change</th><th>Side Effects</th></tr></thead>
+    <tbody>
+      <tr><td>Lease activated</td><td class="mono">LEASES</td><td><span class="badge badge-green">ACTIVE</span></td><td>Unit → OCCUPIED · Generate advance/deposit Payment · Generate LeaseAddonBills for FLAT_FEE add-ons</td></tr>
+      <tr><td>Lease closed</td><td class="mono">LEASES</td><td><span class="badge badge-red">CLOSED</span></td><td>Unit → AVAILABLE · Archive all records</td></tr>
+      <tr><td>Cron billing job</td><td class="mono">PAYMENTS</td><td><span class="badge badge-amber">UNPAID</span></td><td>Create PAYMENT rows + LeaseAddonBill rows · Notify tenant</td></tr>
+      <tr><td>Meter reading entered</td><td class="mono">UTILITY_READINGS</td><td>—</td><td>Compute units_consumed & amount · Create LeaseAddonBill for METERED add-on</td></tr>
+      <tr><td>Payment webhook SUCCESS</td><td class="mono">PAYMENTS</td><td><span class="badge badge-green">PAID</span></td><td>Update amount_paid · Log transaction · Issue receipt notification</td></tr>
+      <tr><td>Subscription expired</td><td class="mono">SUBSCRIPTIONS</td><td><span class="badge badge-red">EXPIRED</span></td><td>Block new units/leases · enter grace period</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ======================== ARCHITECTURE ======================== -->
+<div id="architecture" class="section">
+  <div class="page-header">
+    <h1>System Architecture</h1>
+    <p>C4 Level 1 — Components, data flow, and technology stack.</p>
+  </div>
+
+  <div class="section-title">Tech Stack</div>
+  <div class="arch-layer"><div class="arch-label">Frontend Web</div><div class="arch-content"><div class="tech-chip">⚛️ Next.js</div><div style="color:var(--muted);font-size:12px;">Admin dashboard + Landlord web app · SSR / Static</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Mobile App</div><div class="arch-content"><div class="tech-chip">📱 Flutter</div><div style="color:var(--muted);font-size:12px;">iOS + Android · Landlord on-the-go + Tenant portal (home, bills, pay, receipts)</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Backend API</div><div class="arch-content"><div class="tech-chip">🏗️ NestJS</div><div class="tech-chip">Prisma ORM</div><div class="tech-chip">JWT Auth</div><div style="color:var(--muted);font-size:12px;">REST · RolesGuard + UserTypeGuard · Modular services · Cron billing worker</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Auth</div><div class="arch-content"><div class="tech-chip">🔑 JWT (Access)</div><div class="tech-chip">🔄 RefreshToken</div><div style="color:var(--muted);font-size:12px;">UserRole (ADMIN|USER) + UserType (SYSTEM_ADMIN|LANDLORD|TENANT) · Email verification · Reset password</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Database</div><div class="arch-content"><div class="tech-chip">🐘 PostgreSQL</div><div style="color:var(--muted);font-size:12px;">20 tables · property_group_id scoping · cuid() PKs · JSONB metadata · Soft deletes</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Payments</div><div class="arch-content"><div class="tech-chip">💳 Dragonpay</div><div style="color:var(--muted);font-size:12px;">GCash · Maya · GrabPay · Bank transfers · Webhook-based confirmation · PAYMENT_TRANSACTIONS log</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Notifications</div><div class="arch-content"><div class="tech-chip">📧 Email</div><div class="tech-chip">📲 SMS</div><div class="tech-chip">🔔 Push (FCM)</div><div style="color:var(--muted);font-size:12px;">Overdue alerts, receipts, lease reminders · NOTIFICATIONS table stores all channels</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Hosting</div><div class="arch-content"><div class="tech-chip">☁️ VPS / Cloud</div><div style="color:var(--muted);font-size:12px;">Single region · Managed PostgreSQL · CDN for static assets · PgBouncer for connection pooling</div></div></div>
+
+  <div class="section-title">Service Modules</div>
+  <div class="module-grid">
+    <div class="module-card"><h3>🔐 Auth</h3><ul><li>JWT access + refresh token</li><li>Email verification flow</li><li>Password reset (time-limited token)</li><li>Failed login lockout (N attempts)</li><li>UserRole + UserType on payload</li></ul></div>
+    <div class="module-card"><h3>🏢 Organizations</h3><ul><li>PropertyGroup CRUD</li><li>OrgRole management (OWNER|ADMIN|STAFF)</li><li>Member invite & management</li><li>Plan limit enforcement</li></ul></div>
+    <div class="module-card"><h3>💳 Subscriptions</h3><ul><li>Plan catalog (CRUD by admin)</li><li>Org subscription lifecycle</li><li>Active plan enforcement on limits</li><li>Expiry & cancellation flow</li></ul></div>
+    <div class="module-card"><h3>🏠 Properties</h3><ul><li>Property CRUD</li><li>Unit CRUD + status management</li><li>Scoped by property_group_id</li><li>Unit metadata (furnished, sqm, etc.)</li></ul></div>
+    <div class="module-card"><h3>👤 Tenants</h3><ul><li>Tenant record management</li><li>Portal invite (link User account)</li><li>Emergency contact (JSONB)</li><li>Scoped by property_group_id</li></ul></div>
+    <div class="module-card"><h3>📋 Leases</h3><ul><li>Create / activate / close</li><li>One active lease per unit enforced</li><li>Trigger unit status + initial billing</li><li>Grace period & advance months config</li></ul></div>
+    <div class="module-card"><h3>💰 Payments</h3><ul><li>Cron monthly bill generation</li><li>Manual cash payment recording</li><li>E-payment initiation (Dragonpay)</li><li>Webhook processing (idempotent)</li></ul></div>
+    <div class="module-card"><h3>⚡ Add-ons & Utilities</h3><ul><li>Addon catalog (platform + custom)</li><li>Unit addon assignment</li><li>LeaseAddonBill generation</li><li>Meter reading entry + computation</li></ul></div>
+    <div class="module-card"><h3>🔔 Notifications</h3><ul><li>Overdue & payment alerts</li><li>Lease reminders</li><li>Push (FCM), Email, SMS, In-app</li><li>Unread count + mark-read API</li></ul></div>
+    <div class="module-card"><h3>📝 Audit Trail</h3><ul><li>Immutable INSERT/UPDATE/DELETE log</li><li>Old/new value JSONB snapshots</li><li>IP address + request ID tracing</li><li>Admin query & forensics</li></ul></div>
+    <div class="module-card"><h3>🛡️ Admin (System)</h3><ul><li>All property groups & users</li><li>Subscription overrides</li><li>Platform-wide audit log</li><li>Addon catalog management</li></ul></div>
+  </div>
+
+  <div class="section-title">Data Flow</div>
+  <div class="card">
+    <div style="display:flex; flex-direction:column; gap:12px;">
+      <div class="flow-chain">
+        <div class="flow-node highlight">Web / Mobile</div>
+        <div class="flow-arrow">→ HTTPS + JWT →</div>
+        <div class="flow-node highlight">NestJS API</div>
+        <div class="flow-arrow">→ RolesGuard + UserTypeGuard →</div>
+        <div class="flow-node">PostgreSQL (Prisma)</div>
+      </div>
+      <div class="flow-chain">
+        <div class="flow-node highlight">NestJS API</div>
+        <div class="flow-arrow">→ redirect URL →</div>
+        <div class="flow-node warn">Dragonpay Gateway</div>
+        <div class="flow-arrow">→ webhook callback →</div>
+        <div class="flow-node highlight">NestJS API</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node success">PAYMENT: PAID</div>
+      </div>
+      <div class="flow-chain">
+        <div class="flow-node">Cron Job (2 AM daily)</div>
+        <div class="flow-arrow">→ check billing_day = today →</div>
+        <div class="flow-node">Insert PAYMENT rows + LeaseAddonBill rows</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node warn">Notify Tenant</div>
+      </div>
+      <div class="flow-chain">
+        <div class="flow-node">Landlord enters meter reading</div>
+        <div class="flow-arrow">→ UTILITY_READINGS →</div>
+        <div class="flow-node warn">DB computes units_consumed × rate</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node">Insert LeaseAddonBill (METERED)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== DATABASE ======================== -->
+<div id="database" class="section">
+  <div class="page-header">
+    <h1>Database Design</h1>
+    <p>PostgreSQL · 20 tables · cuid() PKs · property_group_id multi-tenancy · Soft deletes · Audit trail.</p>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:24px;">
+    <div class="stat-tile"><div class="label">Total Tables</div><div class="value">20</div><div class="sub">Including RefreshToken</div></div>
+    <div class="stat-tile"><div class="label">Core Tables</div><div class="value">15</div><div class="sub">Auth, Org, Property, Billing</div></div>
+    <div class="stat-tile"><div class="label">Add-on Tables</div><div class="value">4</div><div class="sub">Catalog, Addons, Bills, Readings</div></div>
+    <div class="stat-tile"><div class="label">Enums</div><div class="value">16</div><div class="sub">UserRole, UserType + 14 domain enums</div></div>
+  </div>
+
+  <div class="section-title">Auth Tables (Preserved Exactly)</div>
+  <div class="entity-block">
+    <div class="entity-header">USERS <span class="badge badge-blue">Identity · cuid()</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">id</span><span class="field-type">String (cuid)</span><span class="field-note">PK — cuid() for all tables</span></div>
+      <div class="entity-field"><span class="field-name">email</span><span class="field-type">String UQ</span><span class="field-note">Login identifier — unique platform-wide</span></div>
+      <div class="entity-field"><span class="field-name">password</span><span class="field-type">String</span><span class="field-note">bcrypt hash — never returned in API</span></div>
+      <div class="entity-field"><span class="field-name">role</span><span class="field-type">UserRole</span><span class="field-note">ADMIN | USER — JWT auth gate</span></div>
+      <div class="entity-field"><span class="field-name">userType</span><span class="field-type">UserType</span><span class="field-note">SYSTEM_ADMIN | LANDLORD | TENANT — app routing</span></div>
+      <div class="entity-field"><span class="field-name">phone</span><span class="field-type">String?</span><span class="field-note">For SMS notifications</span></div>
+      <div class="entity-field"><span class="field-name">isEmailVerified</span><span class="field-type">Boolean</span><span class="field-note">Email verification gate</span></div>
+      <div class="entity-field"><span class="field-name">emailVerificationToken</span><span class="field-type">String? UQ</span><span class="field-note">One-time email verification token</span></div>
+      <div class="entity-field"><span class="field-name">resetPasswordToken</span><span class="field-type">String? UQ</span><span class="field-note">Time-limited reset token</span></div>
+      <div class="entity-field"><span class="field-name">resetPasswordExpires</span><span class="field-type">DateTime?</span><span class="field-note">Token expiry — reject after this</span></div>
+      <div class="entity-field"><span class="field-name">failedLoginAttempts (logical)</span><span class="field-type">Int</span><span class="field-note">Brute force protection — lockout after N</span></div>
+      <div class="entity-field"><span class="field-name">isActive</span><span class="field-type">Boolean</span><span class="field-note">Account enabled flag</span></div>
+    </div>
+  </div>
+  <div class="entity-block">
+    <div class="entity-header">REFRESH_TOKENS <span class="badge badge-blue">JWT Auth</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">token</span><span class="field-type">String UQ</span><span class="field-note">Hashed refresh token — rotated on each use</span></div>
+      <div class="entity-field"><span class="field-name">userId</span><span class="field-type">String FK</span><span class="field-note">FK → users · CASCADE delete</span></div>
+      <div class="entity-field"><span class="field-name">expiresAt</span><span class="field-type">DateTime</span><span class="field-note">Reject if now() > expiresAt</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Org & Subscription Tables</div>
+  <div class="entity-block">
+    <div class="entity-header">PROPERTY_GROUPS <span class="badge badge-purple">Multi-tenancy Root</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">id</span><span class="field-type">String (cuid)</span><span class="field-note">Root isolation key — all data scoped by this</span></div>
+      <div class="entity-field"><span class="field-name">groupName</span><span class="field-type">String</span><span class="field-note">Landlord business name</span></div>
+      <div class="entity-field"><span class="field-name">currencyCode</span><span class="field-type">Char(3)</span><span class="field-note">ISO 4217 — default PHP</span></div>
+      <div class="entity-field"><span class="field-name">timezone</span><span class="field-type">String</span><span class="field-note">IANA timezone — default Asia/Manila</span></div>
+      <div class="entity-field"><span class="field-name">createdBy</span><span class="field-type">String FK</span><span class="field-note">FK → users</span></div>
+    </div>
+  </div>
+  <div class="entity-block">
+    <div class="entity-header">ORG_ROLES <span class="badge badge-purple">Org-level RBAC</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">code</span><span class="field-type">String UQ</span><span class="field-note">OWNER | ADMIN | STAFF</span></div>
+      <div class="entity-field"><span class="field-name">name</span><span class="field-type">String</span><span class="field-note">Display label e.g. "Property Owner"</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Property & Lease Tables</div>
+  <div class="entity-block">
+    <div class="entity-header">UNITS <span class="badge badge-amber">Core Inventory</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">propertyId</span><span class="field-type">String FK</span><span class="field-note">FK → properties</span></div>
+      <div class="entity-field"><span class="field-name">unitType</span><span class="field-type">UnitType enum</span><span class="field-note">STUDIO | BEDROOM | ENTIRE_UNIT | SHARED_ROOM | DORM</span></div>
+      <div class="entity-field"><span class="field-name">monthlyRent</span><span class="field-type">Decimal(12,2)</span><span class="field-note">Default base rent — overridable per lease</span></div>
+      <div class="entity-field"><span class="field-name">status</span><span class="field-type">UnitStatus enum</span><span class="field-note">AVAILABLE | NOT_AVAILABLE | OCCUPIED | MAINTENANCE</span></div>
+      <div class="entity-field"><span class="field-name">metadata</span><span class="field-type">JsonB?</span><span class="field-note">{ furnished, air_conditioned, sqm, image_urls }</span></div>
+    </div>
+  </div>
+  <div class="entity-block">
+    <div class="entity-header">LEASES <span class="badge badge-amber">Core Agreement</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">billingDay</span><span class="field-type">Int (1-28)</span><span class="field-note">Day of month rent is due — used by cron</span></div>
+      <div class="entity-field"><span class="field-name">gracePeriodDays</span><span class="field-type">Int</span><span class="field-note">Days after due_date before status → OVERDUE</span></div>
+      <div class="entity-field"><span class="field-name">rentAmount</span><span class="field-type">Decimal(12,2)</span><span class="field-note">Agreed rent for THIS lease (may differ from unit default)</span></div>
+      <div class="entity-field"><span class="field-name">status</span><span class="field-type">LeaseStatus enum</span><span class="field-note">ACTIVE | CLOSED | EXPIRED — partial unique: 1 ACTIVE per unit</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Add-on Tables (v2.1 New)</div>
+  <div class="entity-block">
+    <div class="entity-header">UNIT_ADDON_CATALOG <span class="badge badge-teal">Add-on Types</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">propertyGroupId</span><span class="field-type">String? FK</span><span class="field-note">NULL = platform-wide · non-null = landlord custom</span></div>
+      <div class="entity-field"><span class="field-name">category</span><span class="field-type">String</span><span class="field-note">internet | utility | parking | laundry | security | pet | amenity</span></div>
+      <div class="entity-field"><span class="field-name">billingType</span><span class="field-type">AddonBillingType</span><span class="field-note">FIXED_AMENITY | FLAT_FEE | METERED</span></div>
+      <div class="entity-field"><span class="field-name">unitOfMeasure</span><span class="field-type">String?</span><span class="field-note">kWh | cubic_meter | kg | load (METERED only)</span></div>
+      <div class="entity-field"><span class="field-name">defaultRate</span><span class="field-type">Decimal(12,4)?</span><span class="field-note">Overridable per unit in UNIT_ADDONS</span></div>
+    </div>
+  </div>
+  <div class="entity-block">
+    <div class="entity-header">UTILITY_READINGS <span class="badge badge-teal">Meter Log</span></div>
+    <div class="entity-fields">
+      <div class="entity-field"><span class="field-name">previousReading</span><span class="field-type">Decimal(12,4)</span><span class="field-note">Auto-filled from last row for this addon</span></div>
+      <div class="entity-field"><span class="field-name">currentReading</span><span class="field-type">Decimal(12,4)</span><span class="field-note">CHECK: current >= previous</span></div>
+      <div class="entity-field"><span class="field-name">units_consumed</span><span class="field-type">GENERATED</span><span class="field-note">current - previous (PostgreSQL GENERATED STORED)</span></div>
+      <div class="entity-field"><span class="field-name">amount_computed</span><span class="field-type">GENERATED</span><span class="field-note">units_consumed × rate_per_unit (GENERATED STORED)</span></div>
+      <div class="entity-field"><span class="field-name">photoUrl</span><span class="field-type">String?</span><span class="field-note">Meter photo for dispute evidence</span></div>
+    </div>
+  </div>
+
+  <div class="section-title">Raw SQL Migration Notes (Prisma limitations)</div>
+  <div class="card" style="background:var(--bg); border-color:rgba(245,158,11,0.3);">
+    <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--muted); line-height:2;">
+      <div style="color:var(--accent4); margin-bottom:8px;">-- Must be added manually to migration SQL after prisma migrate dev:</div>
+      <div style="color:var(--accent3);">-- 1. One active lease per unit (partial unique)</div>
+      <div>CREATE UNIQUE INDEX uq_lease_unit_active ON leases(unit_id) WHERE status = 'ACTIVE' AND deleted_at IS NULL;</div>
+      <br>
+      <div style="color:var(--accent3);">-- 2. No duplicate active add-on per unit (NULLS NOT DISTINCT)</div>
+      <div>CREATE UNIQUE INDEX uq_unit_addon_active ON unit_addons(unit_id, addon_catalog_id, effective_until) NULLS NOT DISTINCT WHERE deleted_at IS NULL;</div>
+      <br>
+      <div style="color:var(--accent3);">-- 3. Computed columns for meter readings</div>
+      <div>ALTER TABLE utility_readings ADD COLUMN units_consumed DECIMAL(12,4) GENERATED ALWAYS AS (current_reading - previous_reading) STORED,</div>
+      <div>ADD COLUMN amount_computed DECIMAL(12,2) GENERATED ALWAYS AS ((current_reading - previous_reading) * rate_per_unit) STORED;</div>
+      <br>
+      <div style="color:var(--accent3);">-- 4. Rename existing Role enum</div>
+      <div>ALTER TYPE "Role" RENAME TO "user_role";</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== API SPEC ======================== -->
+<div id="api" class="section">
+  <div class="page-header">
+    <h1>API Specification</h1>
+    <p>RESTful · JWT Bearer auth · All responses: <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);">{ data, meta? }</code> on success · <code style="font-family:'DM Mono',monospace;font-size:12px;color:var(--accent5);">{ error: { code, message, details? } }</code> on error.</p>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">🔐 Auth</div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/auth/register</span><span class="ep-desc">Register new user (sends verification email)</span><span class="ep-auth public">PUBLIC</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/auth/login</span><span class="ep-desc">Login → returns accessToken + refreshToken + { role, userType }</span><span class="ep-auth public">PUBLIC</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/auth/refresh</span><span class="ep-desc">Exchange refresh token for new access token</span><span class="ep-auth public">PUBLIC</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/auth/logout</span><span class="ep-desc">Revoke refresh token</span><span class="ep-auth any">ANY</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/auth/verify-email</span><span class="ep-desc">Verify email with token</span><span class="ep-auth public">PUBLIC</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/auth/forgot-password</span><span class="ep-desc">Send password reset email</span><span class="ep-auth public">PUBLIC</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/auth/reset-password</span><span class="ep-desc">Set new password with token</span><span class="ep-auth public">PUBLIC</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">🛡️ Admin — SYSTEM_ADMIN only</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/admin/property-groups</span><span class="ep-desc">List all orgs (paginated)</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/admin/property-groups/:id</span><span class="ep-desc">Update org details or status</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/admin/users</span><span class="ep-desc">List all users (paginated, filter by userType)</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/admin/users/:id</span><span class="ep-desc">Toggle isActive, update userType</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/admin/subscriptions</span><span class="ep-desc">All org subscriptions</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/admin/audit</span><span class="ep-desc">Audit log (filter: table, record_id, user_id, date)</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/admin/addon-catalog</span><span class="ep-desc">View platform-wide add-on catalog</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/admin/addon-catalog</span><span class="ep-desc">Create platform add-on (WiFi, Electricity, etc.)</span><span class="ep-auth admin">ADMIN</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/admin/addon-catalog/:id</span><span class="ep-desc">Update platform add-on</span><span class="ep-auth admin">ADMIN</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">🏢 Organizations</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups</span><span class="ep-desc">My property groups</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups</span><span class="ep-desc">Create new org (triggers subscription check)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/property-groups/:id</span><span class="ep-desc">Update org settings (name, timezone, currency)</span><span class="ep-auth landlord">OWNER</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:id/members</span><span class="ep-desc">List members + org roles</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups/:id/members</span><span class="ep-desc">Invite member (email + orgRole)</span><span class="ep-auth landlord">OWNER</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/property-groups/:id/members/:memberId</span><span class="ep-desc">Change member org role</span><span class="ep-auth landlord">OWNER</span></div>
+    <div class="endpoint"><span class="method method-delete">DELETE</span><span class="ep-path">/property-groups/:id/members/:memberId</span><span class="ep-desc">Remove member</span><span class="ep-auth landlord">OWNER</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:id/subscription</span><span class="ep-desc">Current subscription + plan limits</span><span class="ep-auth landlord">LANDLORD</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">🏠 Properties & Units</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:pgId/properties</span><span class="ep-desc">List properties</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups/:pgId/properties</span><span class="ep-desc">Create property</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/property-groups/:pgId/properties/:id</span><span class="ep-desc">Update property</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-delete">DELETE</span><span class="ep-path">/property-groups/:pgId/properties/:id</span><span class="ep-desc">Soft-delete property</span><span class="ep-auth landlord">OWNER</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:pgId/properties/:id/units</span><span class="ep-desc">List units (filter: status, type)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups/:pgId/properties/:id/units</span><span class="ep-desc">Create unit</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/units/:unitId</span><span class="ep-desc">Update unit (rent, metadata, status)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-delete">DELETE</span><span class="ep-path">/units/:unitId</span><span class="ep-desc">Soft-delete unit (only if no ACTIVE lease)</span><span class="ep-auth landlord">OWNER</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">👤 Tenants</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:pgId/tenants</span><span class="ep-desc">List tenants (filter: status)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups/:pgId/tenants</span><span class="ep-desc">Create tenant record</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:pgId/tenants/:id</span><span class="ep-desc">Tenant detail (leases, contact, notes)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/property-groups/:pgId/tenants/:id</span><span class="ep-desc">Update tenant info / status</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups/:pgId/tenants/:id/invite</span><span class="ep-desc">Send portal invite email to tenant</span><span class="ep-auth landlord">LANDLORD</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">📋 Leases</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:pgId/leases</span><span class="ep-desc">List leases (filter: status, unit, tenant)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups/:pgId/leases</span><span class="ep-desc">Create & activate lease → unit OCCUPIED + initial bills</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/leases/:leaseId</span><span class="ep-desc">Lease detail with payment summary</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/leases/:leaseId</span><span class="ep-desc">Update lease (move_out_date, grace_period, etc.)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/leases/:leaseId/close</span><span class="ep-desc">Close lease → unit AVAILABLE + archive</span><span class="ep-auth landlord">LANDLORD</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">💰 Payments</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:pgId/payments</span><span class="ep-desc">List payments (filter: lease, status, date range)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/payments/:id</span><span class="ep-desc">Payment detail + addon bills + transactions</span><span class="ep-auth any">ANY</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/payments/:id/manual</span><span class="ep-desc">Record manual cash payment (amount_paid, method, receipt)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/payments/:id/initiate</span><span class="ep-desc">Start e-payment → return Dragonpay redirect URL</span><span class="ep-auth any">ANY</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/payments/webhook</span><span class="ep-desc">Dragonpay callback — idempotent · verify signature · no auth</span><span class="ep-auth public">WEBHOOK</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">⚡ Add-ons & Utility Readings</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/addon-catalog</span><span class="ep-desc">List available add-on types (platform + landlord custom)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/property-groups/:pgId/addon-catalog</span><span class="ep-desc">Create custom add-on for this org</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/units/:unitId/addons</span><span class="ep-desc">List active add-ons for a unit</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/units/:unitId/addons</span><span class="ep-desc">Assign add-on to unit (set rate, effectiveFrom, meterNumber)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/units/:unitId/addons/:addonId</span><span class="ep-desc">Update unit add-on (rate, effectiveUntil)</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/leases/:leaseId/addon-bills</span><span class="ep-desc">List add-on bill line items for a lease</span><span class="ep-auth any">ANY</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/unit-addons/:addonId/readings</span><span class="ep-desc">Enter meter reading → auto-creates LeaseAddonBill</span><span class="ep-auth landlord">LANDLORD</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/unit-addons/:addonId/readings</span><span class="ep-desc">Meter reading history</span><span class="ep-auth landlord">LANDLORD</span></div>
+  </div>
+
+  <div class="endpoint-group">
+    <div class="endpoint-group-label">🧑 Tenant Portal (/me — current user = tenant)</div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/me</span><span class="ep-desc">Profile + linked tenant record + active lease summary</span><span class="ep-auth tenant">TENANT</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/me</span><span class="ep-desc">Update profile (name, phone)</span><span class="ep-auth tenant">TENANT</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/me/leases</span><span class="ep-desc">My lease history</span><span class="ep-auth tenant">TENANT</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/me/payments</span><span class="ep-desc">My bills (base rent + add-on line items per period)</span><span class="ep-auth tenant">TENANT</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/me/notifications</span><span class="ep-desc">My notifications (unread first)</span><span class="ep-auth tenant">TENANT</span></div>
+    <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/me/notifications/:id/read</span><span class="ep-desc">Mark notification as read</span><span class="ep-auth tenant">TENANT</span></div>
+    <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/me/addresses</span><span class="ep-desc">My saved addresses</span><span class="ep-auth any">ANY</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/me/addresses</span><span class="ep-desc">Add address</span><span class="ep-auth any">ANY</span></div>
+  </div>
+
+  <div class="card" style="margin-top:8px; border-color:rgba(79,142,247,0.2);">
+    <div class="card-title" style="margin-bottom:14px;">📋 API Conventions</div>
+    <div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:var(--muted);">
+      <div><strong style="color:var(--text);">List response:</strong> <span class="mono">GET /resource?page=1&limit=20&sort=createdAt&order=desc</span> → <span class="mono">{ data: [], total, page, limit }</span></div>
+      <div><strong style="color:var(--text);">Error shape:</strong> <span class="mono">{ error: { code: "VALIDATION_ERROR", message: "...", details?: [...] } }</span></div>
+      <div><strong style="color:var(--text);">Soft deletes:</strong> All GET endpoints exclude <span class="mono">deleted_at IS NOT NULL</span> rows automatically</div>
+      <div><strong style="color:var(--text);">Idempotency:</strong> Send <span class="mono">Idempotency-Key: &lt;uuid&gt;</span> header on payment POST to prevent double-charge</div>
+      <div><strong style="color:var(--text);">Webhook security:</strong> Verify Dragonpay signature · return 200 immediately · process idempotently via transaction_ref</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== API GAMEPLAN ======================== -->
+<div id="gameplan" class="section">
+  <div class="page-header">
+    <h1>API Build Gameplan</h1>
+    <p>Complete prioritized list of all 60+ endpoints — grouped by module, tagged by phase and who can call them. Build in order: Phase 1 → 2 → 3 → 4.</p>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:28px;">
+    <div class="stat-tile" style="border-top:2px solid var(--accent3);"><div class="label">Phase 1 — Core Backend</div><div class="value">25</div><div class="sub">Auth, Org, Property, Tenant, Lease, Payment (manual)</div></div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent);"><div class="label">Phase 2 — Dashboard</div><div class="value">14</div><div class="sub">Add-ons, Utility Readings, Notifications, Admin</div></div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent4);"><div class="label">Phase 3 — E-Payment</div><div class="value">8</div><div class="sub">Dragonpay, Webhook, Transactions, Receipts</div></div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent2);"><div class="label">Phase 4 — Mobile</div><div class="value">12</div><div class="sub">Tenant portal, Push, Marketplace, Profile</div></div>
+  </div>
+
+  <div style="display:flex; gap:16px; margin-bottom:24px; flex-wrap:wrap; font-size:12px; color:var(--muted);">
+    <span><span class="phase-dot p1"></span>Phase 1 — Core Backend</span>
+    <span><span class="phase-dot p2"></span>Phase 2 — Dashboard UI</span>
+    <span><span class="phase-dot p3"></span>Phase 3 — E-Payment</span>
+    <span><span class="phase-dot p4"></span>Phase 4 — Mobile</span>
+    <span style="margin-left:16px;"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span> System Admin only</span>
+    <span><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span> Landlord + Staff</span>
+    <span><span class="ep-auth tenant" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(16,185,129,0.12);color:var(--accent3);">TENANT</span> Tenant only</span>
+    <span><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span> No auth</span>
+  </div>
+
+  <!-- MODULE 1: AUTH -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>🔐 Module 1 — Auth</h3><span class="badge badge-green">Phase 1</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/auth/register</span><span class="gp-note">Create user, hash password, send verification email. Sets userType=LANDLORD by default.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/auth/login</span><span class="gp-note">Validate credentials → issue accessToken (15min) + refreshToken (7d). Return { role, userType } for client routing.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/auth/refresh</span><span class="gp-note">Rotate refreshToken → issue new accessToken. Invalidate old refresh token (rotation).</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/auth/logout</span><span class="gp-note">Delete refreshToken from DB. Returns 204.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/auth/verify-email</span><span class="gp-note">Check emailVerificationToken, set isEmailVerified=true, clear token.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/auth/forgot-password</span><span class="gp-note">Generate resetPasswordToken + resetPasswordExpires (1h), send email. Always 200 (no email enumeration).</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/auth/reset-password</span><span class="gp-note">Verify token + expiry, hash new password, clear token. Revoke all refresh tokens for that user.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 2: ORGS -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>🏢 Module 2 — Property Groups (Organizations)</h3><span class="badge badge-green">Phase 1</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/property-groups</span><span class="gp-note">Create org → auto-assign creator as OWNER in PropertyGroupMembers → create initial Subscription record.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups</span><span class="gp-note">My orgs — query PropertyGroupMembers by userId, return groups with active subscription status.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/property-groups/:id</span><span class="gp-note">Update groupName, timezone, currencyCode. OWNER only.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">OWNER</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:id/members</span><span class="gp-note">List members with user info + orgRole. Excludes soft-deleted members.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/property-groups/:id/members</span><span class="gp-note">Invite by email → if user exists, add to group; else send invite email. OWNER/ADMIN only.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">OWNER</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/property-groups/:id/members/:mId</span><span class="gp-note">Change member's orgRole. Cannot change own role. Cannot demote last OWNER.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">OWNER</span></span></div>
+      <div class="gp-row"><span class="method method-delete">DELETE</span><span class="gp-path">/property-groups/:id/members/:mId</span><span class="gp-note">Soft-delete member. Cannot remove last OWNER.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">OWNER</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:id/subscription</span><span class="gp-note">Active subscription + plan limits (propertyLimit, unitLimit, tenantLimit). Used to gate create actions.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 3: PROPERTIES -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>🏠 Module 3 — Properties & Units</h3><span class="badge badge-green">Phase 1</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/property-groups/:pgId/properties</span><span class="gp-note">Create property. Check propertyLimit from active subscription first → 402 if exceeded.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:pgId/properties</span><span class="gp-note">List all properties in org. Include unit count summary (total, occupied, available).</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/property-groups/:pgId/properties/:id</span><span class="gp-note">Update property details, address, metadata (images, amenities).</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-delete">DELETE</span><span class="gp-path">/property-groups/:pgId/properties/:id</span><span class="gp-note">Soft-delete. Block if any unit has ACTIVE lease.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">OWNER</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/properties/:propId/units</span><span class="gp-note">Create unit. Check unitLimit from subscription. Default status = AVAILABLE.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/properties/:propId/units</span><span class="gp-note">List units. Filter by status. Include current active tenant name if occupied.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/units/:unitId</span><span class="gp-note">Update unit. If status changed to MAINTENANCE → block if ACTIVE lease exists.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-delete">DELETE</span><span class="gp-path">/units/:unitId</span><span class="gp-note">Soft-delete unit. Block if status = OCCUPIED or has ACTIVE lease.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">OWNER</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 4: TENANTS -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>👤 Module 4 — Tenants</h3><span class="badge badge-green">Phase 1</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/property-groups/:pgId/tenants</span><span class="gp-note">Create tenant record. Check tenantLimit from subscription. userId is NULL until portal invite accepted.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:pgId/tenants</span><span class="gp-note">List tenants. Filter by status. Include active lease + unit info.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:pgId/tenants/:id</span><span class="gp-note">Tenant detail: leases, payments summary, emergency contact, internal notes.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/property-groups/:pgId/tenants/:id</span><span class="gp-note">Update info, status (BLACKLIST flow), internal notes.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/tenants/:id/invite</span><span class="gp-note">Send portal invite email. If tenant.email exists → send link with token. On accept → set tenant.userId + userType=TENANT.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 5: LEASES -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>📋 Module 5 — Leases</h3><span class="badge badge-green">Phase 1</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/property-groups/:pgId/leases</span><span class="gp-note">Create lease. Validate: unit AVAILABLE, no existing ACTIVE lease (partial unique). → Set unit OCCUPIED. → Generate advance Payment rows. → Generate FLAT_FEE LeaseAddonBill rows. → Write AuditTrail.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:pgId/leases</span><span class="gp-note">List leases. Filter by status, unit, tenant. Include payment summary (total due, total paid, overdue count).</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/leases/:leaseId</span><span class="gp-note">Lease detail: tenant, unit, all payments, all add-on bills, active add-ons.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/leases/:leaseId</span><span class="gp-note">Update move_out_date, grace_period_days, rent_amount (for future periods). Write AuditTrail.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/leases/:leaseId/close</span><span class="gp-note">Close lease → set status=CLOSED, tenant status=MOVED_OUT, unit status=AVAILABLE. Handle security deposit settlement. Write AuditTrail.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 6: PAYMENTS -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>💰 Module 6 — Payments</h3><span class="badge badge-green">Phase 1</span><span class="badge badge-amber" style="margin-left:4px;">E-Pay: Phase 3</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:pgId/payments</span><span class="gp-note">List payments. Filter: status, lease, date range. Include add-on bill count. Used for landlord dashboard overdue view.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/payments/:id</span><span class="gp-note">Payment detail + LeaseAddonBill line items + PaymentTransactions. Shared by landlord + tenant.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/payments/:id/manual</span><span class="gp-note">Record cash payment. Update amount_paid, payment_method, date_paid. Recompute status (PAID/PARTIAL). Write AuditTrail + Notification.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/payments/:id/initiate</span><span class="gp-note">Create PaymentTransaction (PENDING), call Dragonpay API, return redirect URL. Idempotency-Key header required.</span><span class="gp-phase"><span class="phase-dot p3"></span>3</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/payments/webhook</span><span class="gp-note">Dragonpay callback. 1) Verify signature 2) Find by transaction_ref (idempotency) 3) Update Transaction+Payment 4) Notify tenant. Always return 200.</span><span class="gp-phase"><span class="phase-dot p3"></span>3</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">WEBHOOK</span></span></div>
+      <!-- CRON NOTES -->
+      <div class="gp-row" style="background:rgba(245,158,11,0.04);">
+        <span style="font-size:11px;color:var(--accent4);font-family:'DM Mono',monospace;">CRON</span>
+        <span class="gp-path">BillingJob (2 AM daily)</span>
+        <span class="gp-note">Find ACTIVE leases where billing_day = today. Create Payment row (UNPAID). Create FLAT_FEE LeaseAddonBills. Check grace period → mark OVERDUE. Notify tenants.</span>
+        <span class="gp-phase"><span class="phase-dot p1"></span>1</span>
+        <span class="gp-who"><span style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">SYSTEM</span></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 7: ADD-ONS -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>⚡ Module 7 — Add-ons & Utility Readings</h3><span class="badge badge-blue">Phase 2</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/addon-catalog</span><span class="gp-note">List all available add-on types for this org (platform + custom). Filter by category, billingType.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/property-groups/:pgId/addon-catalog</span><span class="gp-note">Create custom add-on for this org (e.g. custom parking tier). Sets propertyGroupId on catalog entry.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/units/:unitId/addons</span><span class="gp-note">Active add-ons for a unit. Include resolved rate (unit override or catalog default).</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/units/:unitId/addons</span><span class="gp-note">Assign add-on to unit. Set rate (overrides catalog), isIncluded, meterNumber (METERED), effectiveFrom.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/units/:unitId/addons/:addonId</span><span class="gp-note">Update rate or set effectiveUntil (deactivate add-on). Partial unique enforced by DB index.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/leases/:leaseId/addon-bills</span><span class="gp-note">All LeaseAddonBill line items for a lease period. Filter by status. Shown on tenant bill view.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/unit-addons/:addonId/readings</span><span class="gp-note">Enter meter reading. API auto-fills previousReading from last reading. DB GENERATED computes units_consumed × rate. Auto-creates LeaseAddonBill for current billing period.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/unit-addons/:addonId/readings</span><span class="gp-note">Reading history. Includes units_consumed and amount_computed (read via $queryRaw for GENERATED columns).</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 8: NOTIFICATIONS -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>🔔 Module 8 — Notifications</h3><span class="badge badge-blue">Phase 2</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/me/notifications</span><span class="gp-note">My notifications sorted by createdAt DESC. Unread first. Include unread count in meta.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/me/notifications/:id/read</span><span class="gp-note">Set readAt = now(). Returns updated notification.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/me/notifications/read-all</span><span class="gp-note">Mark all unread notifications as read. Bulk update.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 9: ADMIN -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>🛡️ Module 9 — System Admin</h3><span class="badge badge-blue">Phase 2</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/admin/property-groups</span><span class="gp-note">All orgs paginated. Filter by subscription status, creation date. Include member count, unit count.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/admin/property-groups/:id</span><span class="gp-note">Update org. Force subscription override, suspend org.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/admin/users</span><span class="gp-note">All users paginated. Filter by role, userType, isActive.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/admin/users/:id</span><span class="gp-note">Toggle isActive, force userType change, force role change.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/admin/subscriptions</span><span class="gp-note">All subscriptions. Filter by status, plan. Used for MRR dashboard.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/admin/subscription-plans</span><span class="gp-note">Create new plan tier (name, price, limits). Used when launching new pricing.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/admin/audit</span><span class="gp-note">Audit trail. Filter by tableName, recordId, userId, action, dateRange. Paginated.</span><span class="gp-phase"><span class="phase-dot p2"></span>2</span><span class="gp-who"><span class="ep-auth admin" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(124,58,237,0.15);color:var(--accent2);">ADMIN</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 10: TENANT PORTAL -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>🧑 Module 10 — Tenant Portal (/me)</h3><span class="badge badge-purple">Phase 4</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/me</span><span class="gp-note">My profile + linked Tenant record + active lease summary (unit, next due date, total due).</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth tenant" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(16,185,129,0.12);color:var(--accent3);">TENANT</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/me</span><span class="gp-note">Update own name, phone. Cannot change email or role via this endpoint.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/me/leases</span><span class="gp-note">My lease history. Include unit, property, payment summary per lease.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth tenant" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(16,185,129,0.12);color:var(--accent3);">TENANT</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/me/payments</span><span class="gp-note">My bills. Each entry shows base rent + LeaseAddonBill line items for that period. Filter by status.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth tenant" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(16,185,129,0.12);color:var(--accent3);">TENANT</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/me/addresses</span><span class="gp-note">My saved addresses.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/me/addresses</span><span class="gp-note">Add address. Mark isDefault if first address.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/me/addresses/:id</span><span class="gp-note">Update address or set as default.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-delete">DELETE</span><span class="gp-path">/me/addresses/:id</span><span class="gp-note">Soft-delete address. Cannot delete if it's the only address.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 11: MARKETPLACE -->
+  <div class="gp-module">
+    <div class="gp-header"><h3>🔮 Module 11 — Marketplace (Explore)</h3><span class="badge badge-purple">Phase 4</span></div>
+    <div class="gp-body">
+      <div class="gp-head"><span>METHOD</span><span>ENDPOINT</span><span>DESCRIPTION</span><span>PHASE</span><span>WHO</span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/explore/units</span><span class="gp-note">Browse available units (isFeatured first). Filter by city, type, price range, amenities. No auth required.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+      <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/explore/units/:unitId</span><span class="gp-note">Unit detail for marketplace. Shows unit info, property location, add-on inclusions. Hides internal data.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/explore/units/:unitId/inquire</span><span class="gp-note">Submit inquiry (name, email, message). Creates a notification for the landlord.</span><span class="gp-phase"><span class="phase-dot p4"></span>4</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">PUBLIC</span></span></div>
+    </div>
+  </div>
+
+  <!-- NestJS Build Order Card -->
+  <div class="card" style="border-color:rgba(16,185,129,0.3);">
+    <div class="card-title" style="margin-bottom:16px;">🗺️ Recommended NestJS Module Build Order</div>
+    <div class="flow-chain" style="flex-wrap:wrap;">
+      <div class="flow-node success">1. AuthModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">2. PropertyGroupModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">3. SubscriptionModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">4. PropertyModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">5. TenantModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">6. LeaseModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">7. PaymentModule</div>
+    </div>
+    <div class="flow-chain" style="flex-wrap:wrap;">
+      <div class="flow-node highlight">8. AddonCatalogModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node highlight">9. UnitAddonModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node highlight">10. UtilityReadingModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node highlight">11. NotificationModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node highlight">12. AdminModule</div>
+    </div>
+    <div class="flow-chain" style="flex-wrap:wrap;">
+      <div class="flow-node warn">13. DragonpayModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node warn">14. WebhookModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node">15. TenantPortalModule (/me)</div><div class="flow-arrow">→</div>
+      <div class="flow-node">16. MarketplaceModule (/explore)</div>
+    </div>
+    <div style="margin-top:14px; color:var(--muted); font-size:12px;">Each module should have: <strong style="color:var(--text);">controller → service → dto → guards → integration tests</strong> before moving to the next.</div>
+  </div>
+</div>
+
+<!-- ======================== SECURITY ======================== -->
+<div id="security" class="section">
+  <div class="page-header">
+    <h1>Security Architecture</h1>
+    <p>Authentication · Authorization · Data protection · Threat model · Pre-launch checklist.</p>
+  </div>
+
+  <div class="section-title">Authentication Flow</div>
+  <div class="flow-chain" style="flex-wrap:wrap; margin-bottom:20px;">
+    <div class="flow-node">email + password</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node">bcrypt verify</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node highlight">Issue JWT { role, userType }</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node warn">Issue RefreshToken (DB)</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-node success">Update last_login_at · reset failed_attempts</div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">🔑 Auth Rules</div>
+      <table><tbody>
+        <tr><td>Access token</td><td class="mono">JWT Bearer · 15 min TTL</td></tr>
+        <tr><td>Refresh token</td><td class="mono">DB-stored · 7 day TTL · rotated on use</td></tr>
+        <tr><td>Hash algorithm</td><td class="mono">bcrypt (cost ≥ 12)</td></tr>
+        <tr><td>Failed login lockout</td><td class="dim">After 5 attempts → 15 min delay</td></tr>
+        <tr><td>Password reset</td><td class="dim">Time-limited token (1h) · one-time use</td></tr>
+        <tr><td>Email verification</td><td class="dim">Required before full access granted</td></tr>
+        <tr><td>Tenant portal auth</td><td class="dim">Same flow · userType=TENANT set on invite accept</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px;">🛡️ Authorization (Two-Layer RBAC)</div>
+      <table><tbody>
+        <tr><td>Layer 1: RolesGuard</td><td class="dim">Checks UserRole (ADMIN|USER) — API gate</td></tr>
+        <tr><td>Layer 2: UserTypeGuard</td><td class="dim">Checks UserType (SYSTEM_ADMIN|LANDLORD|TENANT)</td></tr>
+        <tr><td>OrgRole check</td><td class="dim">OWNER|ADMIN|STAFF — per request from PropertyGroupMembers</td></tr>
+        <tr><td>Data scoping</td><td class="dim">ALL queries filtered by property_group_id</td></tr>
+        <tr><td>OWNER</td><td class="dim">Full org settings, members, delete</td></tr>
+        <tr><td>ADMIN</td><td class="dim">Properties, tenants, leases, payments</td></tr>
+        <tr><td>STAFF</td><td class="dim">Read-only + payment confirmation</td></tr>
+        <tr><td>TENANT</td><td class="dim">Own profile, own lease, own payments only</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="section-title">Threat Model</div>
+  <table>
+    <thead><tr><th>Threat</th><th>Mitigation</th></tr></thead>
+    <tbody>
+      <tr><td>Credential stuffing / brute force</td><td>Rate limit login · lock after 5 failures · failedLoginAttempts counter</td></tr>
+      <tr><td>Cross-org data access</td><td>Strict property_group_id scoping on ALL queries · verified in integration tests</td></tr>
+      <tr><td>Privilege escalation (UserRole)</td><td>Server-side RolesGuard on every endpoint · no client role override</td></tr>
+      <tr><td>Privilege escalation (UserType)</td><td>UserTypeGuard checked independently of RolesGuard</td></tr>
+      <tr><td>Payment fraud / replay</td><td>Webhook signature verification · idempotency via transaction_ref · PAYMENT_TRANSACTIONS log</td></tr>
+      <tr><td>Refresh token theft</td><td>Rotation on use · revoke all on password reset · short TTL</td></tr>
+      <tr><td>Data leakage (logs, errors)</td><td>No secrets or PII in logs · generic error messages · internalNotes never returned to tenants</td></tr>
+      <tr><td>SQL injection</td><td>Parameterized queries via Prisma ORM · input validation DTOs</td></tr>
+      <tr><td>MITM</td><td>HTTPS only (TLS 1.2+) · HSTS · no sensitive data in query params</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title" style="margin-top:28px;">Pre-Launch Security Checklist</div>
+  <div class="card">
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>HTTPS enforced everywhere</strong><span>TLS 1.2+ · HSTS header · no mixed content</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>bcrypt cost factor ≥ 12</strong><span>Never log plaintext password · timing-safe compare</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Rate-limited login endpoint</strong><span>5 attempts / 15 min per IP · failedLoginAttempts counter in DB</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Refresh token rotation implemented</strong><span>Old token invalidated on each use · all tokens revoked on password reset</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>All endpoints scoped by property_group_id</strong><span>Verified in integration tests: wrong-group requests → 403</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>UserType checked independently of UserRole</strong><span>Tenant cannot access landlord endpoints even with valid JWT</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Admin endpoints restricted to SYSTEM_ADMIN</strong><span>UserRole.ADMIN + UserType.SYSTEM_ADMIN both verified</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Payment webhook: signature verified + idempotent</strong><span>Reject replays via transaction_ref · verify Dragonpay signature header</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>internalNotes never returned to tenant endpoints</strong><span>Explicitly excluded from /me and /me/leases responses</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Secrets in env / secret manager — not in repo</strong><span>No .env files committed · CI/CD uses secure variable injection</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Audit trail active on all financial mutations</strong><span>AUDIT_TRAIL written on payment confirm, lease change, role change</span></div></div>
+  </div>
+</div>
+
+<!-- ======================== TESTING ======================== -->
+<div id="testing" class="section">
+  <div class="page-header">
+    <h1>Testing Strategy</h1>
+    <p>Unit · Integration · E2E · Load · Manual QA — coverage targets and ownership.</p>
+  </div>
+
+  <div class="grid-4" style="margin-bottom:24px;">
+    <div class="stat-tile" style="border-top:2px solid var(--accent3);"><div class="label">Unit Tests</div><div class="value">70%+</div><div class="sub">Core modules · 100% payment & lease logic</div></div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent);"><div class="label">Integration</div><div class="value">API + DB</div><div class="sub">Real DB · full lifecycle flows</div></div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent4);"><div class="label">E2E (optional MVP)</div><div class="value">Key paths</div><div class="sub">Playwright / Cypress · nightly</div></div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent2);"><div class="label">Load Tests</div><div class="value">2–5x load</div><div class="sub">p95 &lt; 500ms reads · pre-release</div></div>
+  </div>
+
+  <div class="section-title">Test Coverage Matrix</div>
+  <table>
+    <thead><tr><th>Type</th><th>Scope</th><th>Tools</th><th>When</th><th>Owner</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-green">Unit</span></td><td>Services, helpers, validators — mocked DB</td><td class="mono">Jest · Vitest</td><td>Every PR · required to pass</td><td>Dev</td></tr>
+      <tr><td><span class="badge badge-blue">Integration</span></td><td>API endpoints + real test DB · positive & negative cases</td><td class="mono">Supertest (NestJS)</td><td>Every PR · pre-staging deploy</td><td>Dev / CI</td></tr>
+      <tr><td><span class="badge badge-amber">E2E / UI</span></td><td>Landlord flow · Tenant portal · mock gateway</td><td class="mono">Playwright</td><td>Nightly / release branch</td><td>QA</td></tr>
+      <tr><td><span class="badge badge-purple">Load</span></td><td>Login, list payments, list units at 2–5x concurrent</td><td class="mono">k6 / Artillery</td><td>Pre-major release · after DB changes</td><td>Dev</td></tr>
+      <tr><td><span class="badge badge-red">Manual QA</span></td><td>Full checklist on staging · permissions · payments · add-ons</td><td>—</td><td>Before every production deploy</td><td>QA / Product</td></tr>
+    </tbody>
+  </table>
+
+  <div class="section-title" style="margin-top:28px;">Critical Integration Test Flows</div>
+  <div class="card">
+    <div style="font-size:13px; color:var(--muted); margin-bottom:16px;">These flows must pass before any staging or production deploy:</div>
+    <div class="flow-chain" style="flex-wrap:wrap; margin-bottom:12px;">
+      <div class="flow-node highlight">Login</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Create Org</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Add Property + Unit</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Create Tenant</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Create Lease</div><div class="flow-arrow">→</div>
+      <div class="flow-node warn">Generate Bill (cron)</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">Confirm Payment</div>
+    </div>
+    <div class="flow-chain" style="flex-wrap:wrap; margin-bottom:16px;">
+      <div class="flow-node">Assign Add-on to Unit</div><div class="flow-arrow">→</div>
+      <div class="flow-node warn">Enter Meter Reading</div><div class="flow-arrow">→</div>
+      <div class="flow-node">Auto-create LeaseAddonBill</div><div class="flow-arrow">→</div>
+      <div class="flow-node success">Tenant sees itemized bill</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--muted);">
+      <div>✓ Wrong property_group_id on any request → <strong style="color:var(--accent5);">403 Forbidden</strong></div>
+      <div>✓ Create second ACTIVE lease on occupied unit → <strong style="color:var(--accent5);">409 Conflict</strong></div>
+      <div>✓ Webhook replay with same transaction_ref → idempotent, no double-credit</div>
+      <div>✓ Tenant JWT accessing landlord endpoint → <strong style="color:var(--accent5);">403 Forbidden</strong></div>
+      <div>✓ UserRole.USER accessing /admin/* → <strong style="color:var(--accent5);">403 Forbidden</strong></div>
+      <div>✓ Lease close → unit=AVAILABLE, lease=CLOSED, tenant=MOVED_OUT</div>
+      <div>✓ meter reading where current &lt; previous → <strong style="color:var(--accent5);">400 Bad Request</strong> (DB CHECK constraint)</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================== DEPLOYMENT ======================== -->
+<div id="deployment" class="section">
+  <div class="page-header">
+    <h1>Deployment Architecture</h1>
+    <p>Environments · CI/CD · Hosting · Monitoring · Backups.</p>
+  </div>
+
+  <div class="section-title">Environments</div>
+  <div class="grid-3" style="margin-bottom:24px;">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">🧪 Development</div>
+      <table><tbody>
+        <tr><td class="dim">Purpose</td><td>Feature work, local dev</td></tr>
+        <tr><td class="dim">Data</td><td>Seed data only</td></tr>
+        <tr><td class="dim">Secrets</td><td>Local .env (not committed)</td></tr>
+        <tr><td class="dim">Payments</td><td>Sandbox / mocked</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">🔬 Staging</div>
+      <table><tbody>
+        <tr><td class="dim">Purpose</td><td>QA, demos, pre-prod</td></tr>
+        <tr><td class="dim">Data</td><td>Anonymized / synthetic</td></tr>
+        <tr><td class="dim">Deploy</td><td>Auto on merge to main</td></tr>
+        <tr><td class="dim">Payments</td><td>Gateway sandbox</td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px;">🚀 Production</div>
+      <table><tbody>
+        <tr><td class="dim">Purpose</td><td>Live users & payments</td></tr>
+        <tr><td class="dim">Data</td><td>Real · backups required</td></tr>
+        <tr><td class="dim">Deploy</td><td>Tag + manual approval</td></tr>
+        <tr><td class="dim">Payments</td><td>Live Dragonpay</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="section-title">CI/CD Pipeline</div>
+  <div class="flow-chain" style="flex-wrap:wrap; margin-bottom:20px;">
+    <div class="flow-node">Push to main / tag</div><div class="flow-arrow">→</div>
+    <div class="flow-node highlight">Build (Next.js + NestJS + Flutter)</div><div class="flow-arrow">→</div>
+    <div class="flow-node">Unit + Integration Tests</div><div class="flow-arrow">→</div>
+    <div class="flow-node warn">prisma migrate deploy + raw SQL</div><div class="flow-arrow">→</div>
+    <div class="flow-node success">Deploy to Staging / Prod</div>
+  </div>
+
+  <div class="section-title">Scaling Phases</div>
+  <div class="timeline">
+    <div class="phase phase-1"><div class="phase-label"><span class="badge badge-green">Phase 1 — MVP</span></div><ul class="phase-items"><li>Single API server + single DB instance</li><li>PgBouncer for connection pooling</li><li>Cron worker on same box or separate worker</li><li>Target: 10–50 concurrent users, &lt;1 GB DB</li></ul></div>
+    <div class="phase phase-2"><div class="phase-label"><span class="badge badge-blue">Phase 2 — Growth</span></div><ul class="phase-items"><li>Multiple API instances behind load balancer</li><li>Redis for refresh token cache + rate limiting</li><li>Same DB with read replica for dashboards</li><li>Target: 100–500 concurrent users</li></ul></div>
+    <div class="phase phase-3"><div class="phase-label"><span class="badge badge-amber">Phase 3 — Scale</span></div><ul class="phase-items"><li>DB read replica active for reporting queries</li><li>Separate job/worker pool for billing + notifications</li><li>Queue (Redis / SQS) for async webhook processing</li></ul></div>
+    <div class="phase phase-4"><div class="phase-label"><span class="badge badge-purple">Phase 4 — Enterprise</span></div><ul class="phase-items"><li>Multi-region only if latency demands it</li><li>SLA definitions for paying enterprise customers</li><li>Disaster recovery & formal incident response</li></ul></div>
+  </div>
+
+  <div class="section-title">Monitoring Checklist</div>
+  <div class="card">
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Health endpoints active</strong><span>GET /health for liveness & readiness · automated uptime check</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Error rate alerting</strong><span>Alert on 5xx rate above 1% · on-call defined</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Latency tracking (p50, p95)</strong><span>Per-endpoint metrics · alert when p95 exceeds 500ms</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>DB automated backups</strong><span>Daily · point-in-time recovery · test restore quarterly</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Structured logging (JSON)</strong><span>request_id, user_id, timestamp, level — no PII or secrets</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Cron billing job monitoring</strong><span>Alert if billing cron fails to run · dead-letter queue for failed notifications</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Secret rotation process defined</strong><span>Backed up in secret manager · documented rotation steps</span></div></div>
+  </div>
+</div>
+
+<!-- ======================== ROADMAP ======================== -->
+<div id="roadmap" class="section">
+  <div class="page-header">
+    <h1>Implementation Roadmap</h1>
+    <p>Four-phase delivery plan from core backend to marketplace launch.</p>
+  </div>
+
+  <div class="section-title">Phases</div>
+  <div class="timeline">
+    <div class="phase phase-1">
+      <div class="phase-label"><span class="badge badge-green">Phase 1 — Core Backend</span></div>
+      <ul class="phase-items">
+        <li>Auth module: JWT, refresh tokens, email verification, password reset, lockout</li>
+        <li>Organizations: PropertyGroup, OrgRoles, Members</li>
+        <li>Subscription Plans & Subscriptions table + limit enforcement</li>
+        <li>Properties & Units CRUD</li>
+        <li>Tenants CRUD</li>
+        <li>Leases: create, activate, close + all side effects (unit status, initial billing)</li>
+        <li>Payments: manual cash recording + cron bill generation + AuditTrail</li>
+        <li>Unit + integration tests: 70%+ coverage on core modules</li>
+      </ul>
+    </div>
+    <div class="phase phase-2">
+      <div class="phase-label"><span class="badge badge-blue">Phase 2 — Dashboard UI & Add-ons</span></div>
+      <ul class="phase-items">
+        <li>Landlord Web (Next.js): income, occupancy, overdue dashboard</li>
+        <li>Properties, Units, Tenants, Leases list & detail views</li>
+        <li>Manual payment confirmation UI</li>
+        <li>Add-on Catalog management (platform + custom)</li>
+        <li>Unit add-on assignment + utility meter reading entry</li>
+        <li>LeaseAddonBill line items on tenant bill view</li>
+        <li>Email/SMS notification integration</li>
+        <li>System Admin Web: property groups, subscriptions, audit log</li>
+      </ul>
+    </div>
+    <div class="phase phase-3">
+      <div class="phase-label"><span class="badge badge-amber">Phase 3 — E-Payment Integration</span></div>
+      <ul class="phase-items">
+        <li>Dragonpay integration: redirect flow + webhook endpoint</li>
+        <li>PAYMENT_TRANSACTIONS table live with forensic logging</li>
+        <li>Webhook signature verification + idempotency via transaction_ref</li>
+        <li>Digital receipt generation (PDF / email)</li>
+        <li>Partial payment handling · late fee logic</li>
+        <li>Security audit + load testing (k6)</li>
+      </ul>
+    </div>
+    <div class="phase phase-4">
+      <div class="phase-label"><span class="badge badge-purple">Phase 4 — Mobile App & Marketplace</span></div>
+      <ul class="phase-items">
+        <li>Flutter Tenant app: home, bills (itemized with add-ons), pay, history, profile</li>
+        <li>Flutter Landlord app: on-the-go property & lease management + meter readings</li>
+        <li>Push notifications (FCM / APNs)</li>
+        <li>Tenant portal invite flow (landlord sends → tenant registers)</li>
+        <li>Explore / Marketplace: available unit browsing & inquiry flow</li>
+        <li>App Store & Play Store release</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section-title">Documentation Status</div>
+  <table>
+    <thead><tr><th>#</th><th>Document</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td class="dim">01</td><td>Product Definition Statement (PDS)</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">02</td><td>Product Requirements Document (PRD)</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">03</td><td>User Flow & UX Architecture</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">04</td><td>System Architecture Document (SAD)</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">05</td><td>Database Design (20-table schema v2.1)</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">06</td><td>Prisma Schema (merged with JWT auth)</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">07</td><td>Auth Design (UserRole + UserType)</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">08</td><td>API Contract Specification</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">09</td><td>API Build Gameplan (60+ endpoints · 11 modules)</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">10</td><td>Security Architecture</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">11</td><td>Scalability & Performance Plan</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">12</td><td>Deployment Architecture</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">13</td><td>Testing Strategy</td><td><span class="badge badge-green">✓ Complete</span></td></tr>
+      <tr><td class="dim">—</td><td>SLA Definition</td><td><span class="badge badge-amber">Add when customers go live</span></td></tr>
+      <tr><td class="dim">—</td><td>Disaster Recovery Plan</td><td><span class="badge badge-amber">Before production launch</span></td></tr>
+      <tr><td class="dim">—</td><td>Data Retention Policy</td><td><span class="badge badge-amber">Before handling prod PII/financials</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+</main>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function toggleCheck(el) {
+  if (el.classList.contains('todo')) {
+    el.classList.remove('todo');
+    el.classList.add('done');
+    el.textContent = '✓';
+  } else {
+    el.classList.remove('done');
+    el.classList.add('todo');
+    el.textContent = '✓';
+  }
+}
+</script>
+</body>
+</html>
