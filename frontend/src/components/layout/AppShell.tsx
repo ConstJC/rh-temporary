@@ -1,0 +1,26 @@
+'use client';
+
+import { Sidebar } from './Sidebar';
+import { TopBar } from './TopBar';
+import { useSidebarStore } from '@/stores/sidebar.store';
+import { cn } from '@/lib/utils';
+
+interface AppShellProps {
+  children: React.ReactNode;
+  title?: string;
+  pgId?: string;
+  isAdmin: boolean;
+}
+
+export function AppShell({ children, title, pgId, isAdmin }: AppShellProps) {
+  const open = useSidebarStore((s) => s.open);
+  return (
+    <div className="min-h-screen bg-slate-100">
+      <Sidebar pgId={pgId} isAdmin={isAdmin} />
+      <TopBar title={title} pgId={pgId} isAdmin={isAdmin} />
+      <main className={cn('pt-14 transition-[margin]', open ? 'ml-56' : 'ml-0')}>
+        <div className="p-4 md:p-6">{children}</div>
+      </main>
+    </div>
+  );
+}

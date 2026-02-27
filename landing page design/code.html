@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>RentHub - Empowering Landlords and Tenants</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1A446E", // Deep Trust Blue
+                        secondary: "#2E5C8A", // Soft Blue
+                        accent: "#143654", // Darker Blue for hover
+                        "background-light": "#FFFFFF",
+                        "background-dark": "#0F172A",
+                    },
+                    fontFamily: {
+                        display: ["Inter", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem",
+                    },
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        body { font-family: 'Inter', sans-serif; }
+        .hero-gradient {
+            background: radial-gradient(circle at 50% 50%, rgba(26, 68, 110, 0.05) 0%, rgba(255, 255, 255, 0) 70%);
+        }
+        .dark .hero-gradient {
+            background: radial-gradient(circle at 50% 50%, rgba(26, 68, 110, 0.1) 0%, rgba(15, 23, 42, 0) 70%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<header class="fixed top-0 w-full z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+<nav class="container mx-auto px-6 py-4 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined text-white">house</span>
+</div>
+<span class="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">RentHub</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Home</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Landlords</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Tenants</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Features</a>
+<a class="text-sm font-medium hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-sm font-semibold px-4 py-2 hover:text-primary transition-colors">Sign In</button>
+<button class="bg-primary text-white text-sm font-bold px-6 py-2.5 rounded-full shadow-lg shadow-primary/30 hover:bg-accent transition-all">
+                Download App
+            </button>
+</div>
+</nav>
+</header>
+<section class="relative pt-32 pb-20 overflow-hidden hero-gradient">
+<div class="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-12">
+<div class="w-full lg:w-1/2 flex flex-col items-start">
+<div class="inline-flex items-center gap-2 bg-slate-100 dark:bg-slate-800 text-secondary px-4 py-2 rounded-full mb-6">
+<span class="material-symbols-outlined text-sm">stars</span>
+<span class="text-xs font-bold uppercase tracking-wider">New: Multi-Organization Portal</span>
+</div>
+<h1 class="text-5xl lg:text-7xl font-extrabold leading-tight mb-6 text-primary">
+                Empowering <span class="text-primary">Landlords</span> &amp; <span class="text-secondary">Tenants</span>
+</h1>
+<p class="text-lg text-slate-600 dark:text-slate-400 mb-10 max-w-lg leading-relaxed">
+                The ultimate rental management experience. Centralized payments, multi-organization control, and automated maintenance requests—all in one place.
+            </p>
+<div class="flex flex-wrap gap-4">
+<a class="flex items-center gap-3 bg-slate-900 dark:bg-slate-800 text-white px-6 py-3 rounded-xl hover:bg-slate-800 dark:hover:bg-slate-700 transition-all group" href="#">
+<span class="material-symbols-outlined text-3xl">phone_iphone</span>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-medium opacity-70">Download on the</span>
+<span class="text-lg font-bold">App Store</span>
+</div>
+</a>
+<a class="flex items-center gap-3 bg-slate-900 dark:bg-slate-800 text-white px-6 py-3 rounded-xl hover:bg-slate-800 dark:hover:bg-slate-700 transition-all group" href="#">
+<span class="material-symbols-outlined text-3xl">play_store_installed</span>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase font-medium opacity-70">Get it on</span>
+<span class="text-lg font-bold">Google Play</span>
+</div>
+</a>
+</div>
+<div class="mt-12 flex items-center gap-6">
+<div class="flex -space-x-3">
+<div class="w-10 h-10 rounded-full border-2 border-background-light dark:border-background-dark bg-slate-200 flex items-center justify-center text-[10px] font-bold">JD</div>
+<div class="w-10 h-10 rounded-full border-2 border-background-light dark:border-background-dark bg-slate-300 flex items-center justify-center text-[10px] font-bold">AS</div>
+<div class="w-10 h-10 rounded-full border-2 border-background-light dark:border-background-dark bg-slate-400 flex items-center justify-center text-[10px] font-bold">MK</div>
+</div>
+<p class="text-sm font-medium text-slate-500">Trusted by over <span class="text-slate-900 dark:text-white font-bold">12,000+</span> property managers</p>
+</div>
+</div>
+<div class="w-full lg:w-1/2 flex justify-center lg:justify-end relative">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -z-10"></div>
+<div class="relative w-[300px] lg:w-[350px]">
+<div class="relative bg-slate-900 rounded-[3rem] p-3 border-4 border-slate-800 shadow-2xl overflow-hidden">
+<div class="bg-slate-50 dark:bg-slate-900 rounded-[2.5rem] h-[650px] overflow-hidden flex flex-col">
+<div class="px-6 py-4 flex justify-between items-center bg-white dark:bg-slate-800">
+<span class="text-[10px] font-bold">9:41</span>
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-sm">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-sm">wifi</span>
+<span class="material-symbols-outlined text-sm">battery_full</span>
+</div>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex items-center justify-between">
+<div>
+<p class="text-[10px] text-slate-500 font-medium">Welcome back,</p>
+<p class="text-sm font-bold">Alex Johnson</p>
+</div>
+<div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">notifications</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-primary p-4 rounded-2xl text-white">
+<span class="material-symbols-outlined text-lg mb-2">payments</span>
+<p class="text-[10px] opacity-80">Next Rent</p>
+<p class="font-bold text-sm">$1,450</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm">
+<span class="material-symbols-outlined text-lg mb-2 text-secondary">handyman</span>
+<p class="text-[10px] text-slate-500">Tickets</p>
+<p class="font-bold text-sm">2 Active</p>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center">
+<p class="text-[11px] font-bold">Recent Invoices</p>
+<p class="text-[10px] text-primary font-medium hover:text-accent cursor-pointer transition-colors">View all</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-3 rounded-xl flex items-center gap-3 shadow-sm">
+<div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+</div>
+<div class="flex-1">
+<p class="text-[10px] font-bold">June Rent</p>
+<p class="text-[8px] text-slate-400">Paid on June 1st</p>
+</div>
+<p class="text-[10px] font-bold">$1,450</p>
+</div>
+<div class="bg-white dark:bg-slate-800 p-3 rounded-xl flex items-center gap-3 shadow-sm border-l-2 border-secondary">
+<div class="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-sm">bolt</span>
+</div>
+<div class="flex-1">
+<p class="text-[10px] font-bold">Utility Bill</p>
+<p class="text-[8px] text-slate-400">Due in 3 days</p>
+</div>
+<p class="text-[10px] font-bold text-secondary">$84.20</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="absolute -bottom-6 -right-6 w-32 h-32 bg-secondary/10 rounded-full blur-2xl -z-10"></div>
+</div>
+</div>
+</div>
+</section>
+<section class="py-24 bg-slate-50 dark:bg-slate-900/50">
+<div class="container mx-auto px-6 text-center mb-16">
+<h2 class="text-3xl lg:text-5xl font-extrabold mb-4 text-primary">One System, Infinite Possibilities</h2>
+<p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            Switch seamlessly between managing entire property portfolios and accessing your personal tenant portal.
+        </p>
+</div>
+<div class="container mx-auto px-6 grid md:grid-cols-2 gap-8 max-w-6xl">
+<div class="group bg-white dark:bg-slate-800 p-10 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all border border-transparent hover:border-primary/20">
+<div class="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">domain</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 text-primary">Property Group Management</h3>
+<p class="text-slate-600 dark:text-slate-400 mb-8">
+                Landlords and property managers can manage multiple organizations, track occupancy, and automate lease renewals from a unified dashboard.
+            </p>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-medium">Multi-entity accounting</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-medium">Digital lease signing</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-medium">Advanced reporting &amp; analytics</span>
+</li>
+</ul>
+<a class="inline-flex items-center gap-2 text-primary font-bold hover:text-accent transition-colors" href="#">
+                Explore Landlord Features
+                <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+</div>
+<div class="group bg-white dark:bg-slate-800 p-10 rounded-[2rem] shadow-xl hover:shadow-2xl transition-all border border-transparent hover:border-secondary/20">
+<div class="w-16 h-16 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-4xl">person</span>
+</div>
+<h3 class="text-2xl font-bold mb-4 text-primary">Centralized Tenant Portal</h3>
+<p class="text-slate-600 dark:text-slate-400 mb-8">
+                Tenants enjoy a streamlined experience with one-click rent payments, maintenance tracking, and instant communication with management.
+            </p>
+<ul class="space-y-4 mb-8">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-medium">Automated rent payments</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-medium">In-app maintenance requests</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary">check_circle</span>
+<span class="text-sm font-medium">Centralized document storage</span>
+</li>
+</ul>
+<a class="inline-flex items-center gap-2 text-secondary font-bold hover:text-accent transition-colors" href="#">
+                Explore Tenant Features
+                <span class="material-symbols-outlined">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<footer class="bg-white dark:bg-slate-950 pt-20 pb-10 border-t border-slate-200 dark:border-slate-800">
+<div class="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-12 mb-20">
+<div class="col-span-2">
+<div class="flex items-center gap-2 mb-6">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-sm">house</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-primary">RentHub</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 max-w-xs mb-6">
+                Professionalizing the rental experience for everyone involved. Trustworthy, efficient, and modern.
+            </p>
+<div class="flex gap-4">
+<a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">public</span>
+</a>
+<a class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-primary hover:text-white transition-all" href="#">
+<span class="material-symbols-outlined text-sm">share</span>
+</a>
+</div>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-primary">Platform</h4>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+<li><a class="hover:text-secondary" href="#">Landlords</a></li>
+<li><a class="hover:text-secondary" href="#">Tenants</a></li>
+<li><a class="hover:text-secondary" href="#">Pricing</a></li>
+<li><a class="hover:text-secondary" href="#">Integrations</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-primary">Company</h4>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+<li><a class="hover:text-secondary" href="#">About Us</a></li>
+<li><a class="hover:text-secondary" href="#">Careers</a></li>
+<li><a class="hover:text-secondary" href="#">Blog</a></li>
+<li><a class="hover:text-secondary" href="#">Legal</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold mb-6 text-primary">Support</h4>
+<ul class="space-y-4 text-sm text-slate-500 dark:text-slate-400">
+<li><a class="hover:text-secondary" href="#">Help Center</a></li>
+<li><a class="hover:text-secondary" href="#">Security</a></li>
+<li><a class="hover:text-secondary" href="#">Contact Us</a></li>
+<li><a class="hover:text-secondary" href="#">System Status</a></li>
+</ul>
+</div>
+</div>
+<div class="container mx-auto px-6 pt-10 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-6">
+<p class="text-xs text-slate-400">© 2024 RentHub Technologies Inc. All rights reserved.</p>
+<div class="flex gap-8">
+<a class="text-xs text-slate-400 hover:text-secondary" href="#">Privacy Policy</a>
+<a class="text-xs text-slate-400 hover:text-secondary" href="#">Terms of Service</a>
+<a class="text-xs text-slate-400 hover:text-secondary" href="#">Cookie Settings</a>
+</div>
+</div>
+</footer>
+
+</body></html>
