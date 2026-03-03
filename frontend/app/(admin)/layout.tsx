@@ -12,7 +12,7 @@ export default async function AdminLayout({
   const user = session?.user as { userType?: string; role?: string } | undefined;
   const isSystemAdmin = user?.role === 'ADMIN' && user?.userType === 'SYSTEM_ADMIN';
   if (!session?.user || !isSystemAdmin) {
-    redirect('/select-group');
+    redirect('/login');
   }
   return <AppShell isAdmin>{children}</AppShell>;
 }

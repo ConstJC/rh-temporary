@@ -13,6 +13,7 @@ import { PropertiesModule } from './properties/properties.module';
 import { TenantsModule } from './tenants/tenants.module';
 import { LeasesModule } from './leases/leases.module';
 import { PaymentsModule } from './payments/payments.module';
+import { AdminModule } from './admin/admin.module';
 import configuration from './config/configuration';
 
 @Module({
@@ -37,6 +38,7 @@ import configuration from './config/configuration';
     TenantsModule,
     LeasesModule,
     PaymentsModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService, PrismaService],

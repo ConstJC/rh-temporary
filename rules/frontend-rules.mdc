@@ -1,0 +1,58 @@
+# RentHub Frontend — Cursor Rules
+
+## Project
+Next.js 15 App Router, TypeScript strict mode, Tailwind CSS 4, shadcn/ui.
+Web only. Portals: SYSTEM_ADMIN (/dashboard) and LANDLORD (/:pgId/*).
+Tenant portal is mobile-only — never build web pages for TENANT userType.
+
+## Absolute Rules (never violate these)
+- Never use raw `fetch()` or `axios` directly in components or pages
+- Never use `useState` to store data fetched from the API
+- Never write inline status badge colors — always use `<StatusBadge status="..." />`
+- Never render `internalNotes` in any component inside app/(tenant)/
+- Never add `'use client'` unless the component uses hooks, event handlers, or browser APIs
+- Never call Prisma or any backend logic from the frontend
+- Never use `bg-[#hex]` or inline style for colors — use Tailwind palette classes only
+
+## File Structure Rules
+- API calls → src/lib/api/*.api.ts only (use apiClient from src/lib/api/client.ts)
+- Zod schemas → src/lib/validations/*.schema.ts
+- TanStack Query hooks → src/features/[feature]/hooks/use[Feature].ts
+- Zustand stores → src/stores/*.store.ts (UI state only — sidebar, wizard step)
+- Types → src/types/domain.types.ts (never redefine domain types inline)
+- Common components → src/components/common/
+- Feature components → src/features/[feature]/
+
+## Data Fetching Pattern (always follow this)
+- ALL server state → TanStack Query useQuery / useMutation
+- Query keys → use featureKeys factory (e.g. leaseKeys.list(pgId, filters))
+- After mutation success → call queryClient.invalidateQueries()
+- Loading state → <LoadingSkeleton /> component (never a raw spinner div)
+- Empty state → <EmptyState /> component
+- Never use useEffect + useState to fetch data
+
+## Form Pattern (always follow this)
+- ALL forms → React Hook Form + zodResolver
+- Schema defined in src/lib/validations/ first, then z.infer<> for the type
+- Submit button → disabled + show loading state while mutation is pending
+- Errors → inline below each field via formState.errors
+
+## Styling Rules
+- Tailwind classes only — no CSS modules, no styled-components
+- Use cn() from src/lib/utils.ts for conditional classes
+- Color usage: primary-700 for solid bg, primary-100/200 for badge bg, primary-50 for hover tint
+- shadcn/ui components for all UI primitives (Button, Input, Dialog, Sheet, etc.)
+- Never hand-roll a modal — use shadcn Dialog or Sheet
+
+## Auth Rules
+- Route protection lives in src/middleware.ts only — not in page components
+- Use useAuth() hook from src/hooks/useAuth.ts to read current user
+- userType TENANT → redirect to /mobile-only, never render portal pages
+- userType SYSTEM_ADMIN → /dashboard routes only
+- userType LANDLORD → /:pgId/* routes only
+
+## TypeScript Rules
+- strict mode is on — no `any`, no type assertions unless absolutely necessary
+- All API response types come from src/types/domain.types.ts
+- DTOs (form submit types) come from z.infer<typeof schema>
+- Never use `as unknown as X` to silence TypeScript errors — fix the type properly

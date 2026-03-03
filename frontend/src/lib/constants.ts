@@ -28,4 +28,6 @@ export const API_ENDPOINTS = {
     RESET_PASSWORD: '/auth/reset-password',
   },
   PROPERTY_GROUPS: '/property-groups',
+  tenants: (pgId: string) => `/property-groups/${pgId}/tenants`,
+  tenant: (pgId: string, tenantId: string) => `/property-groups/${pgId}/tenants/${tenantId}`,
 } as const;

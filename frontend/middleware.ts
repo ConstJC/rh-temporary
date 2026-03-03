@@ -28,23 +28,29 @@ export default withAuth(
 
     const token = req.nextauth.token as TokenPayload;
     const userType = token?.userType;
-    const role = token?.role;
 
     if (pathname === '/') {
-      if (isSystemAdmin(token)) return NextResponse.redirect(new URL('/dashboard', req.url));
-      if (isLandlord(token)) return NextResponse.redirect(new URL('/select-group', req.url));
-      if (userType === 'TENANT') return NextResponse.redirect(new URL('/tenant-use-mobile', req.url));
+      if (isSystemAdmin(token)) {
+        return NextResponse.redirect(new URL('/dashboard', req.url));
+      }
+      if (isLandlord(token)) {
+        // Let the home page resolve landlord's single Property Group and redirect to /:pgId/overview
+        return NextResponse.next();
+      }
+      if (userType === 'TENANT') {
+        return NextResponse.redirect(new URL('/tenant-use-mobile', req.url));
+      }
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
     if (isPublic(pathname) && token) {
       if (isSystemAdmin(token)) return NextResponse.redirect(new URL('/dashboard', req.url));
-      if (isLandlord(token)) return NextResponse.redirect(new URL('/select-group', req.url));
+      if (isLandlord(token)) return NextResponse.redirect(new URL('/', req.url));
       if (userType === 'TENANT') return NextResponse.redirect(new URL('/tenant-use-mobile', req.url));
     }
 
     if (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) {
-      if (!isSystemAdmin(token)) return NextResponse.redirect(new URL('/select-group', req.url));
+      if (!isSystemAdmin(token)) return NextResponse.redirect(new URL('/login', req.url));
     }
 
     if (userType === 'TENANT') {

@@ -31,9 +31,12 @@ async function bootstrap() {
   app.use(helmet());
   
   // CORS configuration
+  const frontendUrl = configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
   app.enableCors({
-    origin: configService.get<string>('app.url'),
+    origin: [frontendUrl, 'http://localhost:3000'],
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   // Body parser configuration for handling large payloads

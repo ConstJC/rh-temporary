@@ -264,6 +264,7 @@
   <button onclick="show('testing', this)">Testing</button>
   <button onclick="show('deployment', this)">Deployment</button>
   <button onclick="show('roadmap', this)">Roadmap</button>
+  <button onclick="show('folders', this)">Folder Structure</button>
 </nav>
 
 <main>
@@ -311,7 +312,7 @@
     <div style="display:flex; gap:10px; flex-wrap:wrap;">
       <span class="badge badge-blue">Multi-tenant SaaS</span>
       <span class="badge badge-green">Property Management</span>
-      <span class="badge badge-purple">E-Payment (Dragonpay)</span>
+      <span class="badge badge-purple">E-Payment (PayMongo)</span>
       <span class="badge badge-amber">Subscription Model</span>
       <span class="badge badge-teal">Add-on Billing (WiFi, Utilities)</span>
     </div>
@@ -360,7 +361,7 @@
     </div>
     <div class="role-card">
       <div class="role-name">🏠 Landlord / Staff</div>
-      <div class="platform">Web + Mobile · role: USER · userType: LANDLORD · orgRole: OWNER|ADMIN|STAFF</div>
+      <div class="platform">Web · role: USER · userType: LANDLORD · orgRole: OWNER|ADMIN|STAFF · Mobile (Phase 5+)</div>
       <ul class="perm-list">
         <li>📈 <span>Organization dashboard (income, occupancy)</span></li>
         <li>🏗️ <span>Manage Properties, Units & Add-ons</span></li>
@@ -371,7 +372,7 @@
     </div>
     <div class="role-card">
       <div class="role-name">🧑 Tenant</div>
-      <div class="platform">Mobile (primary) · role: USER · userType: TENANT</div>
+      <div class="platform">Mobile only (React Native · Expo) · role: USER · userType: TENANT</div>
       <ul class="perm-list">
         <li>🏠 <span>View current unit & next due date</span></li>
         <li>📄 <span>View itemized bills (rent + add-ons)</span></li>
@@ -444,11 +445,11 @@
 
   <div class="section-title">Tech Stack</div>
   <div class="arch-layer"><div class="arch-label">Frontend Web</div><div class="arch-content"><div class="tech-chip">⚛️ Next.js</div><div style="color:var(--muted);font-size:12px;">Admin dashboard + Landlord web app · SSR / Static</div></div></div>
-  <div class="arch-layer"><div class="arch-label">Mobile App</div><div class="arch-content"><div class="tech-chip">📱 Flutter</div><div style="color:var(--muted);font-size:12px;">iOS + Android · Landlord on-the-go + Tenant portal (home, bills, pay, receipts)</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Mobile App</div><div class="arch-content"><div class="tech-chip">📱 React Native</div><div class="tech-chip">⚡ Expo SDK 52</div><div style="color:var(--muted);font-size:12px;">iOS + Android · Tenant portal (home, bills, pay, receipts) · Expo Router v4</div></div></div>
   <div class="arch-layer"><div class="arch-label">Backend API</div><div class="arch-content"><div class="tech-chip">🏗️ NestJS</div><div class="tech-chip">Prisma ORM</div><div class="tech-chip">JWT Auth</div><div style="color:var(--muted);font-size:12px;">REST · RolesGuard + UserTypeGuard · Modular services · Cron billing worker</div></div></div>
   <div class="arch-layer"><div class="arch-label">Auth</div><div class="arch-content"><div class="tech-chip">🔑 JWT (Access)</div><div class="tech-chip">🔄 RefreshToken</div><div style="color:var(--muted);font-size:12px;">UserRole (ADMIN|USER) + UserType (SYSTEM_ADMIN|LANDLORD|TENANT) · Email verification · Reset password</div></div></div>
   <div class="arch-layer"><div class="arch-label">Database</div><div class="arch-content"><div class="tech-chip">🐘 PostgreSQL</div><div style="color:var(--muted);font-size:12px;">20 tables · property_group_id scoping · cuid() PKs · JSONB metadata · Soft deletes</div></div></div>
-  <div class="arch-layer"><div class="arch-label">Payments</div><div class="arch-content"><div class="tech-chip">💳 Dragonpay</div><div style="color:var(--muted);font-size:12px;">GCash · Maya · GrabPay · Bank transfers · Webhook-based confirmation · PAYMENT_TRANSACTIONS log</div></div></div>
+  <div class="arch-layer"><div class="arch-label">Payments</div><div class="arch-content"><div class="tech-chip">💳 PayMongo</div><div style="color:var(--muted);font-size:12px;">GCash · Maya · Card · InstaPay · Webhook-based confirmation · PAYMENT_TRANSACTIONS log</div></div></div>
   <div class="arch-layer"><div class="arch-label">Notifications</div><div class="arch-content"><div class="tech-chip">📧 Email</div><div class="tech-chip">📲 SMS</div><div class="tech-chip">🔔 Push (FCM)</div><div style="color:var(--muted);font-size:12px;">Overdue alerts, receipts, lease reminders · NOTIFICATIONS table stores all channels</div></div></div>
   <div class="arch-layer"><div class="arch-label">Hosting</div><div class="arch-content"><div class="tech-chip">☁️ VPS / Cloud</div><div style="color:var(--muted);font-size:12px;">Single region · Managed PostgreSQL · CDN for static assets · PgBouncer for connection pooling</div></div></div>
 
@@ -460,7 +461,7 @@
     <div class="module-card"><h3>🏠 Properties</h3><ul><li>Property CRUD</li><li>Unit CRUD + status management</li><li>Scoped by property_group_id</li><li>Unit metadata (furnished, sqm, etc.)</li></ul></div>
     <div class="module-card"><h3>👤 Tenants</h3><ul><li>Tenant record management</li><li>Portal invite (link User account)</li><li>Emergency contact (JSONB)</li><li>Scoped by property_group_id</li></ul></div>
     <div class="module-card"><h3>📋 Leases</h3><ul><li>Create / activate / close</li><li>One active lease per unit enforced</li><li>Trigger unit status + initial billing</li><li>Grace period & advance months config</li></ul></div>
-    <div class="module-card"><h3>💰 Payments</h3><ul><li>Cron monthly bill generation</li><li>Manual cash payment recording</li><li>E-payment initiation (Dragonpay)</li><li>Webhook processing (idempotent)</li></ul></div>
+    <div class="module-card"><h3>💰 Payments</h3><ul><li>Cron monthly bill generation</li><li>Manual cash payment recording</li><li>E-payment initiation (PayMongo)</li><li>Webhook processing (idempotent)</li></ul></div>
     <div class="module-card"><h3>⚡ Add-ons & Utilities</h3><ul><li>Addon catalog (platform + custom)</li><li>Unit addon assignment</li><li>LeaseAddonBill generation</li><li>Meter reading entry + computation</li></ul></div>
     <div class="module-card"><h3>🔔 Notifications</h3><ul><li>Overdue & payment alerts</li><li>Lease reminders</li><li>Push (FCM), Email, SMS, In-app</li><li>Unread count + mark-read API</li></ul></div>
     <div class="module-card"><h3>📝 Audit Trail</h3><ul><li>Immutable INSERT/UPDATE/DELETE log</li><li>Old/new value JSONB snapshots</li><li>IP address + request ID tracing</li><li>Admin query & forensics</li></ul></div>
@@ -480,7 +481,7 @@
       <div class="flow-chain">
         <div class="flow-node highlight">NestJS API</div>
         <div class="flow-arrow">→ redirect URL →</div>
-        <div class="flow-node warn">Dragonpay Gateway</div>
+        <div class="flow-node warn">PayMongo Gateway</div>
         <div class="flow-arrow">→ webhook callback →</div>
         <div class="flow-node highlight">NestJS API</div>
         <div class="flow-arrow">→</div>
@@ -705,8 +706,8 @@
     <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/property-groups/:pgId/payments</span><span class="ep-desc">List payments (filter: lease, status, date range)</span><span class="ep-auth landlord">LANDLORD</span></div>
     <div class="endpoint"><span class="method method-get">GET</span><span class="ep-path">/payments/:id</span><span class="ep-desc">Payment detail + addon bills + transactions</span><span class="ep-auth any">ANY</span></div>
     <div class="endpoint"><span class="method method-patch">PATCH</span><span class="ep-path">/payments/:id/manual</span><span class="ep-desc">Record manual cash payment (amount_paid, method, receipt)</span><span class="ep-auth landlord">LANDLORD</span></div>
-    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/payments/:id/initiate</span><span class="ep-desc">Start e-payment → return Dragonpay redirect URL</span><span class="ep-auth any">ANY</span></div>
-    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/payments/webhook</span><span class="ep-desc">Dragonpay callback — idempotent · verify signature · no auth</span><span class="ep-auth public">WEBHOOK</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/payments/:id/initiate</span><span class="ep-desc">Start e-payment → create PayMongo Payment Intent → return checkout_url</span><span class="ep-auth any">ANY</span></div>
+    <div class="endpoint"><span class="method method-post">POST</span><span class="ep-path">/payments/webhook</span><span class="ep-desc">PayMongo callback — idempotent · verify X-PayMongo-Signature · no auth</span><span class="ep-auth public">WEBHOOK</span></div>
   </div>
 
   <div class="endpoint-group">
@@ -740,7 +741,7 @@
       <div><strong style="color:var(--text);">Error shape:</strong> <span class="mono">{ error: { code: "VALIDATION_ERROR", message: "...", details?: [...] } }</span></div>
       <div><strong style="color:var(--text);">Soft deletes:</strong> All GET endpoints exclude <span class="mono">deleted_at IS NOT NULL</span> rows automatically</div>
       <div><strong style="color:var(--text);">Idempotency:</strong> Send <span class="mono">Idempotency-Key: &lt;uuid&gt;</span> header on payment POST to prevent double-charge</div>
-      <div><strong style="color:var(--text);">Webhook security:</strong> Verify Dragonpay signature · return 200 immediately · process idempotently via transaction_ref</div>
+      <div><strong style="color:var(--text);">Webhook security:</strong> Verify PayMongo signature (X-PayMongo-Signature header) · return 200 immediately · process idempotently via transaction_ref</div>
     </div>
   </div>
 </div>
@@ -755,7 +756,7 @@
   <div class="grid-4" style="margin-bottom:28px;">
     <div class="stat-tile" style="border-top:2px solid var(--accent3);"><div class="label">Phase 1 — Core Backend</div><div class="value">25</div><div class="sub">Auth, Org, Property, Tenant, Lease, Payment (manual)</div></div>
     <div class="stat-tile" style="border-top:2px solid var(--accent);"><div class="label">Phase 2 — Dashboard</div><div class="value">14</div><div class="sub">Add-ons, Utility Readings, Notifications, Admin</div></div>
-    <div class="stat-tile" style="border-top:2px solid var(--accent4);"><div class="label">Phase 3 — E-Payment</div><div class="value">8</div><div class="sub">Dragonpay, Webhook, Transactions, Receipts</div></div>
+    <div class="stat-tile" style="border-top:2px solid var(--accent4);"><div class="label">Phase 3 — E-Payment</div><div class="value">8</div><div class="sub">PayMongo, Webhook, Transactions, Receipts</div></div>
     <div class="stat-tile" style="border-top:2px solid var(--accent2);"><div class="label">Phase 4 — Mobile</div><div class="value">12</div><div class="sub">Tenant portal, Push, Marketplace, Profile</div></div>
   </div>
 
@@ -851,8 +852,8 @@
       <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/property-groups/:pgId/payments</span><span class="gp-note">List payments. Filter: status, lease, date range. Include add-on bill count. Used for landlord dashboard overdue view.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
       <div class="gp-row"><span class="method method-get">GET</span><span class="gp-path">/payments/:id</span><span class="gp-note">Payment detail + LeaseAddonBill line items + PaymentTransactions. Shared by landlord + tenant.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
       <div class="gp-row"><span class="method method-patch">PATCH</span><span class="gp-path">/payments/:id/manual</span><span class="gp-note">Record cash payment. Update amount_paid, payment_method, date_paid. Recompute status (PAID/PARTIAL). Write AuditTrail + Notification.</span><span class="gp-phase"><span class="phase-dot p1"></span>1</span><span class="gp-who"><span class="ep-auth landlord" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(79,142,247,0.12);color:var(--accent);">LANDLORD</span></span></div>
-      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/payments/:id/initiate</span><span class="gp-note">Create PaymentTransaction (PENDING), call Dragonpay API, return redirect URL. Idempotency-Key header required.</span><span class="gp-phase"><span class="phase-dot p3"></span>3</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
-      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/payments/webhook</span><span class="gp-note">Dragonpay callback. 1) Verify signature 2) Find by transaction_ref (idempotency) 3) Update Transaction+Payment 4) Notify tenant. Always return 200.</span><span class="gp-phase"><span class="phase-dot p3"></span>3</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">WEBHOOK</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/payments/:id/initiate</span><span class="gp-note">Create PaymentTransaction (PENDING), create PayMongo Payment Intent, return checkout_url. Idempotency-Key header required.</span><span class="gp-phase"><span class="phase-dot p3"></span>3</span><span class="gp-who"><span class="ep-auth any" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(245,158,11,0.12);color:var(--accent4);">ANY</span></span></div>
+      <div class="gp-row"><span class="method method-post">POST</span><span class="gp-path">/payments/webhook</span><span class="gp-note">PayMongo webhook callback. 1) Verify signature 2) Find by transaction_ref (idempotency) 3) Update Transaction+Payment 4) Notify tenant. Always return 200.</span><span class="gp-phase"><span class="phase-dot p3"></span>3</span><span class="gp-who"><span class="ep-auth public" style="font-family:'DM Mono',monospace;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(100,116,139,0.12);color:var(--muted);">WEBHOOK</span></span></div>
       <!-- CRON NOTES -->
       <div class="gp-row" style="background:rgba(245,158,11,0.04);">
         <span style="font-size:11px;color:var(--accent4);font-family:'DM Mono',monospace;">CRON</span>
@@ -953,7 +954,7 @@
       <div class="flow-node highlight">12. AdminModule</div>
     </div>
     <div class="flow-chain" style="flex-wrap:wrap;">
-      <div class="flow-node warn">13. DragonpayModule</div><div class="flow-arrow">→</div>
+      <div class="flow-node warn">13. PayMongoModule</div><div class="flow-arrow">→</div>
       <div class="flow-node warn">14. WebhookModule</div><div class="flow-arrow">→</div>
       <div class="flow-node">15. TenantPortalModule (/me)</div><div class="flow-arrow">→</div>
       <div class="flow-node">16. MarketplaceModule (/explore)</div>
@@ -1035,7 +1036,7 @@
     <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>All endpoints scoped by property_group_id</strong><span>Verified in integration tests: wrong-group requests → 403</span></div></div>
     <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>UserType checked independently of UserRole</strong><span>Tenant cannot access landlord endpoints even with valid JWT</span></div></div>
     <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Admin endpoints restricted to SYSTEM_ADMIN</strong><span>UserRole.ADMIN + UserType.SYSTEM_ADMIN both verified</span></div></div>
-    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Payment webhook: signature verified + idempotent</strong><span>Reject replays via transaction_ref · verify Dragonpay signature header</span></div></div>
+    <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Payment webhook: signature verified + idempotent</strong><span>Reject replays via transaction_ref · verify X-PayMongo-Signature header</span></div></div>
     <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>internalNotes never returned to tenant endpoints</strong><span>Explicitly excluded from /me and /me/leases responses</span></div></div>
     <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Secrets in env / secret manager — not in repo</strong><span>No .env files committed · CI/CD uses secure variable injection</span></div></div>
     <div class="checklist-item"><div class="check-box todo" onclick="toggleCheck(this)">✓</div><div class="checklist-text"><strong>Audit trail active on all financial mutations</strong><span>AUDIT_TRAIL written on payment confirm, lease change, role change</span></div></div>
@@ -1131,7 +1132,7 @@
         <tr><td class="dim">Purpose</td><td>Live users & payments</td></tr>
         <tr><td class="dim">Data</td><td>Real · backups required</td></tr>
         <tr><td class="dim">Deploy</td><td>Tag + manual approval</td></tr>
-        <tr><td class="dim">Payments</td><td>Live Dragonpay</td></tr>
+        <tr><td class="dim">Payments</td><td>Live PayMongo</td></tr>
       </tbody></table>
     </div>
   </div>
@@ -1139,7 +1140,7 @@
   <div class="section-title">CI/CD Pipeline</div>
   <div class="flow-chain" style="flex-wrap:wrap; margin-bottom:20px;">
     <div class="flow-node">Push to main / tag</div><div class="flow-arrow">→</div>
-    <div class="flow-node highlight">Build (Next.js + NestJS + Flutter)</div><div class="flow-arrow">→</div>
+    <div class="flow-node highlight">Build (Next.js + NestJS + React Native)</div><div class="flow-arrow">→</div>
     <div class="flow-node">Unit + Integration Tests</div><div class="flow-arrow">→</div>
     <div class="flow-node warn">prisma migrate deploy + raw SQL</div><div class="flow-arrow">→</div>
     <div class="flow-node success">Deploy to Staging / Prod</div>
@@ -1203,7 +1204,7 @@
     <div class="phase phase-3">
       <div class="phase-label"><span class="badge badge-amber">Phase 3 — E-Payment Integration</span></div>
       <ul class="phase-items">
-        <li>Dragonpay integration: redirect flow + webhook endpoint</li>
+        <li>PayMongo integration: Payment Intent + checkout URL flow + webhook endpoint</li>
         <li>PAYMENT_TRANSACTIONS table live with forensic logging</li>
         <li>Webhook signature verification + idempotency via transaction_ref</li>
         <li>Digital receipt generation (PDF / email)</li>
@@ -1214,8 +1215,8 @@
     <div class="phase phase-4">
       <div class="phase-label"><span class="badge badge-purple">Phase 4 — Mobile App & Marketplace</span></div>
       <ul class="phase-items">
-        <li>Flutter Tenant app: home, bills (itemized with add-ons), pay, history, profile</li>
-        <li>Flutter Landlord app: on-the-go property & lease management + meter readings</li>
+        <li>React Native Tenant app (Expo): home, bills (itemized with add-ons), pay, history, profile</li>
+        <li>React Native Landlord companion app: on-the-go lease management + meter readings (Phase 5+)</li>
         <li>Push notifications (FCM / APNs)</li>
         <li>Tenant portal invite flow (landlord sends → tenant registers)</li>
         <li>Explore / Marketplace: available unit browsing & inquiry flow</li>
@@ -1249,6 +1250,652 @@
 </div>
 
 </main>
+
+<!-- ======================== FOLDER STRUCTURE ======================== -->
+<div id="folders" class="section">
+  <div class="page-header">
+    <h1>Recommended Folder Structure</h1>
+    <p>Monorepo-style layout for Frontend (Next.js 15), Backend (NestJS), and Mobile (React Native + Expo). Each layer is independently deployable.</p>
+  </div>
+
+  <!-- tabs -->
+  <div style="display:flex; gap:6px; margin-bottom:28px; flex-wrap:wrap;">
+    <button onclick="showFolder('fe', this)" id="fe-btn" style="background:rgba(79,142,247,0.15);border:1px solid var(--accent);color:var(--accent);font-family:'DM Mono',monospace;font-size:12px;padding:6px 18px;border-radius:6px;cursor:pointer;transition:all 0.15s;">🌐 Frontend</button>
+    <button onclick="showFolder('be', this)" id="be-btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;padding:6px 18px;border-radius:6px;cursor:pointer;transition:all 0.15s;">⚙️ Backend</button>
+    <button onclick="showFolder('mo', this)" id="mo-btn" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Mono',monospace;font-size:12px;padding:6px 18px;border-radius:6px;cursor:pointer;transition:all 0.15s;">📱 Mobile</button>
+  </div>
+
+  <!-- ── FRONTEND ── -->
+  <div id="folder-fe" class="folder-panel">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <span class="badge badge-blue">Next.js 15 · App Router · TypeScript</span>
+      <span class="badge badge-teal">shadcn/ui · Tailwind · TanStack Query</span>
+      <span class="badge badge-purple">Admin + Landlord portals only</span>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Web app serves SYSTEM_ADMIN and LANDLORD users. Tenant portal is mobile-only.</p>
+
+    <div class="grid-2">
+      <!-- Tree -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">File Tree</div>
+        <div style="padding:18px 20px;overflow-x:auto;">
+          <pre style="margin:0;font-family:'DM Mono',monospace;font-size:12px;line-height:1.9;color:var(--text);">renthub-frontend/
+├── <span style="color:var(--accent);">src/</span>
+│   ├── <span style="color:var(--accent);">app/</span>                         <span style="color:var(--muted);"># Next.js App Router</span>
+│   │   ├── <span style="color:var(--accent3);">(auth)/</span>                    <span style="color:var(--muted);"># Public auth pages</span>
+│   │   │   ├── login/page.tsx
+│   │   │   ├── register/page.tsx
+│   │   │   ├── forgot-password/page.tsx
+│   │   │   ├── reset-password/page.tsx
+│   │   │   ├── verify-email/page.tsx
+│   │   │   └── layout.tsx             <span style="color:var(--muted);"># Centered card, no sidebar</span>
+│   │   │
+│   │   ├── <span style="color:var(--accent2);">(admin)/</span>                   <span style="color:var(--muted);"># SYSTEM_ADMIN portal</span>
+│   │   │   ├── layout.tsx             <span style="color:var(--muted);"># Admin AppShell</span>
+│   │   │   └── dashboard/
+│   │   │       ├── page.tsx           <span style="color:var(--muted);"># Platform KPIs</span>
+│   │   │       ├── landlords/page.tsx
+│   │   │       ├── subscriptions/page.tsx
+│   │   │       └── settings/page.tsx
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">(landlord)/</span>                <span style="color:var(--muted);"># LANDLORD portal</span>
+│   │   │   ├── layout.tsx             <span style="color:var(--muted);"># Landlord AppShell</span>
+│   │   │   └── [pgId]/                <span style="color:var(--muted);"># Scoped to property group</span>
+│   │   │       ├── layout.tsx         <span style="color:var(--muted);"># PropertyGroupProvider</span>
+│   │   │       ├── overview/page.tsx
+│   │   │       ├── properties/
+│   │   │       │   ├── page.tsx
+│   │   │       │   └── [propId]/page.tsx
+│   │   │       ├── tenants/
+│   │   │       │   ├── page.tsx
+│   │   │       │   └── [tenantId]/page.tsx
+│   │   │       ├── leases/
+│   │   │       │   ├── page.tsx
+│   │   │       │   ├── new/page.tsx   <span style="color:var(--muted);"># 3-step wizard</span>
+│   │   │       │   └── [leaseId]/page.tsx
+│   │   │       └── payments/
+│   │   │           ├── page.tsx
+│   │   │           └── [paymentId]/page.tsx
+│   │   │
+│   │   ├── <span style="color:var(--accent);">api/auth/[...nextauth]/</span>
+│   │   │   └── route.ts               <span style="color:var(--muted);"># Auth.js handler</span>
+│   │   ├── mobile-only/page.tsx       <span style="color:var(--muted);"># Tenant redirect screen</span>
+│   │   ├── layout.tsx                 <span style="color:var(--muted);"># Root: Providers, Toaster</span>
+│   │   ├── page.tsx                   <span style="color:var(--muted);"># Root redirect by userType</span>
+│   │   ├── not-found.tsx
+│   │   └── error.tsx
+│   │
+│   ├── <span style="color:var(--accent);">components/</span>                   <span style="color:var(--muted);"># Shared UI components</span>
+│   │   ├── ui/                        <span style="color:var(--muted);"># shadcn/ui (auto-generated)</span>
+│   │   ├── layout/
+│   │   │   ├── AppShell.tsx
+│   │   │   ├── Sidebar.tsx
+│   │   │   ├── TopBar.tsx
+│   │   │   └── MobileNav.tsx
+│   │   ├── common/
+│   │   │   ├── StatusBadge.tsx
+│   │   │   ├── EmptyState.tsx
+│   │   │   ├── LoadingSkeleton.tsx
+│   │   │   ├── PageHeader.tsx
+│   │   │   ├── ConfirmDialog.tsx
+│   │   │   ├── SlideOver.tsx
+│   │   │   ├── ForbiddenPage.tsx
+│   │   │   └── UpgradePlanBanner.tsx
+│   │   ├── tables/
+│   │   │   ├── DataTable.tsx          <span style="color:var(--muted);"># TanStack Table wrapper</span>
+│   │   │   ├── DataTablePagination.tsx
+│   │   │   └── DataTableFilters.tsx
+│   │   └── charts/
+│   │       ├── MetricCard.tsx
+│   │       ├── OccupancyChart.tsx
+│   │       └── PaymentChart.tsx
+│   │
+│   ├── <span style="color:var(--accent);">features/</span>                    <span style="color:var(--muted);"># Feature-colocated components</span>
+│   │   ├── auth/
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── RegisterForm.tsx
+│   │   │   └── ResetPasswordForm.tsx
+│   │   ├── properties/
+│   │   │   ├── PropertyCard.tsx
+│   │   │   ├── PropertyForm.tsx
+│   │   │   ├── UnitGrid.tsx
+│   │   │   ├── UnitCard.tsx
+│   │   │   ├── UnitForm.tsx
+│   │   │   └── UnitDetailSlideOver.tsx
+│   │   ├── tenants/
+│   │   │   ├── TenantForm.tsx
+│   │   │   ├── TenantDetailPanel.tsx
+│   │   │   └── BlacklistTenantDialog.tsx
+│   │   ├── leases/
+│   │   │   ├── CreateLeaseWizard.tsx
+│   │   │   ├── LeaseRow.tsx
+│   │   │   ├── LeaseTimeline.tsx
+│   │   │   └── CloseLeaseDialog.tsx
+│   │   └── payments/
+│   │       ├── PaymentRow.tsx
+│   │       ├── RecordPaymentSlideOver.tsx
+│   │       └── BillBreakdown.tsx
+│   │
+│   ├── <span style="color:var(--accent);">hooks/</span>                       <span style="color:var(--muted);"># Custom React hooks</span>
+│   │   ├── useAuth.ts
+│   │   ├── usePropertyGroup.ts
+│   │   ├── usePagination.ts
+│   │   └── useDebounce.ts
+│   │
+│   ├── <span style="color:var(--accent);">lib/</span>                         <span style="color:var(--muted);"># Core utilities & config</span>
+│   │   ├── api/
+│   │   │   ├── client.ts              <span style="color:var(--muted);"># Axios instance + interceptors</span>
+│   │   │   ├── auth.api.ts
+│   │   │   ├── property-groups.api.ts
+│   │   │   ├── properties.api.ts
+│   │   │   ├── tenants.api.ts
+│   │   │   ├── leases.api.ts
+│   │   │   └── payments.api.ts
+│   │   ├── validations/
+│   │   │   ├── auth.schema.ts
+│   │   │   ├── property.schema.ts
+│   │   │   ├── tenant.schema.ts
+│   │   │   ├── lease.schema.ts
+│   │   │   └── payment.schema.ts
+│   │   ├── utils.ts                   <span style="color:var(--muted);"># cn(), formatCurrency(), formatDate()</span>
+│   │   ├── constants.ts               <span style="color:var(--muted);"># ROUTES, PLAN_LIMITS</span>
+│   │   └── auth.config.ts             <span style="color:var(--muted);"># next-auth configuration</span>
+│   │
+│   ├── <span style="color:var(--accent);">stores/</span>                      <span style="color:var(--muted);"># Zustand — UI state only</span>
+│   │   ├── auth.store.ts
+│   │   ├── sidebar.store.ts
+│   │   └── notification.store.ts
+│   │
+│   ├── <span style="color:var(--accent);">types/</span>                       <span style="color:var(--muted);"># TypeScript definitions</span>
+│   │   ├── domain.types.ts            <span style="color:var(--muted);"># All domain models</span>
+│   │   ├── api.types.ts               <span style="color:var(--muted);"># ApiResponse&lt;T&gt;, PaginatedResponse&lt;T&gt;</span>
+│   │   └── index.ts
+│   │
+│   └── middleware.ts                  <span style="color:var(--muted);"># next-auth route protection</span>
+│
+├── public/
+├── .env.local
+├── .env.example
+├── next.config.ts
+├── tailwind.config.ts
+├── components.json                    <span style="color:var(--muted);"># shadcn/ui config</span>
+├── tsconfig.json
+├── eslint.config.js
+└── package.json</pre>
+        </div>
+      </div>
+
+      <!-- Key decisions -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">🗂 Folder Conventions</div>
+          <table>
+            <thead><tr><th>Folder</th><th>Rule</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">app/(auth)/</td><td class="dim">Public routes — no layout wrapper, centered card UI</td></tr>
+              <tr><td class="mono">app/(admin)/</td><td class="dim">SYSTEM_ADMIN only — guarded by middleware</td></tr>
+              <tr><td class="mono">app/(landlord)/[pgId]/</td><td class="dim">All landlord pages scoped to property group ID</td></tr>
+              <tr><td class="mono">components/ui/</td><td class="dim">shadcn/ui only — never hand-edit these files</td></tr>
+              <tr><td class="mono">components/common/</td><td class="dim">StatusBadge, EmptyState, ConfirmDialog — shared everywhere</td></tr>
+              <tr><td class="mono">features/</td><td class="dim">Components that belong to a specific domain feature</td></tr>
+              <tr><td class="mono">lib/api/</td><td class="dim">One file per resource — all Axios calls live here</td></tr>
+              <tr><td class="mono">lib/validations/</td><td class="dim">Zod schemas — single source of truth for form + types</td></tr>
+              <tr><td class="mono">stores/</td><td class="dim">Zustand for UI state only — never server/fetched data</td></tr>
+              <tr><td class="mono">types/</td><td class="dim">Domain types mirror backend Prisma models exactly</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">⚠️ Key Rules</div>
+          <ul style="list-style:none;padding:0;">
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent5);">✕</span><span style="color:var(--muted);"><code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">internalNotes</code> must <strong style="color:var(--accent5);">never</strong> render in <code style="font-family:'DM Mono',monospace;font-size:12px;">(tenant)</code> routes</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">Server Components by default — add <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">'use client'</code> only when needed</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">All data fetching via TanStack Query hooks — no raw fetch in components</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">All API calls go through <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">lib/api/client.ts</code> — never call Axios directly in components</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">Route protection lives in <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">middleware.ts</code> — not in individual pages</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">📦 Tech Stack</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="badge badge-blue">Next.js 15</span>
+            <span class="badge badge-blue">TypeScript</span>
+            <span class="badge badge-teal">Tailwind CSS 4</span>
+            <span class="badge badge-teal">shadcn/ui</span>
+            <span class="badge badge-green">TanStack Query v5</span>
+            <span class="badge badge-green">TanStack Table v8</span>
+            <span class="badge badge-purple">Zustand</span>
+            <span class="badge badge-purple">Zod</span>
+            <span class="badge badge-amber">React Hook Form</span>
+            <span class="badge badge-amber">Axios</span>
+            <span class="badge badge-blue">next-auth v5</span>
+            <span class="badge badge-green">Sonner</span>
+            <span class="badge badge-teal">Recharts</span>
+            <span class="badge badge-red">Vitest</span>
+            <span class="badge badge-red">Playwright</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BACKEND ── -->
+  <div id="folder-be" class="folder-panel" style="display:none;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <span class="badge badge-green">NestJS · TypeScript · Prisma v7</span>
+      <span class="badge badge-amber">PostgreSQL · JWT Auth</span>
+      <span class="badge badge-purple">11 Modules · 60+ Endpoints</span>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">REST API following NestJS module structure. One folder per domain module. Prisma client generated to <code style="font-family:'DM Mono',monospace;color:var(--accent);">src/generated/prisma/</code>.</p>
+
+    <div class="grid-2">
+      <!-- Tree -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">File Tree</div>
+        <div style="padding:18px 20px;overflow-x:auto;">
+          <pre style="margin:0;font-family:'DM Mono',monospace;font-size:12px;line-height:1.9;color:var(--text);">renthub-backend/
+├── <span style="color:var(--accent);">prisma/</span>
+│   ├── schema.prisma                  <span style="color:var(--muted);"># Single schema file</span>
+│   ├── seed.ts                        <span style="color:var(--muted);"># Dev seeder (realistic PH data)</span>
+│   └── migrations/                    <span style="color:var(--muted);"># Auto-generated migration SQL</span>
+│
+├── <span style="color:var(--accent);">src/</span>
+│   │
+│   ├── <span style="color:var(--accent3);">prisma/</span>                      <span style="color:var(--muted);"># Prisma service module</span>
+│   │   ├── prisma.service.ts          <span style="color:var(--muted);"># Extends PrismaClient, onModuleInit</span>
+│   │   └── prisma.module.ts           <span style="color:var(--muted);"># Global module — imported once</span>
+│   │
+│   ├── <span style="color:var(--accent3);">config/</span>                      <span style="color:var(--muted);"># App configuration</span>
+│   │   ├── app.config.ts              <span style="color:var(--muted);"># PORT, NODE_ENV</span>
+│   │   ├── jwt.config.ts              <span style="color:var(--muted);"># JWT_SECRET, ACCESS_EXPIRES, REFRESH_EXPIRES</span>
+│   │   ├── database.config.ts         <span style="color:var(--muted);"># DATABASE_URL</span>
+│   │   └── mail.config.ts             <span style="color:var(--muted);"># SMTP settings</span>
+│   │
+│   ├── <span style="color:var(--accent3);">common/</span>                      <span style="color:var(--muted);"># Shared across all modules</span>
+│   │   ├── decorators/
+│   │   │   ├── current-user.decorator.ts
+│   │   │   ├── roles.decorator.ts     <span style="color:var(--muted);"># @Roles(UserType.LANDLORD)</span>
+│   │   │   └── org-roles.decorator.ts <span style="color:var(--muted);"># @OrgRoles('OWNER', 'ADMIN')</span>
+│   │   ├── guards/
+│   │   │   ├── jwt-auth.guard.ts
+│   │   │   ├── roles.guard.ts         <span style="color:var(--muted);"># UserType guard</span>
+│   │   │   └── org-role.guard.ts      <span style="color:var(--muted);"># Org-level RBAC guard</span>
+│   │   ├── filters/
+│   │   │   └── http-exception.filter.ts <span style="color:var(--muted);"># Global error normalizer</span>
+│   │   ├── interceptors/
+│   │   │   ├── response.interceptor.ts  <span style="color:var(--muted);"># Wrap responses in { data, meta }</span>
+│   │   │   └── audit.interceptor.ts     <span style="color:var(--muted);"># Auto-log mutations to audit_trail</span>
+│   │   ├── pipes/
+│   │   │   └── zod-validation.pipe.ts
+│   │   ├── dto/
+│   │   │   └── pagination.dto.ts      <span style="color:var(--muted);"># page, limit, sortBy, order</span>
+│   │   └── utils/
+│   │       ├── pagination.util.ts
+│   │       └── date.util.ts           <span style="color:var(--muted);"># billingDay helpers, timezone utils</span>
+│   │
+│   ├── <span style="color:var(--accent4);">modules/</span>                     <span style="color:var(--muted);"># Domain modules</span>
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">auth/</span>
+│   │   │   ├── auth.module.ts
+│   │   │   ├── auth.controller.ts     <span style="color:var(--muted);"># /auth/* endpoints</span>
+│   │   │   ├── auth.service.ts
+│   │   │   ├── strategies/
+│   │   │   │   ├── jwt.strategy.ts
+│   │   │   │   └── refresh.strategy.ts
+│   │   │   └── dto/
+│   │   │       ├── login.dto.ts
+│   │   │       ├── register.dto.ts
+│   │   │       └── reset-password.dto.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">admin/</span>
+│   │   │   ├── admin.module.ts
+│   │   │   ├── admin.controller.ts    <span style="color:var(--muted);"># /admin/* — SYSTEM_ADMIN only</span>
+│   │   │   └── admin.service.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">property-groups/</span>
+│   │   │   ├── property-groups.module.ts
+│   │   │   ├── property-groups.controller.ts
+│   │   │   ├── property-groups.service.ts
+│   │   │   └── dto/
+│   │   │       ├── create-property-group.dto.ts
+│   │   │       └── invite-member.dto.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">properties/</span>
+│   │   │   ├── properties.module.ts
+│   │   │   ├── properties.controller.ts
+│   │   │   ├── properties.service.ts
+│   │   │   └── dto/
+│   │   │       ├── create-property.dto.ts
+│   │   │       ├── create-unit.dto.ts
+│   │   │       └── update-unit.dto.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">tenants/</span>
+│   │   │   ├── tenants.module.ts
+│   │   │   ├── tenants.controller.ts
+│   │   │   ├── tenants.service.ts
+│   │   │   └── dto/
+│   │   │       ├── create-tenant.dto.ts
+│   │   │       └── update-tenant.dto.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">leases/</span>
+│   │   │   ├── leases.module.ts
+│   │   │   ├── leases.controller.ts
+│   │   │   ├── leases.service.ts      <span style="color:var(--muted);"># create → OCCUPIED + initial bills</span>
+│   │   │   └── dto/
+│   │   │       ├── create-lease.dto.ts
+│   │   │       └── update-lease.dto.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">payments/</span>
+│   │   │   ├── payments.module.ts
+│   │   │   ├── payments.controller.ts
+│   │   │   ├── payments.service.ts    <span style="color:var(--muted);"># manual recording + PayMongo</span>
+│   │   │   ├── billing-cron.service.ts <span style="color:var(--muted);"># @Cron — monthly bill generation</span>
+│   │   │   └── dto/
+│   │   │       ├── record-payment.dto.ts
+│   │   │       └── paymongo-webhook.dto.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">addons/</span>
+│   │   │   ├── addons.module.ts
+│   │   │   ├── addons.controller.ts
+│   │   │   ├── addons.service.ts
+│   │   │   └── dto/
+│   │   │       ├── create-addon-catalog.dto.ts
+│   │   │       ├── assign-unit-addon.dto.ts
+│   │   │       └── create-utility-reading.dto.ts
+│   │   │
+│   │   ├── <span style="color:var(--accent4);">notifications/</span>
+│   │   │   ├── notifications.module.ts
+│   │   │   ├── mail.service.ts        <span style="color:var(--muted);"># Nodemailer / Resend</span>
+│   │   │   └── sms.service.ts         <span style="color:var(--muted);"># Semaphore SMS</span>
+│   │   │
+│   │   └── <span style="color:var(--accent4);">tenant-portal/</span>
+│   │       ├── tenant-portal.module.ts
+│   │       ├── tenant-portal.controller.ts <span style="color:var(--muted);"># /tenant/* — TENANT userType only</span>
+│   │       └── tenant-portal.service.ts
+│   │
+│   ├── app.module.ts                  <span style="color:var(--muted);"># Root module — imports all above</span>
+│   └── main.ts                        <span style="color:var(--muted);"># Bootstrap: CORS, ValidationPipe, Swagger</span>
+│
+├── test/
+│   ├── auth.e2e-spec.ts
+│   ├── leases.e2e-spec.ts
+│   └── jest-e2e.json
+│
+├── .env
+├── .env.example
+├── nest-cli.json
+├── tsconfig.json
+└── package.json</pre>
+        </div>
+      </div>
+
+      <!-- Conventions + stack -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">🗂 Module Conventions</div>
+          <table>
+            <thead><tr><th>File</th><th>Responsibility</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">*.module.ts</td><td class="dim">Imports, providers, exports — wiring only</td></tr>
+              <tr><td class="mono">*.controller.ts</td><td class="dim">Route handlers, guards, DTOs — no business logic</td></tr>
+              <tr><td class="mono">*.service.ts</td><td class="dim">All business logic + Prisma queries</td></tr>
+              <tr><td class="mono">dto/*.dto.ts</td><td class="dim">class-validator decorators for request body validation</td></tr>
+              <tr><td class="mono">strategies/</td><td class="dim">Passport strategies — JWT + Refresh only</td></tr>
+              <tr><td class="mono">common/guards/</td><td class="dim">Global guards — apply at controller or method level</td></tr>
+              <tr><td class="mono">common/interceptors/</td><td class="dim">Response wrapping, audit logging — apply globally in main.ts</td></tr>
+              <tr><td class="mono">billing-cron.service.ts</td><td class="dim">@Cron('0 8 * * *') — runs daily, bills on billingDay match</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">⚠️ Key Rules</div>
+          <ul style="list-style:none;padding:0;">
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">All Prisma queries in <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">*.service.ts</code> only — never in controllers</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);"><code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">PrismaModule</code> is global — import once in <code style="font-family:'DM Mono',monospace;font-size:12px;">app.module.ts</code></span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">Soft-delete pattern: <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">deletedAt</code> field — never hard-delete records</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent5);">✕</span><span style="color:var(--muted);">Never expose <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">internalNotes</code> or <code style="font-family:'DM Mono',monospace;font-size:12px;">hashedPassword</code> in tenant-portal responses</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">All multi-step operations (create lease, record payment) wrapped in <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">prisma.$transaction()</code></span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">📦 Tech Stack</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="badge badge-green">NestJS 10</span>
+            <span class="badge badge-green">TypeScript</span>
+            <span class="badge badge-blue">Prisma v7</span>
+            <span class="badge badge-blue">PostgreSQL 16</span>
+            <span class="badge badge-amber">JWT (access + refresh)</span>
+            <span class="badge badge-amber">class-validator</span>
+            <span class="badge badge-purple">Passport.js</span>
+            <span class="badge badge-teal">@nestjs/schedule (cron)</span>
+            <span class="badge badge-teal">Nodemailer / Resend</span>
+            <span class="badge badge-red">Jest + Supertest</span>
+            <span class="badge badge-red">Swagger / OpenAPI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MOBILE ── -->
+  <div id="folder-mo" class="folder-panel" style="display:none;">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+      <span class="badge badge-teal">React Native · Expo SDK 52</span>
+      <span class="badge badge-purple">TypeScript · NativeWind</span>
+      <span class="badge badge-amber">Tenant portal only</span>
+    </div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Mobile app serves TENANT users only. Landlord mobile features (meter readings, on-the-go management) can be added as a separate stack in a later phase.</p>
+
+    <div class="grid-2">
+      <!-- Tree -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:12px 18px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;">File Tree</div>
+        <div style="padding:18px 20px;overflow-x:auto;">
+          <pre style="margin:0;font-family:'DM Mono',monospace;font-size:12px;line-height:1.9;color:var(--text);">renthub-mobile/
+├── <span style="color:var(--accent);">app/</span>                             <span style="color:var(--muted);"># Expo Router (file-based routing)</span>
+│   ├── <span style="color:var(--accent3);">(auth)/</span>                        <span style="color:var(--muted);"># Public — no tab bar</span>
+│   │   ├── login.tsx
+│   │   ├── forgot-password.tsx
+│   │   ├── reset-password.tsx
+│   │   ├── verify-email.tsx
+│   │   └── _layout.tsx                <span style="color:var(--muted);"># Stack navigator, no header</span>
+│   │
+│   ├── <span style="color:var(--accent2);">(portal)/</span>                      <span style="color:var(--muted);"># Authenticated tenant portal</span>
+│   │   ├── _layout.tsx                <span style="color:var(--muted);"># Tab navigator (4 tabs)</span>
+│   │   ├── index.tsx                  <span style="color:var(--muted);"># Home — active lease + next due</span>
+│   │   ├── lease.tsx                  <span style="color:var(--muted);"># Lease details + addon list</span>
+│   │   ├── payments/
+│   │   │   ├── index.tsx              <span style="color:var(--muted);"># Payment history list</span>
+│   │   │   └── [id].tsx               <span style="color:var(--muted);"># Bill breakdown + pay button</span>
+│   │   └── profile.tsx                <span style="color:var(--muted);"># Profile + emergency contact</span>
+│   │
+│   ├── _layout.tsx                    <span style="color:var(--muted);"># Root layout: Providers, redirect</span>
+│   └── +not-found.tsx
+│
+├── <span style="color:var(--accent);">src/</span>
+│   ├── <span style="color:var(--accent4);">components/</span>                  <span style="color:var(--muted);"># Reusable UI components</span>
+│   │   ├── common/
+│   │   │   ├── StatusBadge.tsx        <span style="color:var(--muted);"># Same enum map as web</span>
+│   │   │   ├── EmptyState.tsx
+│   │   │   ├── LoadingSkeleton.tsx
+│   │   │   ├── ErrorBoundary.tsx
+│   │   │   └── SafeAreaWrapper.tsx
+│   │   ├── layout/
+│   │   │   ├── ScreenHeader.tsx       <span style="color:var(--muted);"># Back button + title</span>
+│   │   │   └── TabBar.tsx             <span style="color:var(--muted);"># Custom tab bar component</span>
+│   │   └── ui/
+│   │       ├── Button.tsx             <span style="color:var(--muted);"># Touchable with loading state</span>
+│   │       ├── Input.tsx              <span style="color:var(--muted);"># Styled TextInput + label</span>
+│   │       ├── Card.tsx
+│   │       ├── Badge.tsx
+│   │       └── Divider.tsx
+│   │
+│   ├── <span style="color:var(--accent4);">features/</span>                    <span style="color:var(--muted);"># Feature-colocated components</span>
+│   │   ├── auth/
+│   │   │   ├── LoginForm.tsx
+│   │   │   └── ForgotPasswordForm.tsx
+│   │   ├── home/
+│   │   │   ├── LeaseCard.tsx          <span style="color:var(--muted);"># Active lease summary widget</span>
+│   │   │   └── OverdueAlert.tsx       <span style="color:var(--muted);"># Banner when payment overdue</span>
+│   │   ├── lease/
+│   │   │   ├── LeaseDetail.tsx
+│   │   │   └── AddonList.tsx          <span style="color:var(--muted);"># WiFi, electricity etc.</span>
+│   │   └── payments/
+│   │       ├── PaymentHistoryItem.tsx
+│   │       ├── BillBreakdown.tsx      <span style="color:var(--muted);"># Base rent + addon line items</span>
+│   │       └── PayButton.tsx          <span style="color:var(--muted);"># PayMongo checkout trigger</span>
+│   │
+│   ├── <span style="color:var(--accent4);">hooks/</span>                       <span style="color:var(--muted);"># Custom hooks</span>
+│   │   ├── useAuth.ts
+│   │   ├── useActiveLease.ts
+│   │   ├── usePayments.ts
+│   │   └── usePushNotifications.ts
+│   │
+│   ├── <span style="color:var(--accent4);">lib/</span>                         <span style="color:var(--muted);"># Core utilities</span>
+│   │   ├── api/
+│   │   │   ├── client.ts              <span style="color:var(--muted);"># Axios instance + interceptors</span>
+│   │   │   ├── auth.api.ts
+│   │   │   ├── lease.api.ts
+│   │   │   └── payments.api.ts
+│   │   ├── storage.ts                 <span style="color:var(--muted);"># expo-secure-store wrapper (tokens)</span>
+│   │   ├── notifications.ts           <span style="color:var(--muted);"># expo-notifications setup</span>
+│   │   └── utils.ts                   <span style="color:var(--muted);"># formatCurrency, formatDate</span>
+│   │
+│   ├── <span style="color:var(--accent4);">stores/</span>                      <span style="color:var(--muted);"># Zustand stores</span>
+│   │   ├── auth.store.ts              <span style="color:var(--muted);"># user, accessToken, logout()</span>
+│   │   └── notification.store.ts      <span style="color:var(--muted);"># unread badge count</span>
+│   │
+│   └── <span style="color:var(--accent4);">types/</span>
+│       ├── domain.types.ts            <span style="color:var(--muted);"># Same domain types as web</span>
+│       └── api.types.ts
+│
+├── assets/
+│   ├── fonts/
+│   ├── images/
+│   └── icons/
+│
+├── .env
+├── .env.example
+├── app.json                           <span style="color:var(--muted);"># Expo config (bundleId, permissions)</span>
+├── babel.config.js
+├── tsconfig.json
+├── tailwind.config.js                 <span style="color:var(--muted);"># NativeWind config</span>
+└── package.json</pre>
+        </div>
+      </div>
+
+      <!-- Conventions + stack -->
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">🗂 Folder Conventions</div>
+          <table>
+            <thead><tr><th>Folder</th><th>Rule</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">app/(auth)/</td><td class="dim">Unauthenticated screens — stack navigator, no tab bar</td></tr>
+              <tr><td class="mono">app/(portal)/</td><td class="dim">Authenticated screens — tab navigator with 4 tabs</td></tr>
+              <tr><td class="mono">app/_layout.tsx</td><td class="dim">Root layout — checks auth token, redirects accordingly</td></tr>
+              <tr><td class="mono">src/components/ui/</td><td class="dim">Atomic UI — Button, Input, Card, Badge (no logic)</td></tr>
+              <tr><td class="mono">src/features/</td><td class="dim">Screen-level components colocated with their feature</td></tr>
+              <tr><td class="mono">src/lib/api/</td><td class="dim">All API calls — same pattern as web (one file per resource)</td></tr>
+              <tr><td class="mono">src/lib/storage.ts</td><td class="dim">expo-secure-store wrapper — never store tokens in AsyncStorage</td></tr>
+              <tr><td class="mono">src/stores/</td><td class="dim">Zustand — auth session and push notification badge only</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">📱 4 Tabs — Tenant Portal</div>
+          <table>
+            <thead><tr><th>Tab</th><th>Screen</th><th>Content</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">Home</td><td class="dim">index.tsx</td><td class="dim">Active lease card, next due date, overdue alert</td></tr>
+              <tr><td class="mono">Lease</td><td class="dim">lease.tsx</td><td class="dim">Lease terms, move-in, billing day, addon list</td></tr>
+              <tr><td class="mono">Payments</td><td class="dim">payments/</td><td class="dim">History list + per-bill breakdown + Pay button</td></tr>
+              <tr><td class="mono">Profile</td><td class="dim">profile.tsx</td><td class="dim">Phone, emergency contact — read-only lease info</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">⚠️ Key Rules</div>
+          <ul style="list-style:none;padding:0;">
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent5);">✕</span><span style="color:var(--muted);">Never store tokens in <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">AsyncStorage</code> — use <code style="font-family:'DM Mono',monospace;font-size:12px;">expo-secure-store</code></span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent5);">✕</span><span style="color:var(--muted);"><code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">internalNotes</code> must never be fetched or rendered anywhere in this app</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">Root <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">_layout.tsx</code> handles auth redirect — no per-screen auth checks</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">All API calls share same Axios instance pattern as web — consistent interceptors</span></li>
+            <li style="display:flex;gap:10px;padding:7px 0;font-size:13px;"><span style="color:var(--accent3);">✓</span><span style="color:var(--muted);">Use <code style="color:var(--text);font-family:'DM Mono',monospace;font-size:12px;">TanStack Query</code> for all server state — same pattern as web</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">📦 Tech Stack</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="badge badge-teal">React Native</span>
+            <span class="badge badge-teal">Expo SDK 52</span>
+            <span class="badge badge-blue">TypeScript</span>
+            <span class="badge badge-green">Expo Router v4</span>
+            <span class="badge badge-purple">NativeWind v4</span>
+            <span class="badge badge-amber">TanStack Query v5</span>
+            <span class="badge badge-amber">Zustand</span>
+            <span class="badge badge-blue">Axios</span>
+            <span class="badge badge-green">expo-secure-store</span>
+            <span class="badge badge-teal">expo-notifications</span>
+            <span class="badge badge-purple">React Hook Form + Zod</span>
+            <span class="badge badge-red">Jest + RNTL</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Monorepo suggestion -->
+  <div class="card" style="margin-top:28px;border-left:3px solid var(--accent4);">
+    <div class="card-title" style="margin-bottom:10px;">📁 Monorepo Option</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">If all three live in a single repository, use this root structure with a shared types package:</p>
+    <pre style="font-family:'DM Mono',monospace;font-size:12px;line-height:1.9;color:var(--text);background:var(--bg);padding:16px;border-radius:8px;overflow-x:auto;">renthub/
+├── apps/
+│   ├── <span style="color:var(--accent);">web/</span>           <span style="color:var(--muted);"># Next.js frontend (this repo)</span>
+│   ├── <span style="color:var(--accent3);">api/</span>           <span style="color:var(--muted);"># NestJS backend (this repo)</span>
+│   └── <span style="color:var(--accent2);">mobile/</span>        <span style="color:var(--muted);"># React Native / Expo (this repo)</span>
+├── packages/
+│   └── <span style="color:var(--accent4);">types/</span>         <span style="color:var(--muted);"># Shared TypeScript types (domain + API)</span>
+│       ├── src/
+│       │   ├── domain.types.ts
+│       │   └── api.types.ts
+│       └── package.json
+├── turbo.json                 <span style="color:var(--muted);"># Turborepo config</span>
+└── package.json               <span style="color:var(--muted);"># Root workspace</span></pre>
+    <p style="color:var(--muted);font-size:12px;margin-top:10px;">Using <strong style="color:var(--text);">Turborepo</strong> + npm/yarn workspaces. The <code style="font-family:'DM Mono',monospace;color:var(--accent4);">packages/types</code> package is imported by all three apps — domain models and API response types are defined once and shared across web, api, and mobile.</p>
+  </div>
+</div>
+
+<style>
+  .folder-panel { animation: fadeIn 0.2s ease; }
+  #folder-fe pre, #folder-be pre, #folder-mo pre { white-space: pre; }
+</style>
+
+<script>
+function showFolder(id, btn) {
+  document.querySelectorAll('.folder-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('folder-' + id).style.display = 'block';
+  ['fe','be','mo'].forEach(k => {
+    const b = document.getElementById(k + '-btn');
+    if (k === id) {
+      b.style.background = 'rgba(79,142,247,0.15)';
+      b.style.border = '1px solid var(--accent)';
+      b.style.color = 'var(--accent)';
+    } else {
+      b.style.background = 'var(--surface2)';
+      b.style.border = '1px solid var(--border)';
+      b.style.color = 'var(--muted)';
+    }
+  });
+}
+</script>
 
 <script>
 function show(id, btn) {

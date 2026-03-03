@@ -1,65 +1,93 @@
-import Image from "next/image";
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth.config';
+import type { UserType, PropertyGroupSummary } from '@/types/domain.types';
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
+const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
+const baseUrl = apiUrl.replace(/\/$/, '');
+
+async function getDefaultPropertyGroupId(accessToken: string | undefined): Promise<string | null> {
+  if (!accessToken || !baseUrl) return null;
+  try {
+    const res = await fetch(`${baseUrl}/property-groups`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    const groups = (json.data ?? json) as PropertyGroupSummary[];
+    if (!Array.isArray(groups) || groups.length === 0) return null;
+    return groups[0].id;
+  } catch {
+    return null;
+  }
+}
+
+export default async function Home() {
+  const session = await getServerSession(authOptions);
+  const user = session?.user as { userType?: UserType; role?: string } | undefined;
+
+  // Unauthenticated: simple placeholder landing until full design (Phase B)
+  if (!session?.user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+        <div className="mx-4 max-w-md rounded-lg bg-white p-8 shadow">
+          <h1 className="text-2xl font-semibold text-slate-900">RentHub</h1>
+          <p className="mt-2 text-slate-600">
+            Sign in to manage your properties, tenants, and payments.
+          </p>
+          <div className="mt-6 flex gap-3">
             <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="/login"
+              className="flex-1 rounded-md bg-primary-700 px-4 py-2 text-center text-sm font-medium text-white hover:bg-primary-600"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
+              Sign in
+            </a>
             <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              href="/register"
+              className="flex-1 rounded-md border border-slate-300 px-4 py-2 text-center text-sm font-medium text-slate-700 hover:bg-slate-50"
             >
-              Learning
-            </a>{" "}
-            center.
+              Register
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const userType = user?.userType;
+  const role = user?.role;
+  const accessToken = (session as { accessToken?: string }).accessToken;
+
+  if (role === 'ADMIN' && userType === 'SYSTEM_ADMIN') {
+    redirect('/dashboard');
+  }
+
+  if (userType === 'TENANT') {
+    redirect('/tenant-use-mobile');
+  }
+
+  if (role === 'USER' && userType === 'LANDLORD') {
+    const pgId = await getDefaultPropertyGroupId(accessToken);
+    if (pgId) {
+      redirect(`/${pgId}/overview`);
+    }
+
+    // No property group found – show simple message for now
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-100">
+        <div className="mx-4 max-w-md rounded-lg bg-white p-8 text-center shadow">
+          <h1 className="text-lg font-semibold text-slate-900">No organization found</h1>
+          <p className="mt-2 text-sm text-slate-600">
+            We couldn&apos;t find a Property Group for your account. Please contact support.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+      </div>
+    );
+  }
+
+  // Fallback: unknown combination → send to login
+  redirect('/login');
 }

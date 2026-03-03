@@ -1,10 +1,14 @@
 import { PageHeader } from '@/components/common/PageHeader';
+import { SubscriptionsTable } from '@/features/admin/subscriptions/SubscriptionsTable';
 
-export default function SubscriptionsPage() {
+export default function AdminSubscriptionsPage() {
   return (
     <>
-      <PageHeader title="Subscriptions" description="Subscription plan management" />
-      <p className="mt-4 text-sm text-slate-500">Subscription management will be added in Phase 4.</p>
+      <PageHeader title="Subscriptions" description="Platform subscription overview and expiry management." />
+      <div className="mt-4">
+        <SubscriptionsTable />
+      </div>
     </>
   );
 }
+

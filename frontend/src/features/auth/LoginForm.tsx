@@ -37,7 +37,7 @@ export function LoginForm() {
       }
       if (result?.ok) {
         toast.success('Signed in successfully');
-        // Redirect to root; middleware will send Admin+System Admin → /dashboard, User+Landlord → /select-group (then overview)
+        // Redirect to root; middleware + home page will send Admin+System Admin → /dashboard, User+Landlord → /:pgId/overview
         const url = callbackUrl ?? '/';
         router.push(url);
         router.refresh();

@@ -614,7 +614,7 @@ async function main() {
     // ── Done ───────────────────────────────────────────────────────────────────
     console.log('✅  Seeding complete!\n')
     console.log('─────────────────────────────────────')
-    console.log('  Test Accounts (password: Password@123)')
+    console.log('  Test Accounts (password: password)')
     console.log('─────────────────────────────────────')
     console.log('  SYSTEM_ADMIN  admin@renthub.com')
     console.log('  LANDLORD      landlord1@renthub.com')
