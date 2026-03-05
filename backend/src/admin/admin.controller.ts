@@ -20,6 +20,8 @@ import { AdminService } from './admin.service';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { AdminUpdatePropertyGroupDto } from './dto/admin-update-property-group.dto';
 import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
+import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
+import { UpdateSubscriptionPlanStatusDto } from './dto/update-subscription-plan-status.dto';
 
 @ApiTags('Admin')
 @Controller('admin')
@@ -80,8 +82,16 @@ export class AdminController {
   }
 
   @Patch('property-groups/:id')
-  async updatePropertyGroup(@Param('id') id: string, @Body() dto: AdminUpdatePropertyGroupDto) {
-    return this.adminService.updatePropertyGroup(id, dto.status);
+  async updatePropertyGroup(
+    @Param('id') id: string,
+    @Body() dto: AdminUpdatePropertyGroupDto,
+  ) {
+    return this.adminService.updatePropertyGroup(id, dto);
+  }
+
+  @Get('property-groups/:id/details')
+  async getPropertyGroupDetails(@Param('id') id: string) {
+    return this.adminService.getPropertyGroupDetails(id);
   }
 
   @Get('subscriptions')
@@ -108,6 +118,41 @@ export class AdminController {
     return this.adminService.createSubscriptionPlan(dto);
   }
 
+  @Get('subscription-plans')
+  async getSubscriptionPlans(
+    @Query('page') page = 1,
+    @Query('limit') limit = 20,
+    @Query('search') search?: string,
+    @Query('includeInactive') includeInactive?: string,
+    @Query('sort') sort?: string,
+    @Query('order') order?: 'asc' | 'desc',
+  ) {
+    return this.adminService.getSubscriptionPlans({
+      page: Number(page) || 1,
+      limit: Number(limit) || 20,
+      search,
+      includeInactive: includeInactive === 'true',
+      sort,
+      order,
+    });
+  }
+
+  @Patch('subscription-plans/:id')
+  async updateSubscriptionPlan(
+    @Param('id') id: string,
+    @Body() dto: UpdateSubscriptionPlanDto,
+  ) {
+    return this.adminService.updateSubscriptionPlan(id, dto);
+  }
+
+  @Patch('subscription-plans/:id/status')
+  async updateSubscriptionPlanStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateSubscriptionPlanStatusDto,
+  ) {
+    return this.adminService.updateSubscriptionPlanStatus(id, dto.status);
+  }
+
   @Get('audit')
   async getAudit(
     @Query('page') page = 1,
@@ -129,4 +174,3 @@ export class AdminController {
     });
   }
 }
-

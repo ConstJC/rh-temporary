@@ -11,7 +11,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserTypeGuard } from '../auth/guards/user-type.guard';
 import { UserTypes } from '../auth/decorators/user-type.decorator';
@@ -76,7 +81,12 @@ export class PropertiesController {
     @CurrentUser() user: JwtPayload,
     @Body() dto: UpdatePropertyDto,
   ) {
-    return this.propertiesService.updateProperty(pgId, propertyId, user.sub, dto);
+    return this.propertiesService.updateProperty(
+      pgId,
+      propertyId,
+      user.sub,
+      dto,
+    );
   }
 
   @Delete('property-groups/:pgId/properties/:id')
@@ -86,7 +96,10 @@ export class PropertiesController {
   @ApiOperation({ summary: 'Delete a property (OWNER only)' })
   @ApiResponse({ status: 204, description: 'Deleted' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  @ApiResponse({ status: 409, description: 'Has OCCUPIED units or ACTIVE leases' })
+  @ApiResponse({
+    status: 409,
+    description: 'Has OCCUPIED units or ACTIVE leases',
+  })
   async deleteProperty(
     @Param('pgId') pgId: string,
     @Param('id') propertyId: string,
@@ -131,7 +144,10 @@ export class PropertiesController {
   @ApiOperation({ summary: 'Update a unit' })
   @ApiResponse({ status: 200, description: 'Updated' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  @ApiResponse({ status: 409, description: 'Cannot set MAINTENANCE with ACTIVE lease' })
+  @ApiResponse({
+    status: 409,
+    description: 'Cannot set MAINTENANCE with ACTIVE lease',
+  })
   async updateUnit(
     @Param('unitId') unitId: string,
     @CurrentUser() user: JwtPayload,
@@ -147,7 +163,10 @@ export class PropertiesController {
   @ApiOperation({ summary: 'Delete a unit (OWNER only)' })
   @ApiResponse({ status: 204, description: 'Deleted' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
-  @ApiResponse({ status: 409, description: 'Unit OCCUPIED or has ACTIVE lease' })
+  @ApiResponse({
+    status: 409,
+    description: 'Unit OCCUPIED or has ACTIVE lease',
+  })
   async deleteUnit(
     @Param('unitId') unitId: string,
     @CurrentUser() user: JwtPayload,

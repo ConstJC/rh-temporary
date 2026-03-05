@@ -56,6 +56,29 @@ export interface AdminPropertyGroup {
   _count: { properties: number; units: number; members: number };
 }
 
+export interface PropertyGroupUnitDetail {
+  id: string;
+  unitName: string;
+  unitType: string;
+  status: UnitStatus;
+  monthlyRent: number;
+}
+
+export interface PropertyGroupPropertyDetail {
+  id: string;
+  propertyName: string;
+  propertyType: PropertyType;
+  address: string;
+  postalCode: string | null;
+  unitCount: number;
+  unitStatusCounts: Record<string, number>;
+  units: PropertyGroupUnitDetail[];
+}
+
+export interface AdminPropertyGroupDetail extends AdminPropertyGroup {
+  properties: PropertyGroupPropertyDetail[];
+}
+
 export interface AdminSubscription {
   id: string;
   status: SubStatus;
@@ -74,6 +97,18 @@ export interface AdminSubscription {
     maxUnits: number;
     maxProperties: number;
   };
+}
+
+export interface AdminSubscriptionPlan {
+  id: string;
+  name: string;
+  priceMonthly: number;
+  maxUnits: number;
+  maxProperties: number;
+  maxTenants?: number;
+  status: 'ACTIVE' | 'SUSPENDED';
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AdminUser {

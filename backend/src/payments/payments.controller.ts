@@ -7,7 +7,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserTypeGuard } from '../auth/guards/user-type.guard';
 import { UserTypes } from '../auth/decorators/user-type.decorator';
@@ -46,7 +51,10 @@ export class PaymentsController {
 
   @Get('payments/:id')
   @ApiOperation({ summary: 'Get payment detail (landlord or tenant)' })
-  @ApiResponse({ status: 200, description: 'Payment with addon bills and transactions' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment with addon bills and transactions',
+  })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   @ApiResponse({ status: 404, description: 'Not found' })
   async findOne(@Param('id') id: string, @CurrentUser() user: JwtPayload) {

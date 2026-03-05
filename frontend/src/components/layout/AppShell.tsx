@@ -22,11 +22,11 @@ export function AppShell({ children, title, pgId, isAdmin }: AppShellProps) {
     ? 'lg:ml-56'
     : 'ml-0';
   return (
-    <div className="min-h-screen bg-slate-100">
+    <div className="min-h-screen overflow-x-hidden bg-slate-100">
       <Sidebar pgId={pgId} isAdmin={isAdmin} />
-      <TopBar title={title} pgId={pgId} isAdmin={isAdmin} />
+      <TopBar title={title} isAdmin={isAdmin} />
       <main className={cn('pt-14 transition-[margin]', mainMargin)}>
-        <div className="p-4 md:p-6">{children}</div>
+        <div className="p-3 sm:p-4 md:p-6">{children}</div>
       </main>
     </div>
   );

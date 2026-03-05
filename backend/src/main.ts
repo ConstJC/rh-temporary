@@ -1,5 +1,9 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe, VersioningType, ClassSerializerInterceptor } from '@nestjs/common';
+import {
+  ValidationPipe,
+  VersioningType,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { Reflector } from '@nestjs/core';
@@ -7,7 +11,10 @@ import helmet from 'helmet';
 import { useContainer } from 'class-validator';
 import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
-import { AllExceptionsFilter, HttpExceptionFilter } from './common/filters/http-exception.filter';
+import {
+  AllExceptionsFilter,
+  HttpExceptionFilter,
+} from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
 async function bootstrap() {
@@ -29,9 +36,10 @@ async function bootstrap() {
 
   // Security middleware
   app.use(helmet());
-  
+
   // CORS configuration
-  const frontendUrl = configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
+  const frontendUrl =
+    configService.get<string>('app.frontendUrl') || 'http://localhost:3000';
   app.enableCors({
     origin: [frontendUrl, 'http://localhost:3000'],
     credentials: true,
@@ -73,7 +81,9 @@ async function bootstrap() {
   // Swagger configuration
   const config = new DocumentBuilder()
     .setTitle('NestJS Auth API')
-    .setDescription('A comprehensive authentication and authorization API with JWT, RBAC, and email verification')
+    .setDescription(
+      'A comprehensive authentication and authorization API with JWT, RBAC, and email verification',
+    )
     .setVersion('1.0')
     .addBearerAuth(
       {
@@ -99,7 +109,7 @@ async function bootstrap() {
 
   const port = configService.get<number>('port') ?? 8000;
   await app.listen(port);
-  
+
   console.log(`🚀 Application is running on: http://localhost:${port}`);
   console.log(`📚 Swagger documentation: http://localhost:${port}/docs`);
   console.log(`🔗 API Base URL: http://localhost:${port}/api`);

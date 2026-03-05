@@ -1,7 +1,9 @@
 import { apiClient } from './client';
 import type {
   AdminPropertyGroup,
+  AdminPropertyGroupDetail,
   AdminSubscription,
+  AdminSubscriptionPlan,
   AdminUser,
   AuditLogEntry,
   PaginatedResponse,
@@ -9,7 +11,7 @@ import type {
   AddonCatalog,
   DashboardStats,
 } from '@/types/domain.types';
-import type { AddonDto } from '@/lib/validations/admin.schema';
+import type { AddonDto, SubscriptionPlanDto } from '@/lib/validations/admin.schema';
 
 export interface PaginationParams {
   page?: number;
@@ -26,6 +28,11 @@ export interface PropertyGroupFilters extends PaginationParams {
 export interface SubscriptionFilters extends PaginationParams {
   status?: 'ACTIVE' | 'TRIAL' | 'EXPIRED' | 'CANCELLED';
   plan?: string;
+}
+
+export interface SubscriptionPlanFilters extends PaginationParams {
+  search?: string;
+  includeInactive?: boolean;
 }
 
 export interface UserFilters extends PaginationParams {
@@ -55,9 +62,18 @@ export const adminApi = {
       })
       .then((r) => r.data),
 
+  getPropertyGroupDetails: (id: string) =>
+    apiClient.get<AdminPropertyGroupDetail>(`/admin/property-groups/${id}/details`).then((r) => r.data),
+
   updatePropertyGroup: (
     id: string,
-    data: { status?: 'ACTIVE' | 'SUSPENDED'; notes?: string },
+    data: {
+      status?: 'ACTIVE' | 'SUSPENDED';
+      notes?: string;
+      groupName?: string;
+      currencyCode?: string;
+      timezone?: string;
+    },
   ) => apiClient.patch(`/admin/property-groups/${id}`, data).then((r) => r.data),
 
   // Feature 3 — Subscriptions
@@ -68,12 +84,21 @@ export const adminApi = {
       })
       .then((r) => r.data),
 
-  createSubscriptionPlan: (data: {
-    name: string;
-    priceMonthly: number;
-    maxUnits: number;
-    maxProperties: number;
-  }) => apiClient.post('/admin/subscription-plans', data).then((r) => r.data),
+  getSubscriptionPlans: (filters: SubscriptionPlanFilters) =>
+    apiClient
+      .get<PaginatedResponse<AdminSubscriptionPlan>>('/admin/subscription-plans', {
+        params: filters,
+      })
+      .then((r) => r.data),
+
+  createSubscriptionPlan: (data: SubscriptionPlanDto) =>
+    apiClient.post('/admin/subscription-plans', data).then((r) => r.data),
+
+  updateSubscriptionPlan: (id: string, data: Partial<SubscriptionPlanDto>) =>
+    apiClient.patch(`/admin/subscription-plans/${id}`, data).then((r) => r.data),
+
+  updateSubscriptionPlanStatus: (id: string, status: 'ACTIVE' | 'SUSPENDED') =>
+    apiClient.patch(`/admin/subscription-plans/${id}/status`, { status }).then((r) => r.data),
 
   // Feature 4 — Users
   getUsers: (filters: UserFilters) =>
@@ -102,4 +127,3 @@ export const adminApi = {
 
   deleteAddon: (id: string) => apiClient.delete(`/admin/addon-catalog/${id}`),
 };
-

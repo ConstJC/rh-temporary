@@ -10,7 +10,9 @@ import { AUTH_CONSTANTS } from '../constants/auth.constants';
 function jwtFromRequest(req: Request): string | null {
   const authHeader = req.headers?.authorization;
   if (!authHeader || typeof authHeader !== 'string') return null;
-  let token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+  let token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : authHeader;
   if (token.startsWith('Bearer ')) token = token.slice(7);
   return token || null;
 }

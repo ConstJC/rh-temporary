@@ -56,7 +56,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } else if (body.details && Array.isArray(body.details)) {
         details = body.details as ErrorDetail[];
         code = 'VALIDATION_ERROR';
-      } else if (typeof body.message === 'string' && status === HttpStatus.BAD_REQUEST) {
+      } else if (
+        typeof body.message === 'string' &&
+        status === HttpStatus.BAD_REQUEST
+      ) {
         code = 'VALIDATION_ERROR';
       }
     } else {

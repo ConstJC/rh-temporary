@@ -22,9 +22,12 @@ import {
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(page: number = 1, limit: number = 10): Promise<PaginatedUsersResponse> {
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<PaginatedUsersResponse> {
     const skip = (page - 1) * limit;
-    
+
     const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         where: { deletedAt: null },
@@ -66,7 +69,10 @@ export class UsersService {
     return this.findOne(userId);
   }
 
-  async updateMe(userId: string, updateUserDto: UpdateUserDto): Promise<UserResponse> {
+  async updateMe(
+    userId: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserResponse> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId, deletedAt: null },
     });
@@ -84,7 +90,11 @@ export class UsersService {
     return updatedUser;
   }
 
-  async updateRole(userId: string, updateUserRoleDto: UpdateUserRoleDto, currentUserId: string): Promise<UpdateRoleResponse> {
+  async updateRole(
+    userId: string,
+    updateUserRoleDto: UpdateUserRoleDto,
+    currentUserId: string,
+  ): Promise<UpdateRoleResponse> {
     // Check if user exists
     const user = await this.prisma.user.findUnique({
       where: { id: userId, deletedAt: null },
@@ -108,7 +118,10 @@ export class UsersService {
     return updatedUser;
   }
 
-  async deactivateUser(userId: string, currentUserId: string): Promise<UserStatusResponse> {
+  async deactivateUser(
+    userId: string,
+    currentUserId: string,
+  ): Promise<UserStatusResponse> {
     // Check if user exists
     const user = await this.prisma.user.findUnique({
       where: { id: userId, deletedAt: null },
@@ -150,7 +163,10 @@ export class UsersService {
     return updatedUser;
   }
 
-  async softDeleteUser(userId: string, currentUserId: string): Promise<DeleteUserResponse> {
+  async softDeleteUser(
+    userId: string,
+    currentUserId: string,
+  ): Promise<DeleteUserResponse> {
     // Check if user exists
     const user = await this.prisma.user.findUnique({
       where: { id: userId, deletedAt: null },
@@ -168,7 +184,7 @@ export class UsersService {
     // Soft delete user
     await this.prisma.user.update({
       where: { id: userId },
-      data: { 
+      data: {
         deletedAt: new Date(),
         isActive: false,
       },
@@ -197,7 +213,7 @@ export class UsersService {
 
     const restoredUser = await this.prisma.user.update({
       where: { id: userId },
-      data: { 
+      data: {
         deletedAt: null,
         isActive: true,
       },

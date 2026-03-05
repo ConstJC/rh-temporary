@@ -18,4 +18,3 @@ export class CreateSubscriptionPlanDto {
   @Min(0)
   maxProperties!: number;
 }
-

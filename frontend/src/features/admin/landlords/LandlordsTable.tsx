@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { TableSkeleton } from '@/components/common/LoadingSkeleton';
 import { useDebounce } from '@/hooks/useDebounce';
 import { usePagination } from '@/hooks/usePagination';
-import { useAdminPropertyGroups } from '@/features/admin/hooks/usePropertyGroups';
+import { useAdminPropertyGroupDetails, useAdminPropertyGroups } from '@/features/admin/hooks/usePropertyGroups';
 import { getLandlordsColumns } from './LandlordsTableColumns';
 import type { AdminPropertyGroup } from '@/types/domain.types';
 import { PropertyGroupDetailSlideOver } from './PropertyGroupDetailSlideOver';
@@ -33,13 +33,21 @@ export function LandlordsTable() {
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [suspendOpen, setSuspendOpen] = useState(false);
+  const [detailMode, setDetailMode] = useState<'view' | 'edit'>('view');
   const [selected, setSelected] = useState<AdminPropertyGroup | null>(null);
+  const detailsQuery = useAdminPropertyGroupDetails(selected?.id, detailOpen);
 
   const columns = useMemo(
     () =>
       getLandlordsColumns({
         onViewDetails: (g) => {
           setSelected(g);
+          setDetailMode('view');
+          setDetailOpen(true);
+        },
+        onEdit: (g) => {
+          setSelected(g);
+          setDetailMode('edit');
           setDetailOpen(true);
         },
         onToggleSuspend: (g) => {
@@ -94,12 +102,13 @@ export function LandlordsTable() {
       )}
 
       <PropertyGroupDetailSlideOver
-        group={selected}
+        key={`${selected?.id ?? 'none'}-${detailMode}-${detailOpen ? 'open' : 'closed'}`}
+        group={detailsQuery.data ?? null}
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
+        mode={detailMode}
       />
       <SuspendOrgDialog group={selected} open={suspendOpen} onClose={() => setSuspendOpen(false)} />
     </div>
   );
 }
-

@@ -17,7 +17,12 @@ export class PaymentsService {
   async findAllByPropertyGroup(
     pgId: string,
     pagination: PaginationDto,
-    filters?: { status?: string; leaseId?: string; dateFrom?: string; dateTo?: string },
+    filters?: {
+      status?: string;
+      leaseId?: string;
+      dateFrom?: string;
+      dateTo?: string;
+    },
   ) {
     const { page = 1, limit = 20 } = pagination;
     const skip = (page - 1) * limit;
@@ -106,19 +111,29 @@ export class PaymentsService {
       throw new NotFoundException('Payment not found');
     }
     const member = await this.prisma.propertyGroupMember.findFirst({
-      where: { propertyGroupId: payment.propertyGroupId, userId, deletedAt: null },
+      where: {
+        propertyGroupId: payment.propertyGroupId,
+        userId,
+        deletedAt: null,
+      },
     });
     if (!member) {
       throw new ForbiddenException('Not a member of this property group');
     }
     if (payment.status === 'PAID') {
-      throw new UnprocessableEntityException('Cannot modify a fully paid payment');
+      throw new UnprocessableEntityException(
+        'Cannot modify a fully paid payment',
+      );
     }
     const amountDue = Number(payment.amountDue);
     const currentPaid = Number(payment.amountPaid);
     const newPaid = currentPaid + dto.amountPaid;
-    const status = newPaid >= amountDue ? 'PAID' : newPaid > 0 ? 'PARTIAL' : payment.status;
-    const oldValues = { amountPaid: payment.amountPaid, status: payment.status };
+    const status =
+      newPaid >= amountDue ? 'PAID' : newPaid > 0 ? 'PARTIAL' : payment.status;
+    const oldValues = {
+      amountPaid: payment.amountPaid,
+      status: payment.status,
+    };
     const updated = await this.prisma.payment.update({
       where: { id: paymentId },
       data: {
@@ -135,7 +150,10 @@ export class PaymentsService {
       tableName: 'payments',
       recordId: paymentId,
       oldValues: oldValues as any,
-      newValues: { amountPaid: updated.amountPaid, status: updated.status } as any,
+      newValues: {
+        amountPaid: updated.amountPaid,
+        status: updated.status,
+      } as any,
     });
     if (payment.lease.tenant.userId) {
       await this.prisma.notification.create({
@@ -168,11 +186,19 @@ export class PaymentsService {
     });
     const firstOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const lastOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    const dueDate = new Date(today.getFullYear(), today.getMonth(), Math.min(dayOfMonth, lastOfMonth.getDate()));
+    const dueDate = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      Math.min(dayOfMonth, lastOfMonth.getDate()),
+    );
 
     for (const lease of leases) {
       const existing = await this.prisma.payment.findFirst({
-        where: { leaseId: lease.id, periodStart: firstOfMonth, deletedAt: null },
+        where: {
+          leaseId: lease.id,
+          periodStart: firstOfMonth,
+          deletedAt: null,
+        },
       });
       if (existing) continue;
 
@@ -214,7 +240,9 @@ export class PaymentsService {
           deletedAt: null,
           status: { in: ['UNPAID', 'PARTIAL'] },
           dueDate: {
-            lt: new Date(Date.now() - lease.gracePeriodDays * 24 * 60 * 60 * 1000),
+            lt: new Date(
+              Date.now() - lease.gracePeriodDays * 24 * 60 * 60 * 1000,
+            ),
           },
         },
       });

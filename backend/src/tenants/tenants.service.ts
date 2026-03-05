@@ -102,7 +102,12 @@ export class TenantsService {
     };
   }
 
-  async update(pgId: string, tenantId: string, userId: string, dto: UpdateTenantDto) {
+  async update(
+    pgId: string,
+    tenantId: string,
+    userId: string,
+    dto: UpdateTenantDto,
+  ) {
     const tenant = await this.prisma.tenant.findFirst({
       where: { id: tenantId, propertyGroupId: pgId, deletedAt: null },
     });

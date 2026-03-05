@@ -60,7 +60,11 @@ export class PropertyGroupsService {
         action: AuditAction.INSERT,
         tableName: 'property_groups',
         recordId: group.id,
-        newValues: { groupName: group.groupName, currencyCode: group.currencyCode, timezone: group.timezone },
+        newValues: {
+          groupName: group.groupName,
+          currencyCode: group.currencyCode,
+          timezone: group.timezone,
+        },
       });
       return group;
     });
@@ -88,7 +92,11 @@ export class PropertyGroupsService {
     });
     const groupIds = members.map((m) => m.propertyGroupId);
     const subscriptions = await this.prisma.subscription.findMany({
-      where: { propertyGroupId: { in: groupIds }, status: 'ACTIVE', deletedAt: null },
+      where: {
+        propertyGroupId: { in: groupIds },
+        status: 'ACTIVE',
+        deletedAt: null,
+      },
       include: { subscriptionPlan: true },
     });
     const subByPg = new Map(subscriptions.map((s) => [s.propertyGroupId, s]));
@@ -101,8 +109,10 @@ export class PropertyGroupsService {
         ? {
             status: subByPg.get(m.propertyGroupId)!.status,
             plan: {
-              planName: subByPg.get(m.propertyGroupId)!.subscriptionPlan.planName,
-              unitLimit: subByPg.get(m.propertyGroupId)!.subscriptionPlan.unitLimit,
+              planName: subByPg.get(m.propertyGroupId)!.subscriptionPlan
+                .planName,
+              unitLimit: subByPg.get(m.propertyGroupId)!.subscriptionPlan
+                .unitLimit,
             },
           }
         : null,
@@ -153,7 +163,11 @@ export class PropertyGroupsService {
     }));
   }
 
-  async addMember(propertyGroupId: string, userId: string, dto: InviteMemberDto) {
+  async addMember(
+    propertyGroupId: string,
+    userId: string,
+    dto: InviteMemberDto,
+  ) {
     const orgRole = await this.prisma.orgRole.findFirst({
       where: { code: dto.roleCode, deletedAt: null },
     });
@@ -181,7 +195,9 @@ export class PropertyGroupsService {
           roleId: orgRole.id,
         },
         include: {
-          user: { select: { id: true, email: true, firstName: true, lastName: true } },
+          user: {
+            select: { id: true, email: true, firstName: true, lastName: true },
+          },
           role: { select: { code: true, name: true } },
         },
       });
@@ -230,7 +246,9 @@ export class PropertyGroupsService {
       where: { id: memberId },
       data: { roleId: newRole.id },
       include: {
-        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        user: {
+          select: { id: true, email: true, firstName: true, lastName: true },
+        },
         role: { select: { code: true, name: true } },
       },
     });
@@ -245,7 +263,11 @@ export class PropertyGroupsService {
     return updated;
   }
 
-  async removeMember(propertyGroupId: string, memberId: string, userId: string) {
+  async removeMember(
+    propertyGroupId: string,
+    memberId: string,
+    userId: string,
+  ) {
     const member = await this.prisma.propertyGroupMember.findFirst({
       where: { id: memberId, propertyGroupId, deletedAt: null },
       include: { role: true },
@@ -281,8 +303,12 @@ export class PropertyGroupsService {
       throw new NotFoundException('No active subscription');
     }
     const [properties, units, tenants] = await Promise.all([
-      this.prisma.property.count({ where: { propertyGroupId, deletedAt: null } }),
-      this.prisma.unit.count({ where: { property: { propertyGroupId }, deletedAt: null } }),
+      this.prisma.property.count({
+        where: { propertyGroupId, deletedAt: null },
+      }),
+      this.prisma.unit.count({
+        where: { property: { propertyGroupId }, deletedAt: null },
+      }),
       this.prisma.tenant.count({ where: { propertyGroupId, deletedAt: null } }),
     ]);
     return {

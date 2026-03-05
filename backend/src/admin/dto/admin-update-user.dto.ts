@@ -10,4 +10,3 @@ export class AdminUpdateUserDto {
   @IsEnum(UserType)
   userType?: UserType;
 }
-

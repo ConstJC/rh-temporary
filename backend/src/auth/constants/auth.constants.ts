@@ -13,19 +13,19 @@ export const AUTH_CONSTANTS = {
     DEFAULT_ACCESS_SECRET: 'default-secret',
     DEFAULT_REFRESH_SECRET: 'default-refresh-secret',
   },
-  
+
   // Password Configuration
   PASSWORD: {
     SALT_ROUNDS: 12,
   },
-  
+
   // Token Configuration
   TOKEN: {
     EMAIL_VERIFICATION_LENGTH: 32,
     PASSWORD_RESET_LENGTH: 32,
     REFRESH_TOKEN_LENGTH: 32,
   },
-  
+
   // Expiration Times (in milliseconds)
   EXPIRATION: {
     PASSWORD_RESET: 60 * 60 * 1000, // 1 hour
@@ -48,15 +48,17 @@ export const AUTH_CONSTANTS = {
     EMAIL_ALREADY_VERIFIED: 'Email already verified',
     INVALID_RESET_TOKEN: 'Invalid or expired reset token',
   },
-  
+
   // Success Messages
   MESSAGES: {
-    REGISTER_SUCCESS: 'User registered successfully. Please check your email for verification.',
+    REGISTER_SUCCESS:
+      'User registered successfully. Please check your email for verification.',
     LOGIN_SUCCESS: 'Login successful',
     LOGOUT_SUCCESS: 'Logout successful',
     TOKEN_REFRESH_SUCCESS: 'Tokens refreshed successfully',
     EMAIL_VERIFIED_SUCCESS: 'Email verified successfully',
-    PASSWORD_RESET_REQUEST_SUCCESS: 'If the email exists, a password reset link has been sent',
+    PASSWORD_RESET_REQUEST_SUCCESS:
+      'If the email exists, a password reset link has been sent',
     PASSWORD_RESET_SUCCESS: 'Password reset successfully',
   },
 } as const;

@@ -89,15 +89,15 @@ export function SubscriptionsTable() {
 
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <div className="flex flex-col gap-3 rounded-lg border border-slate-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-wrap gap-2">
+          <div className="rounded-lg border border-slate-200 bg-white p-4">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[200px_minmax(0,1fr)]">
               <select
                 value={status}
                 onChange={(e) => {
                   setStatus(e.target.value as SubStatus | '');
                   pagination.reset();
                 }}
-                className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
+                className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-800"
               >
                 <option value="">All status</option>
                 <option value="ACTIVE">ACTIVE</option>
@@ -113,7 +113,7 @@ export function SubscriptionsTable() {
                   pagination.reset();
                 }}
                 placeholder="Filter plan…"
-                className="w-48 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                className="h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
             </div>
           </div>
@@ -148,4 +148,3 @@ export function SubscriptionsTable() {
     </div>
   );
 }
-

@@ -7,7 +7,10 @@ import { JwtRefreshPayload } from '../types';
 import { AUTH_CONSTANTS } from '../constants/auth.constants';
 
 @Injectable()
-export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'refresh-jwt') {
+export class RefreshJwtStrategy extends PassportStrategy(
+  Strategy,
+  'refresh-jwt',
+) {
   constructor(
     private configService: ConfigService,
     private prisma: PrismaService,
@@ -15,7 +18,10 @@ export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'refresh-jwt'
     super({
       jwtFromRequest: ExtractJwt.fromBodyField('refreshToken'),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>(AUTH_CONSTANTS.JWT.REFRESH_SECRET_KEY) || process.env.JWT_REFRESH_SECRET || AUTH_CONSTANTS.JWT.DEFAULT_REFRESH_SECRET,
+      secretOrKey:
+        configService.get<string>(AUTH_CONSTANTS.JWT.REFRESH_SECRET_KEY) ||
+        process.env.JWT_REFRESH_SECRET ||
+        AUTH_CONSTANTS.JWT.DEFAULT_REFRESH_SECRET,
     });
   }
 
@@ -38,8 +44,14 @@ export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'refresh-jwt'
       },
     });
 
-    if (!refreshToken || refreshToken.user.deletedAt || !refreshToken.user.isActive) {
-      throw new UnauthorizedException(AUTH_CONSTANTS.ERRORS.INVALID_REFRESH_TOKEN);
+    if (
+      !refreshToken ||
+      refreshToken.user.deletedAt ||
+      !refreshToken.user.isActive
+    ) {
+      throw new UnauthorizedException(
+        AUTH_CONSTANTS.ERRORS.INVALID_REFRESH_TOKEN,
+      );
     }
 
     if (refreshToken.expiresAt < new Date()) {
@@ -47,7 +59,9 @@ export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'refresh-jwt'
       await this.prisma.refreshToken.delete({
         where: { id: refreshToken.id },
       });
-      throw new UnauthorizedException(AUTH_CONSTANTS.ERRORS.REFRESH_TOKEN_EXPIRED);
+      throw new UnauthorizedException(
+        AUTH_CONSTANTS.ERRORS.REFRESH_TOKEN_EXPIRED,
+      );
     }
 
     return {

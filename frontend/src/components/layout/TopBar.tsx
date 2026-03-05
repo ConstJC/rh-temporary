@@ -5,9 +5,11 @@ import { signOut, useSession } from 'next-auth/react';
 import { Menu, LogOut, Bell, Search, User, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 function ProfileDropdown() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   
   const user = session?.user;
@@ -48,12 +50,23 @@ function ProfileDropdown() {
               type="button"
               onClick={() => {
                 setIsOpen(false);
-                // Navigate to profile page when implemented
+                router.push('/dashboard/profile');
               }}
               className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
             >
               <User className="h-4 w-4" />
-              Profile
+              My Profile
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                router.push('/dashboard/settings');
+              }}
+              className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50"
+            >
+              <User className="h-4 w-4" />
+              Account Settings
             </button>
             <button
               type="button"
@@ -73,7 +86,7 @@ function ProfileDropdown() {
   );
 }
 
-export function TopBar({ title, pgId, isAdmin }: { title?: string; pgId?: string; isAdmin: boolean }) {
+export function TopBar({ title, isAdmin }: { title?: string; isAdmin: boolean }) {
   const open = useSidebarStore((s) => s.open);
   const toggle = useSidebarStore((s) => s.toggle);
 
@@ -81,7 +94,7 @@ export function TopBar({ title, pgId, isAdmin }: { title?: string; pgId?: string
     return (
       <header
         className={cn(
-          'fixed top-0 z-30 flex h-14 items-center gap-4 border-b border-slate-200 bg-white px-4 lg:px-6',
+          'fixed top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200 bg-white px-3 sm:gap-4 sm:px-4 lg:px-6',
           'left-0 right-0 lg:right-0',
           open ? 'lg:left-64' : 'lg:left-20'
         )}
@@ -95,7 +108,7 @@ export function TopBar({ title, pgId, isAdmin }: { title?: string; pgId?: string
           <Menu className="h-5 w-5" />
         </button>
 
-        <div className="flex-1">
+        <div className="hidden flex-1 md:block">
           <div className="relative max-w-md">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
@@ -106,7 +119,7 @@ export function TopBar({ title, pgId, isAdmin }: { title?: string; pgId?: string
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
           <button
             type="button"
             className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-primary-700"
@@ -122,7 +135,7 @@ export function TopBar({ title, pgId, isAdmin }: { title?: string; pgId?: string
   }
 
   return (
-    <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center gap-4 border-b border-slate-200 bg-white px-4">
+    <header className="fixed left-0 right-0 top-0 z-30 flex h-14 items-center gap-2 border-b border-slate-200 bg-white px-3 sm:gap-4 sm:px-4">
       <button
         type="button"
         onClick={toggle}

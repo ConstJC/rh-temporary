@@ -42,3 +42,11 @@ export const addonSchema = z
     path: ['unitOfMeasure'],
   });
 export type AddonDto = z.infer<typeof addonSchema>;
+
+export const subscriptionPlanSchema = z.object({
+  name: z.string().min(1, 'Plan name is required'),
+  priceMonthly: z.number().positive('Monthly price must be greater than 0'),
+  maxUnits: z.number().int().min(0, 'Max units must be 0 or more'),
+  maxProperties: z.number().int().min(0, 'Max properties must be 0 or more'),
+});
+export type SubscriptionPlanDto = z.infer<typeof subscriptionPlanSchema>;

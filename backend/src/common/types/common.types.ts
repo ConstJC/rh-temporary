@@ -95,7 +95,11 @@ export interface PasswordResetEntity {
 /**
  * Base user entity combining all common user properties
  */
-export interface BaseUserEntity extends SoftDeletableEntity, ActiveEntity, EmailVerifiableEntity, PasswordResetEntity {
+export interface BaseUserEntity
+  extends SoftDeletableEntity,
+    ActiveEntity,
+    EmailVerifiableEntity,
+    PasswordResetEntity {
   id: string;
   email: string;
   password: string;
@@ -107,7 +111,10 @@ export interface BaseUserEntity extends SoftDeletableEntity, ActiveEntity, Email
 /**
  * User entity without sensitive data
  */
-export interface SafeUserEntity extends SoftDeletableEntity, ActiveEntity, EmailVerifiableEntity {
+export interface SafeUserEntity
+  extends SoftDeletableEntity,
+    ActiveEntity,
+    EmailVerifiableEntity {
   id: string;
   email: string;
   firstName: string;

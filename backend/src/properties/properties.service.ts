@@ -63,9 +63,12 @@ export class PropertiesService {
           _count: true,
         });
         const total = groups.reduce((s, g) => s + g._count, 0);
-        const occupied = groups.find((g) => g.status === 'OCCUPIED')?._count ?? 0;
-        const available = groups.find((g) => g.status === 'AVAILABLE')?._count ?? 0;
-        const maintenance = groups.find((g) => g.status === 'MAINTENANCE')?._count ?? 0;
+        const occupied =
+          groups.find((g) => g.status === 'OCCUPIED')?._count ?? 0;
+        const available =
+          groups.find((g) => g.status === 'AVAILABLE')?._count ?? 0;
+        const maintenance =
+          groups.find((g) => g.status === 'MAINTENANCE')?._count ?? 0;
         return { total, occupied, available, maintenance };
       }),
     );
@@ -130,7 +133,9 @@ export class PropertiesService {
       where: { unit: { propertyId }, status: 'ACTIVE', deletedAt: null },
     });
     if (activeLease) {
-      throw new ConflictException('Cannot delete property with units that have ACTIVE leases');
+      throw new ConflictException(
+        'Cannot delete property with units that have ACTIVE leases',
+      );
     }
     await this.prisma.property.update({
       where: { id: propertyId },
@@ -194,7 +199,9 @@ export class PropertiesService {
           leases: {
             where: { status: 'ACTIVE', deletedAt: null },
             take: 1,
-            include: { tenant: { select: { firstName: true, lastName: true } } },
+            include: {
+              tenant: { select: { firstName: true, lastName: true } },
+            },
           },
         },
       }),
@@ -224,7 +231,9 @@ export class PropertiesService {
         where: { unitId, status: 'ACTIVE', deletedAt: null },
       });
       if (activeLease) {
-        throw new ConflictException('Cannot set unit to MAINTENANCE/NOT_AVAILABLE while it has an ACTIVE lease');
+        throw new ConflictException(
+          'Cannot set unit to MAINTENANCE/NOT_AVAILABLE while it has an ACTIVE lease',
+        );
       }
     }
     const oldValues = { ...unit };

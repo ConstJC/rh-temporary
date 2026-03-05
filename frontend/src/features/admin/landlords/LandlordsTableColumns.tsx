@@ -11,9 +11,11 @@ function subKey(status: string) {
 
 export function getLandlordsColumns({
   onViewDetails,
+  onEdit,
   onToggleSuspend,
 }: {
   onViewDetails: (g: AdminPropertyGroup) => void;
+  onEdit: (g: AdminPropertyGroup) => void;
   onToggleSuspend: (g: AdminPropertyGroup) => void;
 }): ColumnDef<AdminPropertyGroup>[] {
   return [
@@ -73,6 +75,13 @@ export function getLandlordsColumns({
           </button>
           <button
             type="button"
+            onClick={() => onEdit(row.original)}
+            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            Edit
+          </button>
+          <button
+            type="button"
             onClick={() => onToggleSuspend(row.original)}
             className="rounded-md bg-primary-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-600"
           >
@@ -83,4 +92,3 @@ export function getLandlordsColumns({
     },
   ];
 }
-

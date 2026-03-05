@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsEmail, IsOptional, IsObject, MinLength, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  IsObject,
+  MinLength,
+  MaxLength,
+} from 'class-validator';
 
 export class EmergencyContactDto {
   @IsString()

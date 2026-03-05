@@ -16,9 +16,17 @@ export async function checkSubscriptionLimit(
       HttpStatus.BAD_REQUEST,
     );
   }
-  const plan = sub.subscriptionPlan as { propertyLimit: number; unitLimit: number; tenantLimit: number };
+  const plan = sub.subscriptionPlan as {
+    propertyLimit: number;
+    unitLimit: number;
+    tenantLimit: number;
+  };
   const limit =
-    type === 'property' ? plan.propertyLimit : type === 'unit' ? plan.unitLimit : plan.tenantLimit;
+    type === 'property'
+      ? plan.propertyLimit
+      : type === 'unit'
+        ? plan.unitLimit
+        : plan.tenantLimit;
   if (limit === 0) return; // unlimited
 
   let count: number;

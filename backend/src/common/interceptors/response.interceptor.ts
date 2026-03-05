@@ -16,20 +16,32 @@ export interface ApiResponse<T> {
 }
 
 @Injectable()
-export class ResponseInterceptor<T> implements NestInterceptor<T, ApiResponse<T>> {
+export class ResponseInterceptor<T>
+  implements NestInterceptor<T, ApiResponse<T>>
+{
   private readonly logger = new Logger(ResponseInterceptor.name);
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<ApiResponse<T>> {
+  intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Observable<ApiResponse<T>> {
     const response = context.switchToHttp().getResponse<Response>();
     const request = context.switchToHttp().getRequest<Request>();
 
     return next.handle().pipe(
       map((value) => {
         const message = response.statusCode < 400 ? 'OK' : 'Error';
-        this.logger.log(`Endpoint accessed: ${request.method} ${request.originalUrl} - Status: ${response.statusCode} (${message})`);
+        this.logger.log(
+          `Endpoint accessed: ${request.method} ${request.originalUrl} - Status: ${response.statusCode} (${message})`,
+        );
 
         // If already wrapped (e.g. controller returned { data, meta }), pass through
-        if (value && typeof value === 'object' && 'data' in value && Object.keys(value).length <= 2) {
+        if (
+          value &&
+          typeof value === 'object' &&
+          'data' in value &&
+          Object.keys(value).length <= 2
+        ) {
           return value as ApiResponse<T>;
         }
         // 204 No Content: some endpoints return nothing

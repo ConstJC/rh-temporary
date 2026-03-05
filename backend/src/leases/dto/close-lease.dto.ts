@@ -6,7 +6,10 @@ export class CloseLeaseDto {
   @IsDateString()
   moveOutDate: string;
 
-  @ApiPropertyOptional({ example: 'REFUNDED', enum: ['REFUNDED', 'FORFEITED', 'APPLIED_TO_RENT', 'OTHER'] })
+  @ApiPropertyOptional({
+    example: 'REFUNDED',
+    enum: ['REFUNDED', 'FORFEITED', 'APPLIED_TO_RENT', 'OTHER'],
+  })
   @IsOptional()
   @IsString()
   @IsIn(['REFUNDED', 'FORFEITED', 'APPLIED_TO_RENT', 'OTHER'])

@@ -43,7 +43,9 @@ export class OrgMemberGuard implements CanActivate {
       include: { role: true },
     });
     if (!member) {
-      throw new ForbiddenException('You do not have access to this property group');
+      throw new ForbiddenException(
+        'You do not have access to this property group',
+      );
     }
     request.orgMember = member;
     request.propertyGroupId = pgId;

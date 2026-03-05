@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsNumber, IsEnum, IsOptional, IsObject, IsDateString, Min } from 'class-validator';
+import {
+  IsNumber,
+  IsEnum,
+  IsOptional,
+  IsObject,
+  IsDateString,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { PaymentMethod } from '../../generated/prisma/client';
 
@@ -18,7 +25,9 @@ export class RecordManualPaymentDto {
   @IsDateString()
   datePaid: string;
 
-  @ApiPropertyOptional({ example: { notes: 'Collected in person, receipt #001' } })
+  @ApiPropertyOptional({
+    example: { notes: 'Collected in person, receipt #001' },
+  })
   @IsOptional()
   @IsObject()
   paymentDetails?: Record<string, unknown>;

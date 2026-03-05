@@ -10,7 +10,12 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UserTypeGuard } from '../auth/guards/user-type.guard';
 import { UserTypes } from '../auth/decorators/user-type.decorator';
@@ -38,13 +43,19 @@ export class PropertyGroupsController {
   @ApiOperation({ summary: 'Create a property group (org)' })
   @ApiResponse({ status: 201, description: 'Property group created' })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  async create(@CurrentUser() user: JwtPayload, @Body() dto: CreatePropertyGroupDto) {
+  async create(
+    @CurrentUser() user: JwtPayload,
+    @Body() dto: CreatePropertyGroupDto,
+  ) {
     return this.propertyGroupsService.create(user.sub, dto);
   }
 
   @Get()
   @ApiOperation({ summary: 'List property groups for current user' })
-  @ApiResponse({ status: 200, description: 'List of property groups with subscription' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of property groups with subscription',
+  })
   async findAll(@CurrentUser() user: JwtPayload) {
     return this.propertyGroupsService.findAll(user.sub);
   }

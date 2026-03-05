@@ -33,9 +33,13 @@ export class MailService {
         user: smtpUser!.trim(),
         pass: smtpPass!.trim(),
       };
-      this.logger.log(`SMTP authentication enabled for ${smtpHost}:${smtpPort}`);
+      this.logger.log(
+        `SMTP authentication enabled for ${smtpHost}:${smtpPort}`,
+      );
     } else {
-      this.logger.log(`SMTP authentication disabled (connecting to ${smtpHost}:${smtpPort})`);
+      this.logger.log(
+        `SMTP authentication disabled (connecting to ${smtpHost}:${smtpPort})`,
+      );
     }
 
     this.transporter = nodemailer.createTransport(transporterConfig);
@@ -44,7 +48,7 @@ export class MailService {
   async sendEmailVerification(email: string, token: string, firstName: string) {
     const appUrl = this.configService.get<string>('app.url');
     const verificationLink = `${appUrl}/api/auth/verify-email?token=${token}`;
-    console.log("verificationLink", verificationLink);
+    console.log('verificationLink', verificationLink);
 
     const mailOptions = {
       from: this.configService.get<string>('smtp.from'),
@@ -67,7 +71,10 @@ export class MailService {
       await this.transporter.sendMail(mailOptions);
       this.logger.log(`Email verification sent to ${email}`);
     } catch (error) {
-      this.logger.error(`Failed to send email verification to ${email}:`, error);
+      this.logger.error(
+        `Failed to send email verification to ${email}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -98,7 +105,10 @@ export class MailService {
       await this.transporter.sendMail(mailOptions);
       this.logger.log(`Password reset email sent to ${email}`);
     } catch (error) {
-      this.logger.error(`Failed to send password reset email to ${email}:`, error);
+      this.logger.error(
+        `Failed to send password reset email to ${email}:`,
+        error,
+      );
       throw error;
     }
   }
@@ -122,7 +132,10 @@ export class MailService {
       await this.transporter.sendMail(mailOptions);
       this.logger.log(`Password changed notification sent to ${email}`);
     } catch (error) {
-      this.logger.error(`Failed to send password changed notification to ${email}:`, error);
+      this.logger.error(
+        `Failed to send password changed notification to ${email}:`,
+        error,
+      );
       throw error;
     }
   }

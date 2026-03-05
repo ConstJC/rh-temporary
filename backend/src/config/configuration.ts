@@ -1,5 +1,5 @@
 export default () => ({
-  port: parseInt(process.env.PORT || '8000', 10),
+  port: parseInt(process.env.PORT || '3002', 10),
   database: {
     url: process.env.DATABASE_URL,
   },
@@ -10,8 +10,8 @@ export default () => ({
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || '7d',
   },
   app: {
-    url: process.env.APP_URL || 'http://localhost:8000',
-    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
+    url: process.env.APP_URL || 'http://localhost:3002',
+    frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3001',
     nodeEnv: process.env.NODE_ENV || 'development',
   },
   smtp: {

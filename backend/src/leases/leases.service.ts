@@ -39,13 +39,17 @@ export class LeasesService {
       }),
     ]);
     if (!unit || unit.property.propertyGroupId !== pgId) {
-      throw new NotFoundException('Unit not found or does not belong to this property group');
+      throw new NotFoundException(
+        'Unit not found or does not belong to this property group',
+      );
     }
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
     }
     if (unit.status !== 'AVAILABLE') {
-      throw new ConflictException('Unit is not available (may be OCCUPIED or in MAINTENANCE)');
+      throw new ConflictException(
+        'Unit is not available (may be OCCUPIED or in MAINTENANCE)',
+      );
     }
     const activeLease = await this.prisma.lease.findFirst({
       where: { unitId: dto.unitId, status: 'ACTIVE', deletedAt: null },
@@ -82,7 +86,10 @@ export class LeasesService {
       });
 
       for (let i = 0; i < advanceMonths; i++) {
-        const periodStart = i === 0 ? firstDayOfMonth(moveInDate) : firstDayOfMonth(addMonths(moveInDate, i));
+        const periodStart =
+          i === 0
+            ? firstDayOfMonth(moveInDate)
+            : firstDayOfMonth(addMonths(moveInDate, i));
         const periodEnd = lastDayOfMonth(periodStart);
         await tx.payment.create({
           data: {
@@ -150,7 +157,10 @@ export class LeasesService {
         orderBy: { createdAt: 'desc' },
         include: {
           tenant: { select: { id: true, firstName: true, lastName: true } },
-          unit: { select: { id: true, unitName: true, floorNumber: true }, include: { property: { select: { propertyName: true } } } },
+          unit: {
+            select: { id: true, unitName: true, floorNumber: true },
+            include: { property: { select: { propertyName: true } } },
+          },
         },
       }),
       this.prisma.lease.count({ where }),
@@ -173,7 +183,10 @@ export class LeasesService {
       }),
     );
 
-    const data = items.map((l, i) => ({ ...l, paymentSummary: paymentSummaries[i] }));
+    const data = items.map((l, i) => ({
+      ...l,
+      paymentSummary: paymentSummaries[i],
+    }));
     const meta: PaginationMeta = { page, limit, total };
     return { data, meta };
   }
@@ -210,7 +223,11 @@ export class LeasesService {
       throw new NotFoundException('Lease not found');
     }
     const member = await this.prisma.propertyGroupMember.findFirst({
-      where: { propertyGroupId: lease.tenant.propertyGroupId, userId, deletedAt: null },
+      where: {
+        propertyGroupId: lease.tenant.propertyGroupId,
+        userId,
+        deletedAt: null,
+      },
     });
     if (!member) {
       throw new ForbiddenException('Not a member of this property group');
@@ -219,8 +236,12 @@ export class LeasesService {
     const updated = await this.prisma.lease.update({
       where: { id: leaseId },
       data: {
-        ...(dto.moveOutDate != null && { moveOutDate: new Date(dto.moveOutDate) }),
-        ...(dto.gracePeriodDays != null && { gracePeriodDays: dto.gracePeriodDays }),
+        ...(dto.moveOutDate != null && {
+          moveOutDate: new Date(dto.moveOutDate),
+        }),
+        ...(dto.gracePeriodDays != null && {
+          gracePeriodDays: dto.gracePeriodDays,
+        }),
         ...(dto.rentAmount != null && { rentAmount: dto.rentAmount }),
       },
       include: { tenant: true, unit: true },
@@ -245,7 +266,11 @@ export class LeasesService {
       throw new NotFoundException('Lease not found');
     }
     const member = await this.prisma.propertyGroupMember.findFirst({
-      where: { propertyGroupId: lease.tenant.propertyGroupId, userId, deletedAt: null },
+      where: {
+        propertyGroupId: lease.tenant.propertyGroupId,
+        userId,
+        deletedAt: null,
+      },
     });
     if (!member) {
       throw new ForbiddenException('Not a member of this property group');
