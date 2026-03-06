@@ -139,4 +139,13 @@ export class PropertyGroupsController {
   async getSubscription(@Param('id') id: string) {
     return this.propertyGroupsService.getSubscription(id);
   }
+
+  @Get(':id/stats/overview')
+  @UseGuards(OrgMemberGuard)
+  @ApiOperation({ summary: 'Get overview statistics for landlord dashboard' })
+  @ApiResponse({ status: 200, description: 'Overview statistics' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async getOverviewStats(@Param('id') id: string) {
+    return this.propertyGroupsService.getOverviewStats(id);
+  }
 }

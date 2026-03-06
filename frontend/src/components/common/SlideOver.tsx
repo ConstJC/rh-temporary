@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { X } from 'lucide-react';
 
@@ -14,9 +14,12 @@ interface SlideOverProps {
 }
 
 export function SlideOver({ open, onClose, title, children, className, action }: SlideOverProps) {
+  const [isClosing, setIsClosing] = useState(false);
+
   useEffect(() => {
     if (open) {
       document.body.style.overflow = 'hidden';
+      setIsClosing(false);
     } else {
       document.body.style.overflow = '';
     }
@@ -25,13 +28,24 @@ export function SlideOver({ open, onClose, title, children, className, action }:
     };
   }, [open]);
 
-  if (!open) return null;
+  const handleClose = () => {
+    setIsClosing(true);
+    setTimeout(() => {
+      onClose();
+      setIsClosing(false);
+    }, 300);
+  };
+
+  if (!open && !isClosing) return null;
 
   return (
     <div className="fixed inset-0 z-50">
       <div
-        className="fixed inset-0 bg-black/30 backdrop-blur-sm"
-        onClick={onClose}
+        className={cn(
+          "fixed inset-0 bg-black/30 backdrop-blur-sm",
+          isClosing ? "animate-out fade-out duration-300" : "animate-in fade-in duration-300"
+        )}
+        onClick={handleClose}
         aria-hidden
       />
       
@@ -41,14 +55,16 @@ export function SlideOver({ open, onClose, title, children, className, action }:
         aria-labelledby="slideover-title"
         className={cn(
           'fixed right-0 top-2 bottom-2 z-50 flex h-auto w-full max-w-2xl flex-col rounded-l-2xl bg-white shadow-2xl',
-          'animate-in slide-in-from-right duration-300',
+          isClosing
+            ? 'animate-out slide-out-to-right duration-300'
+            : 'animate-in slide-in-from-right duration-300',
           className
         )}
       >
         {/* Close button - positioned near the left edge of the panel */}
         <button
           type="button"
-          onClick={onClose}
+          onClick={handleClose}
           className="absolute -left-12 top-0 z-60 flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-700 shadow-lg hover:bg-slate-50"
           aria-label="Close"
         >

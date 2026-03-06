@@ -74,10 +74,36 @@ export class PropertiesService {
     );
     const data = items.map((p, i) => ({
       ...p,
+      _count: { units: unitCounts[i].total },
       unitCount: unitCounts[i],
     }));
     const meta: PaginationMeta = { page, limit, total };
     return { data, meta };
+  }
+
+  async findPropertyById(pgId: string, propertyId: string) {
+    const property = await this.prisma.property.findFirst({
+      where: { id: propertyId, propertyGroupId: pgId, deletedAt: null },
+    });
+    if (!property) {
+      throw new NotFoundException('Property not found');
+    }
+
+    const units = await this.prisma.unit.findMany({
+      where: { propertyId, deletedAt: null },
+      select: { status: true },
+    });
+
+    return {
+      ...property,
+      _count: { units: units.length },
+      unitCount: {
+        total: units.length,
+        occupied: units.filter((u) => u.status === 'OCCUPIED').length,
+        available: units.filter((u) => u.status === 'AVAILABLE').length,
+        maintenance: units.filter((u) => u.status === 'MAINTENANCE').length,
+      },
+    };
   }
 
   async updateProperty(
@@ -216,6 +242,72 @@ export class PropertiesService {
     });
     const meta: PaginationMeta = { page, limit, total };
     return { data, meta };
+  }
+
+  async findUnitsByPropertyGroup(
+    pgId: string,
+    pagination: PaginationDto,
+    status?: string,
+  ) {
+    const { page = 1, limit = 20 } = pagination;
+    const skip = (page - 1) * limit;
+    const where: any = {
+      property: { propertyGroupId: pgId, deletedAt: null },
+      deletedAt: null,
+    };
+    if (status) where.status = status;
+
+    const [items, total] = await Promise.all([
+      this.prisma.unit.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [{ property: { propertyName: 'asc' } }, { unitName: 'asc' }],
+        include: {
+          property: { select: { id: true, propertyName: true } },
+          leases: {
+            where: { status: 'ACTIVE', deletedAt: null },
+            take: 1,
+            include: {
+              tenant: { select: { firstName: true, lastName: true } },
+            },
+          },
+        },
+      }),
+      this.prisma.unit.count({ where }),
+    ]);
+
+    const data = items.map((u) => {
+      const { leases, ...rest } = u;
+      const activeTenantName =
+        leases?.[0]?.tenant &&
+        `${leases[0].tenant.firstName} ${leases[0].tenant.lastName}`.trim();
+      return { ...rest, activeTenantName: activeTenantName || undefined };
+    });
+
+    const meta: PaginationMeta = { page, limit, total };
+    return { data, meta };
+  }
+
+  async findUnitById(unitId: string) {
+    const unit = await this.prisma.unit.findFirst({
+      where: { id: unitId, deletedAt: null },
+      include: {
+        property: { select: { id: true, propertyName: true } },
+        leases: {
+          where: { status: 'ACTIVE', deletedAt: null },
+          take: 1,
+          include: {
+            tenant: { select: { firstName: true, lastName: true } },
+          },
+        },
+      },
+    });
+    if (!unit) {
+      throw new NotFoundException('Unit not found');
+    }
+
+    return unit;
   }
 
   async updateUnit(unitId: string, userId: string, dto: UpdateUnitDto) {

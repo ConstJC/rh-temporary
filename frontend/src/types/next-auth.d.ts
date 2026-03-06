@@ -13,6 +13,7 @@ declare module 'next-auth' {
   interface Session {
     accessToken?: string;
     refreshToken?: string;
+    error?: string;
     user: User;
   }
 }
@@ -24,5 +25,7 @@ declare module 'next-auth/jwt' {
     role?: string;
     userType?: UserType;
     isEmailVerified?: boolean;
+    accessTokenExpiresAt?: number;
+    error?: string;
   }
 }

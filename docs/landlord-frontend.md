@@ -72,7 +72,7 @@ Tabs:
 - Unit name / number
 - Type
 - Monthly rent
-- Status (Available, Occupied, Maintenance)
+- Status (Not Available, Available, Occupied, Maintenance)
 
 ### Actions
 - Edit unit details
@@ -165,7 +165,7 @@ Export: PDF / Excel
 
 ## 12. Build Priority
 
-### Phase 1 (MVP)
+### Phase 1
 - Dashboard
 - Properties
 - Units

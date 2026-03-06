@@ -3,10 +3,13 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Body,
   Param,
   Query,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -84,5 +87,20 @@ export class TenantsController {
     @Body() dto: UpdateTenantDto,
   ) {
     return this.tenantsService.update(pgId, id, user.sub, dto);
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Soft delete a tenant' })
+  @ApiResponse({ status: 204, description: 'Deleted' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  @ApiResponse({ status: 409, description: 'Has ACTIVE lease' })
+  async remove(
+    @Param('pgId') pgId: string,
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    await this.tenantsService.remove(pgId, id, user.sub);
   }
 }

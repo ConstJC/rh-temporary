@@ -7,15 +7,21 @@ export type UserRole = 'ADMIN' | 'USER';
 export type UserType = 'SYSTEM_ADMIN' | 'LANDLORD' | 'TENANT';
 export type OrgRole = 'OWNER' | 'ADMIN' | 'STAFF';
 
-export type PropertyType = 'RESIDENTIAL' | 'COMMERCIAL' | 'MIXED';
-export type UnitType = 'STUDIO' | 'BEDROOM_1' | 'BEDROOM_2' | 'BEDROOM_3' | 'OTHER';
+export type PropertyType =
+  | 'BOARDING_HOUSE'
+  | 'APARTMENT_BUILDING'
+  | 'CONDO'
+  | 'SINGLE_FAMILY'
+  | 'COMMERCIAL_MIXED'
+  | 'OTHER';
+export type UnitType = 'STUDIO' | 'BEDROOM' | 'ENTIRE_UNIT' | 'SHARED_ROOM' | 'DORM' | 'OTHER';
 export type UnitStatus = 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'NOT_AVAILABLE';
-export type TenantStatus = 'ACTIVE' | 'INACTIVE' | 'BLACKLISTED';
-export type LeaseType = 'FIXED' | 'MONTH_TO_MONTH';
-export type LeaseStatus = 'DRAFT' | 'PENDING' | 'ACTIVE' | 'EXPIRED' | 'CLOSED';
-export type PaymentStatus = 'PENDING' | 'PAID' | 'OVERDUE' | 'PARTIAL' | 'CANCELLED';
-export type PaymentMethod = 'CASH' | 'GCASH' | 'BANK_TRANSFER' | 'OTHER';
-export type SubscriptionStatus = 'ACTIVE' | 'EXPIRED' | 'CANCELLED' | 'TRIAL';
+export type TenantStatus = 'ACTIVE' | 'MOVED_OUT' | 'BLACKLISTED';
+export type LeaseType = 'MONTHLY' | 'DAILY' | 'FIXED';
+export type LeaseStatus = 'ACTIVE' | 'EXPIRED' | 'CLOSED';
+export type PaymentStatus = 'UNPAID' | 'PAID' | 'OVERDUE' | 'PARTIAL' | 'CANCELLED';
+export type PaymentMethod = 'CASH' | 'GCASH' | 'BANK_TRANSFER' | 'CARD' | 'OTHER';
+export type SubscriptionStatus = 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
 export type AddonBillingType = 'FLAT_FEE' | 'METERED' | 'FIXED_AMENITY';
 export type AddonCategory = 'internet' | 'utility' | 'parking' | 'laundry' | 'security' | 'pet' | 'amenity';
 export type OrgStatus = 'ACTIVE' | 'SUSPENDED';
@@ -172,28 +178,240 @@ export interface LoginUser {
 export interface PropertyGroupSummary {
   id: string;
   name: string;
+  groupName?: string;
   currencyCode?: string;
   timezone?: string;
-  subscription?: { status: SubscriptionStatus };
+  subscription?: {
+    status: SubscriptionStatus;
+    plan?: {
+      planName?: string;
+      propertyLimit?: number;
+      unitLimit?: number;
+      tenantLimit?: number;
+    };
+  };
 }
 
-// ── Minimal entity types used by existing UI ────────────────────────────────
+// ── Landlord portal types (LANDLORD) ────────────────────────────────────────────
+
+export interface OverviewStats {
+  totalProperties: number;
+  totalUnits: number;
+  occupiedUnits: number;
+  availableUnits: number;
+  totalTenants: number;
+  activeTenants: number;
+  totalRevenue: number;
+  pendingPayments: number;
+  overduePayments: number;
+  occupancyRate: number;
+}
+
+export interface PropertyGroupSubscription {
+  status: SubscriptionStatus;
+  plan: {
+    planName: string;
+    propertyLimit: number;
+    unitLimit: number;
+    tenantLimit: number;
+  };
+  usage: {
+    properties: number;
+    units: number;
+    tenants: number;
+  };
+}
+
+export interface Property {
+  id: string;
+  propertyGroupId: string;
+  propertyType: PropertyType;
+  propertyName: string;
+  addressLine: string;
+  city: string;
+  province?: string;
+  postalCode?: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+  _count?: {
+    units: number;
+  };
+}
 
 export interface Unit {
   id: string;
-  unitType: string;
+  propertyId: string;
+  unitType: UnitType;
   unitName: string;
-  monthlyRent: number | string;
+  monthlyRent: number;
+  floorNumber?: number;
+  maxOccupants?: number;
   status: UnitStatus;
+  isFeatured: boolean;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+  property?: {
+    id: string;
+    propertyName: string;
+  };
   activeTenantName?: string | null;
+  leases?: Array<{
+    id: string;
+    status: string;
+    tenant: {
+      firstName: string;
+      lastName: string;
+    };
+  }>;
 }
 
 export interface Tenant {
   id: string;
+  propertyGroupId: string;
+  userId?: string;
   firstName: string;
   lastName: string;
   phone: string;
-  email?: string | null;
-  status: TenantStatus | string;
-  createdAt?: string;
+  email?: string;
+  internalNotes?: string;
+  emergencyContact?: Record<string, any>;
+  status: TenantStatus;
+  createdAt: string;
+  updatedAt: string;
+  leases?: Array<{
+    id: string;
+    status: string;
+    unit: {
+      unitName: string;
+      property: {
+        propertyName: string;
+      };
+    };
+  }>;
+}
+
+export interface Lease {
+  id: string;
+  tenantId: string;
+  unitId: string;
+  leaseType: LeaseType;
+  billingDay: number;
+  advanceMonths: number;
+  gracePeriodDays: number;
+  moveInDate: string;
+  moveOutDate?: string;
+  rentAmount: number;
+  securityDeposit: number;
+  status: LeaseStatus;
+  createdAt: string;
+  updatedAt: string;
+  tenant: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email?: string;
+  };
+  unit: {
+    id: string;
+    unitName: string;
+    property: {
+      id: string;
+      propertyName: string;
+    };
+  };
+  payments?: Array<{
+    id: string;
+    status: string;
+    amountDue: number;
+    amountPaid: number;
+    dueDate: string;
+  }>;
+}
+
+export interface Payment {
+  id: string;
+  leaseId: string;
+  propertyGroupId: string;
+  periodStart: string;
+  periodEnd: string;
+  dueDate: string;
+  amountDue: number;
+  amountPaid: number;
+  datePaid?: string;
+  paymentMethod?: PaymentMethod;
+  status: PaymentStatus;
+  paymentDetails?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+  lease: {
+    id: string;
+    tenant: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
+    unit: {
+      id: string;
+      unitName: string;
+      property: {
+        id: string;
+        propertyName: string;
+      };
+    };
+  };
+}
+
+// ── DTOs for creating/updating entities ──────────────────────────────────────────
+
+export interface CreatePropertyDto {
+  propertyType: PropertyType;
+  propertyName: string;
+  addressLine: string;
+  city: string;
+  province?: string;
+  postalCode?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface CreateUnitDto {
+  unitType: UnitType;
+  unitName: string;
+  monthlyRent: number;
+  floorNumber?: number;
+  maxOccupants?: number;
+  status?: UnitStatus;
+  isFeatured?: boolean;
+  metadata?: Record<string, any>;
+}
+
+export interface CreateTenantDto {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email?: string;
+  internalNotes?: string;
+  emergencyContact?: Record<string, any>;
+}
+
+export interface CreateLeaseDto {
+  tenantId: string;
+  unitId: string;
+  leaseType: LeaseType;
+  billingDay?: number;
+  advanceMonths?: number;
+  gracePeriodDays?: number;
+  moveInDate: string;
+  moveOutDate?: string;
+  rentAmount: number;
+  securityDeposit: number;
+}
+
+export interface RecordPaymentDto {
+  amountPaid: number;
+  datePaid: string;
+  paymentMethod: PaymentMethod;
+  paymentDetails?: Record<string, any>;
 }

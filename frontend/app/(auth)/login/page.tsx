@@ -1,10 +1,20 @@
-'use client';
-
 import { Suspense } from 'react';
 import { LoginForm } from '@/features/auth/LoginForm';
 import Link from 'next/link';
+import { getServerSession } from 'next-auth';
+import { redirect } from 'next/navigation';
+import { authOptions } from '@/lib/auth.config';
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const session = await getServerSession(authOptions);
+  const user = session?.user as { role?: string; userType?: string } | undefined;
+
+  if (session?.user) {
+    if (user?.role === 'ADMIN' && user?.userType === 'SYSTEM_ADMIN') redirect('/dashboard');
+    if (user?.userType === 'TENANT') redirect('/tenant-use-mobile');
+    redirect('/');
+  }
+
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
       <div className="mb-6 text-center">

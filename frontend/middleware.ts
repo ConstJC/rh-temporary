@@ -27,6 +27,7 @@ export default withAuth(
     if (pathname.startsWith(authPathPrefix)) return NextResponse.next();
 
     const token = req.nextauth.token as TokenPayload;
+    const isAuthenticated = Boolean(req.nextauth.token?.sub) && !(req.nextauth.token as { error?: string } | null)?.error;
     const userType = token?.userType;
 
     if (pathname === '/') {
@@ -43,14 +44,16 @@ export default withAuth(
       return NextResponse.redirect(new URL('/login', req.url));
     }
 
-    if (isPublic(pathname) && token) {
+    if (isPublic(pathname) && isAuthenticated) {
       if (isSystemAdmin(token)) return NextResponse.redirect(new URL('/dashboard', req.url));
       if (isLandlord(token)) return NextResponse.redirect(new URL('/', req.url));
       if (userType === 'TENANT') return NextResponse.redirect(new URL('/tenant-use-mobile', req.url));
+      // Authenticated but missing role metadata: keep user off auth pages.
+      return NextResponse.redirect(new URL('/', req.url));
     }
 
     if (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) {
-      if (!isSystemAdmin(token)) return NextResponse.redirect(new URL('/login', req.url));
+      if (!isAuthenticated || !isSystemAdmin(token)) return NextResponse.redirect(new URL('/login', req.url));
     }
 
     if (userType === 'TENANT') {

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditAction } from '../generated/prisma/client';
 import { createAuditTrail } from '../common/helpers/audit.helper';
@@ -50,7 +54,16 @@ export class TenantsService {
           leases: {
             where: { status: 'ACTIVE', deletedAt: null },
             take: 1,
-            include: { unit: { select: { unitName: true } } },
+            include: {
+              unit: {
+                select: {
+                  unitName: true,
+                  property: {
+                    select: { id: true, propertyName: true },
+                  },
+                },
+              },
+            },
           },
         },
       }),
@@ -60,8 +73,19 @@ export class TenantsService {
       const { leases, ...rest } = t;
       return {
         ...rest,
+        leases: leases.map((lease) => ({
+          id: lease.id,
+          status: lease.status,
+          unit: {
+            unitName: lease.unit.unitName,
+            property: lease.unit.property,
+          },
+        })),
         activeLease: leases?.[0]
-          ? { unitName: leases[0].unit.unitName }
+          ? {
+              unitName: leases[0].unit.unitName,
+              property: leases[0].unit.property,
+            }
           : undefined,
       };
     });
@@ -75,7 +99,15 @@ export class TenantsService {
       include: {
         leases: {
           where: { deletedAt: null },
-          include: { unit: { select: { unitName: true, floorNumber: true } } },
+          include: {
+            unit: {
+              select: {
+                unitName: true,
+                floorNumber: true,
+                property: { select: { id: true, propertyName: true } },
+              },
+            },
+          },
         },
       },
     });
@@ -132,5 +164,35 @@ export class TenantsService {
       newValues: updated as any,
     });
     return updated;
+  }
+
+  async remove(pgId: string, tenantId: string, userId: string) {
+    const tenant = await this.prisma.tenant.findFirst({
+      where: { id: tenantId, propertyGroupId: pgId, deletedAt: null },
+    });
+    if (!tenant) {
+      throw new NotFoundException('Tenant not found');
+    }
+
+    const activeLease = await this.prisma.lease.findFirst({
+      where: { tenantId, status: 'ACTIVE', deletedAt: null },
+      select: { id: true },
+    });
+    if (activeLease) {
+      throw new ConflictException('Cannot delete tenant with ACTIVE lease');
+    }
+
+    await this.prisma.tenant.update({
+      where: { id: tenantId },
+      data: { deletedAt: new Date() },
+    });
+
+    await createAuditTrail(this.prisma, {
+      userId,
+      action: AuditAction.DELETE,
+      tableName: 'tenants',
+      recordId: tenantId,
+      oldValues: tenant as any,
+    });
   }
 }

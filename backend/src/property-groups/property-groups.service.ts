@@ -322,4 +322,76 @@ export class PropertyGroupsService {
       usage: { properties, units, tenants },
     };
   }
+
+  async getOverviewStats(propertyGroupId: string) {
+    const [totalProperties, allUnits, allTenants, activeLeases, allPayments] =
+      await Promise.all([
+        this.prisma.property.count({
+          where: { propertyGroupId, deletedAt: null },
+        }),
+        this.prisma.unit.findMany({
+          where: { property: { propertyGroupId }, deletedAt: null },
+          select: { status: true },
+        }),
+        this.prisma.tenant.findMany({
+          where: { propertyGroupId, deletedAt: null },
+          select: { status: true },
+        }),
+        this.prisma.lease.count({
+          where: {
+            unit: { property: { propertyGroupId } },
+            status: 'ACTIVE',
+            deletedAt: null,
+          },
+        }),
+        this.prisma.payment.findMany({
+          where: {
+            lease: { unit: { property: { propertyGroupId } } },
+            deletedAt: null,
+          },
+          select: { status: true, amountDue: true, amountPaid: true },
+        }),
+      ]);
+
+    const totalUnits = allUnits.length;
+    const occupiedUnits = allUnits.filter(
+      (u) => u.status === 'OCCUPIED',
+    ).length;
+    const availableUnits = allUnits.filter(
+      (u) => u.status === 'AVAILABLE',
+    ).length;
+
+    const totalTenants = allTenants.length;
+    const activeTenants = allTenants.filter(
+      (t) => t.status === 'ACTIVE',
+    ).length;
+
+    const totalRevenue = allPayments
+      .filter((p) => p.status === 'PAID')
+      .reduce((sum, p) => sum + Number(p.amountPaid), 0);
+
+    const pendingPayments = allPayments.filter(
+      (p) => p.status === 'UNPAID',
+    ).length;
+
+    const overduePayments = allPayments.filter(
+      (p) => p.status === 'OVERDUE',
+    ).length;
+
+    const occupancyRate =
+      totalUnits > 0 ? (occupiedUnits / totalUnits) * 100 : 0;
+
+    return {
+      totalProperties,
+      totalUnits,
+      occupiedUnits,
+      availableUnits,
+      totalTenants,
+      activeTenants,
+      totalRevenue,
+      pendingPayments,
+      overduePayments,
+      occupancyRate: Math.round(occupancyRate * 100) / 100,
+    };
+  }
 }

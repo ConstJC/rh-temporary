@@ -14,18 +14,12 @@ interface AppShellProps {
 
 export function AppShell({ children, title, pgId, isAdmin }: AppShellProps) {
   const open = useSidebarStore((s) => s.open);
-  const mainMargin = isAdmin
-    ? open
-      ? 'lg:ml-64'
-      : 'lg:ml-20'
-    : open
-    ? 'lg:ml-56'
-    : 'ml-0';
+  const mainMargin = open ? 'lg:ml-64' : 'lg:ml-20';
   return (
     <div className="min-h-screen overflow-x-hidden bg-slate-100">
       <Sidebar pgId={pgId} isAdmin={isAdmin} />
-      <TopBar title={title} isAdmin={isAdmin} />
-      <main className={cn('pt-14 transition-[margin]', mainMargin)}>
+      <TopBar title={title} isAdmin={isAdmin} pgId={pgId} />
+      <main className={cn('pt-14 transition-[margin] duration-300 ease-out', mainMargin)}>
         <div className="p-3 sm:p-4 md:p-6">{children}</div>
       </main>
     </div>

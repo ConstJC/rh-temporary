@@ -753,6 +753,41 @@
     <p>Complete prioritized list of all 60+ endpoints — grouped by module, tagged by phase and who can call them. Build in order: Phase 1 → 2 → 3 → 4.</p>
   </div>
 
+  <div class="card" style="border-left:3px solid var(--accent3); margin-bottom:22px;">
+    <div class="card-title" style="margin-bottom:12px;">Landlord Web Implementation Delta (as of 2026-03-06)</div>
+    <div class="grid-3" style="margin-bottom:14px;">
+      <div class="stat-tile">
+        <div class="label">Core Routes</div>
+        <div class="value">Ready</div>
+        <div class="sub">Overview, Properties, Tenants, Leases, Payments</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Newly Added</div>
+        <div class="value">6</div>
+        <div class="sub">Property/Unit/Tenant/Lease create + payment record</div>
+      </div>
+      <div class="stat-tile">
+        <div class="label">Backend Delta</div>
+        <div class="value">4</div>
+        <div class="sub">3 read endpoints + tenant delete endpoint</div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>Area</th><th>Endpoint</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Property detail</td><td class="mono">GET /property-groups/:pgId/properties/:id</td><td><span class="badge badge-green">Implemented</span></td><td>Added for landlord property detail page.</td></tr>
+        <tr><td>Units by org</td><td class="mono">GET /property-groups/:pgId/units</td><td><span class="badge badge-green">Implemented</span></td><td>Used by lease create flow.</td></tr>
+        <tr><td>Unit detail</td><td class="mono">GET /units/:unitId</td><td><span class="badge badge-green">Implemented</span></td><td>Used by new unit detail route.</td></tr>
+        <tr><td>Tenant delete</td><td class="mono">DELETE /property-groups/:pgId/tenants/:id</td><td><span class="badge badge-green">Implemented</span></td><td>Soft-delete with ACTIVE lease guard.</td></tr>
+        <tr><td>Add-on catalog (landlord)</td><td class="mono">/property-groups/:pgId/addon-catalog</td><td><span class="badge badge-amber">Pending</span></td><td>Phase 2 billing expansion.</td></tr>
+        <tr><td>Unit add-on assignment</td><td class="mono">/property-groups/:pgId/units/:unitId/addons</td><td><span class="badge badge-amber">Pending</span></td><td>Phase 2 billing expansion.</td></tr>
+        <tr><td>Utility readings</td><td class="mono">/property-groups/:pgId/utility-readings</td><td><span class="badge badge-amber">Pending</span></td><td>Requires duplicate/negative usage guardrails.</td></tr>
+        <tr><td>Billing generator</td><td class="mono">POST /property-groups/:pgId/billing/generate</td><td><span class="badge badge-amber">Pending</span></td><td>Manual trigger acceptable for MVP.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
   <div class="grid-4" style="margin-bottom:28px;">
     <div class="stat-tile" style="border-top:2px solid var(--accent3);"><div class="label">Phase 1 — Core Backend</div><div class="value">25</div><div class="sub">Auth, Org, Property, Tenant, Lease, Payment (manual)</div></div>
     <div class="stat-tile" style="border-top:2px solid var(--accent);"><div class="label">Phase 2 — Dashboard</div><div class="value">14</div><div class="sub">Add-ons, Utility Readings, Notifications, Admin</div></div>

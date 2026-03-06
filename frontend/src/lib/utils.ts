@@ -23,3 +23,17 @@ export function formatPeriod(start: Date | string, end: Date | string): string {
   const e = new Date(end);
   return `${formatDate(s)} – ${formatDate(e)}`;
 }
+
+export function toFiniteNumber(value: unknown, fallback = 0): number {
+  const n = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+export function formatPeso(value: unknown): string {
+  return `₱${toFiniteNumber(value).toLocaleString()}`;
+}
+
+export function toDateOrNull(value: unknown): Date | null {
+  const d = new Date(value as string | number | Date);
+  return Number.isNaN(d.getTime()) ? null : d;
+}

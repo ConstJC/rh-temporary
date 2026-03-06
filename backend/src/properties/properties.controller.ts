@@ -69,6 +69,19 @@ export class PropertiesController {
     return this.propertiesService.findAllProperties(pgId, pagination);
   }
 
+  @Get('property-groups/:pgId/properties/:id')
+  @UseGuards(OrgMemberGuard)
+  @ApiOperation({ summary: 'Get property detail' })
+  @ApiResponse({ status: 200, description: 'Property detail with unit count' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  async findPropertyById(
+    @Param('pgId') pgId: string,
+    @Param('id') propertyId: string,
+  ) {
+    return this.propertiesService.findPropertyById(pgId, propertyId);
+  }
+
   @Patch('property-groups/:pgId/properties/:id')
   @UseGuards(OrgMemberGuard)
   @ApiOperation({ summary: 'Update a property' })
@@ -137,6 +150,35 @@ export class PropertiesController {
       { page, limit },
       status,
     );
+  }
+
+  @Get('property-groups/:pgId/units')
+  @UseGuards(OrgMemberGuard)
+  @ApiOperation({
+    summary: 'List units across property group (optional status filter)',
+  })
+  @ApiResponse({ status: 200, description: 'Paginated list' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async findUnitsByPropertyGroup(
+    @Param('pgId') pgId: string,
+    @Query() query: ListUnitsQueryDto,
+  ) {
+    const { page, limit, status } = query;
+    return this.propertiesService.findUnitsByPropertyGroup(
+      pgId,
+      { page, limit },
+      status,
+    );
+  }
+
+  @Get('units/:unitId')
+  @UseGuards(OrgMemberGuard)
+  @ApiOperation({ summary: 'Get unit detail' })
+  @ApiResponse({ status: 200, description: 'Unit detail' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiResponse({ status: 404, description: 'Not found' })
+  async findUnitById(@Param('unitId') unitId: string) {
+    return this.propertiesService.findUnitById(unitId);
   }
 
   @Patch('units/:unitId')

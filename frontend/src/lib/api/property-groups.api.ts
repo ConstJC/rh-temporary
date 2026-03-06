@@ -4,7 +4,10 @@ import type { PropertyGroupSummary } from '@/types/domain.types';
 
 export async function listPropertyGroups(): Promise<PropertyGroupSummary[]> {
   const { data } = await apiClient.get<{ data: PropertyGroupSummary[] }>(API_ENDPOINTS.PROPERTY_GROUPS);
-  return data.data ?? [];
+  return (data.data ?? []).map((g) => ({
+    ...g,
+    name: g.name ?? g.groupName ?? '',
+  }));
 }
 
 export interface CreatePropertyGroupDto {

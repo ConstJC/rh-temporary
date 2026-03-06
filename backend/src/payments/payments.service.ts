@@ -44,7 +44,13 @@ export class PaymentsService {
           lease: {
             include: {
               tenant: { select: { firstName: true, lastName: true } },
-              unit: { select: { unitName: true } },
+              unit: {
+                select: {
+                  id: true,
+                  unitName: true,
+                  property: { select: { id: true, propertyName: true } },
+                },
+              },
             },
           },
         },
