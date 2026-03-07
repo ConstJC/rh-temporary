@@ -46,17 +46,17 @@ export default function OverviewPage() {
 
   return (
     <>
-      <PageHeader title="Overview" description="KPIs, occupancy, and recent activity" />
-
-      <Card className="mt-6 border-slate-200 bg-white">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base">Organization</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-lg font-semibold text-slate-900">{groupName}</p>
-          <p className="text-sm text-slate-500">Property Group ID: {pgId}</p>
-        </CardContent>
-      </Card>
+      <PageHeader
+        title="Overview"
+        description="KPIs, occupancy, and recent activity"
+        action={(
+          <div className="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 sm:text-right">
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Organization</p>
+            <p className="mt-1 text-base font-semibold text-slate-900 capitalize">{groupName}</p>
+            <p className="text-xs text-slate-500">Property Group ID: {pgId}</p>
+          </div>
+        )}
+      />
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatCard

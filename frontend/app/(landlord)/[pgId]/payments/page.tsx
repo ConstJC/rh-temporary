@@ -1,25 +1,83 @@
 'use client';
 
+import { useMemo, useState } from 'react';
 import { PageHeader } from '@/components/common/PageHeader';
 import { usePropertyGroup } from '@/hooks/usePropertyGroup';
 import { usePayments } from '@/features/landlord/hooks/usePayments';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, Search, ArrowUpDown, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { TableSkeleton } from '@/components/common/LoadingSkeleton';
 import { EmptyState } from '@/components/common/EmptyState';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { formatPeso, toDateOrNull } from '@/lib/utils';
+import { formatPeso, toDateOrNull, toFiniteNumber } from '@/lib/utils';
+import { Input } from '@/components/ui/input';
+
+const PAYMENT_STATUS_OPTIONS = ['ALL', 'UNPAID', 'PAID', 'OVERDUE', 'PARTIAL', 'CANCELLED'] as const;
+type PaymentSortColumn = 'tenant' | 'property' | 'period' | 'dueDate' | 'amountDue' | 'amountPaid' | 'status';
 
 export default function PaymentsPage() {
   const { pgId } = usePropertyGroup();
-  const { data: payments, isLoading } = usePayments(pgId);
+  const { data: payments, isLoading, isFetching, refetch } = usePayments(pgId);
   const router = useRouter();
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<(typeof PAYMENT_STATUS_OPTIONS)[number]>('ALL');
+  const [sortColumn, setSortColumn] = useState<PaymentSortColumn>('dueDate');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
   const formatDateSafe = (value: unknown, pattern: string) => {
     const d = toDateOrNull(value);
     return d ? format(d, pattern) : '—';
+  };
+
+  const filteredPayments = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return (payments ?? []).filter((payment) => {
+      const matchesStatus = statusFilter === 'ALL' || payment.status === statusFilter;
+      const searchable = `${payment.lease.tenant.firstName} ${payment.lease.tenant.lastName} ${payment.lease.unit.property.propertyName} ${payment.lease.unit.unitName} ${payment.status} ${payment.amountDue} ${payment.amountPaid}`.toLowerCase();
+      const matchesSearch = q.length === 0 || searchable.includes(q);
+      return matchesStatus && matchesSearch;
+    });
+  }, [payments, searchQuery, statusFilter]);
+
+  const sortedPayments = useMemo(() => {
+    const rows = [...filteredPayments];
+    const dir = sortDirection === 'asc' ? 1 : -1;
+    rows.sort((a, b) => {
+      const getVal = (payment: (typeof filteredPayments)[number]): string | number => {
+        if (sortColumn === 'tenant') return `${payment.lease.tenant.firstName} ${payment.lease.tenant.lastName}`.toLowerCase();
+        if (sortColumn === 'property') return `${payment.lease.unit.property.propertyName} ${payment.lease.unit.unitName}`.toLowerCase();
+        if (sortColumn === 'status') return payment.status.toLowerCase();
+        if (sortColumn === 'amountDue') return toFiniteNumber(payment.amountDue);
+        if (sortColumn === 'amountPaid') return toFiniteNumber(payment.amountPaid);
+        if (sortColumn === 'period') return toDateOrNull(payment.periodStart)?.getTime() ?? 0;
+        return toDateOrNull(payment.dueDate)?.getTime() ?? 0;
+      };
+      const aVal = getVal(a);
+      const bVal = getVal(b);
+      if (typeof aVal === 'number' && typeof bVal === 'number') return (aVal - bVal) * dir;
+      return String(aVal).localeCompare(String(bVal)) * dir;
+    });
+    return rows;
+  }, [filteredPayments, sortColumn, sortDirection]);
+
+  const toggleSort = (column: PaymentSortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      return;
+    }
+    setSortColumn(column);
+    setSortDirection(column === 'dueDate' || column === 'period' ? 'desc' : 'asc');
+  };
+
+  const renderSortIcon = (column: PaymentSortColumn) => {
+    if (sortColumn !== column) return <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />;
+    return sortDirection === 'asc'
+      ? <ChevronUp className="h-3.5 w-3.5 text-slate-700" />
+      : <ChevronDown className="h-3.5 w-3.5 text-slate-700" />;
   };
 
   if (isLoading) {
@@ -35,7 +93,23 @@ export default function PaymentsPage() {
 
   return (
     <>
-      <PageHeader title="Payments" description="Track rental payments" />
+      <PageHeader
+        title="Payments"
+        description="Track rental payments"
+        action={(
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void refetch();
+            }}
+            disabled={isFetching}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        )}
+      />
 
       {payments && payments.length === 0 ? (
         <EmptyState
@@ -45,72 +119,132 @@ export default function PaymentsPage() {
           className="mt-6"
         />
       ) : (
-        <div className="mt-6 bg-white rounded-lg border border-slate-200">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tenant</TableHead>
-                <TableHead>Property & Unit</TableHead>
-                <TableHead>Period</TableHead>
-                <TableHead>Due Date</TableHead>
-                <TableHead>Amount Due</TableHead>
-                <TableHead>Amount Paid</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {payments?.map((payment) => (
-                <TableRow
-                  key={payment.id}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/${pgId}/payments/${payment.id}`)}
-                >
-                  <TableCell className="font-medium">
-                    {payment.lease.tenant.firstName} {payment.lease.tenant.lastName}
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm">
-                      <div className="font-medium">
-                        {payment.lease.unit.property.propertyName}
-                      </div>
-                      <div className="text-slate-500">
-                        {payment.lease.unit.unitName}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-sm">
-                    {formatDateSafe(payment.periodStart, 'MMM dd')} -{' '}
-                    {formatDateSafe(payment.periodEnd, 'MMM dd, yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    {formatDateSafe(payment.dueDate, 'MMM dd, yyyy')}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {formatPeso(payment.amountDue)}
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {formatPeso(payment.amountPaid)}
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={payment.status} />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        router.push(`/${pgId}/payments/${payment.id}`);
-                      }}
-                    >
-                      View Details
-                    </Button>
-                  </TableCell>
+        <div className="mt-6 space-y-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="relative w-full sm:max-w-md">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+              <Input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search by tenant, property, status, amount"
+                className="pl-9"
+              />
+            </div>
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <label htmlFor="payment-status-filter" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+                Status
+              </label>
+              <select
+                id="payment-status-filter"
+                value={statusFilter}
+                onChange={(event) => setStatusFilter(event.target.value as (typeof PAYMENT_STATUS_OPTIONS)[number])}
+                className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                {PAYMENT_STATUS_OPTIONS.map((status) => (
+                  <option key={status} value={status}>
+                    {status === 'ALL' ? 'All statuses' : status.replace(/_/g, ' ')}
+                  </option>
+                ))}
+              </select>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSearchQuery('');
+                  setStatusFilter('ALL');
+                }}
+                disabled={searchQuery.length === 0 && statusFilter === 'ALL'}
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-slate-50 hover:bg-slate-50">
+                  <TableHead>
+                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('tenant')}>
+                      Tenant {renderSortIcon('tenant')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('property')}>
+                      Property & Unit {renderSortIcon('property')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('period')}>
+                      Period {renderSortIcon('period')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('dueDate')}>
+                      Due Date {renderSortIcon('dueDate')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('amountDue')}>
+                      Amount Due {renderSortIcon('amountDue')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('amountPaid')}>
+                      Amount Paid {renderSortIcon('amountPaid')}
+                    </button>
+                  </TableHead>
+                  <TableHead>
+                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('status')}>
+                      Status {renderSortIcon('status')}
+                    </button>
+                  </TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {sortedPayments.map((payment) => (
+                  <TableRow
+                    key={payment.id}
+                    className="cursor-pointer"
+                    onClick={() => router.push(`/${pgId}/payments/${payment.id}`)}
+                  >
+                    <TableCell className="font-medium">
+                      {payment.lease.tenant.firstName} {payment.lease.tenant.lastName}
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm">
+                        <div className="font-medium">{payment.lease.unit.property.propertyName}</div>
+                        <div className="text-slate-500">{payment.lease.unit.unitName}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm">
+                      {formatDateSafe(payment.periodStart, 'MMM dd')} - {formatDateSafe(payment.periodEnd, 'MMM dd, yyyy')}
+                    </TableCell>
+                    <TableCell>{formatDateSafe(payment.dueDate, 'MMM dd, yyyy')}</TableCell>
+                    <TableCell className="font-medium">{formatPeso(payment.amountDue)}</TableCell>
+                    <TableCell className="font-medium">{formatPeso(payment.amountPaid)}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={payment.status} />
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/${pgId}/payments/${payment.id}`);
+                        }}
+                      >
+                        View Details
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </div>
       )}
     </>

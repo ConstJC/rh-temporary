@@ -13,6 +13,8 @@ import { getUsersColumns } from './UsersTableColumns';
 import type { AdminUser, UserType } from '@/types/domain.types';
 import { UserDetailSlideOver } from './UserDetailSlideOver';
 import { ToggleUserStatusDialog } from './ToggleUserStatusDialog';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 export function UsersTable() {
   const { data: session } = useSession();
@@ -102,6 +104,18 @@ export function UsersTable() {
             <option value="INACTIVE">Inactive</option>
             <option value="UNVERIFIED">Unverified</option>
           </select>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              void query.refetch();
+            }}
+            disabled={query.isFetching}
+          >
+            <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
         </div>
       </div>
 
@@ -134,4 +148,3 @@ export function UsersTable() {
     </div>
   );
 }
-

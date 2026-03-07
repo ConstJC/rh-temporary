@@ -11,6 +11,8 @@ import { getAuditColumns } from './AuditLogTableColumns';
 import type { AuditAction, AuditLogEntry } from '@/types/domain.types';
 import { AuditFilters } from './AuditFilters';
 import { AuditDetailSlideOver } from './AuditDetailSlideOver';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 export function AuditLogTable() {
   const pagination = usePagination({ page: 1, limit: 50 });
@@ -62,6 +64,20 @@ export function AuditLogTable() {
         }}
       />
 
+      <div className="flex justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            void query.refetch();
+          }}
+          disabled={query.isFetching}
+        >
+          <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
+      </div>
+
       {query.isLoading ? (
         <TableSkeleton rows={8} />
       ) : rows.length === 0 ? (
@@ -90,4 +106,3 @@ export function AuditLogTable() {
     </div>
   );
 }
-

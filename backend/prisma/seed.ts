@@ -363,7 +363,6 @@ async function main() {
 
     const tenant1 = await prisma.tenant.create({
         data: {
-            propertyGroupId: pg1.id,
             userId: tenantUser1.id,
             firstName: 'Ana', lastName: 'Garcia',
             phone: '09201234567', email: 'tenant1@renthub.com',
@@ -373,7 +372,6 @@ async function main() {
 
     const tenant2 = await prisma.tenant.create({
         data: {
-            propertyGroupId: pg1.id,
             userId: tenantUser2.id,
             firstName: 'Jose', lastName: 'Mendoza',
             phone: '09211234567', email: 'tenant2@renthub.com',
@@ -384,7 +382,6 @@ async function main() {
     // No portal account yet
     const tenant3 = await prisma.tenant.create({
         data: {
-            propertyGroupId: pg1.id,
             userId: null,
             firstName: 'Carla', lastName: 'Bautista',
             phone: '09221234567', email: 'carla.bautista@email.com',
@@ -396,7 +393,6 @@ async function main() {
     // Moved-out tenant (historical data)
     await prisma.tenant.create({
         data: {
-            propertyGroupId: pg1.id,
             userId: null,
             firstName: 'Ramon', lastName: 'Torres',
             phone: '09231234567', email: 'ramon.torres@email.com',
@@ -408,7 +404,6 @@ async function main() {
     // Santos boarding house tenant
     const tenant5 = await prisma.tenant.create({
         data: {
-            propertyGroupId: pg2.id,
             userId: null,
             firstName: 'Lorna', lastName: 'Villanueva',
             phone: '09241234567', email: 'lorna.v@email.com',
@@ -423,6 +418,7 @@ async function main() {
 
     const lease1 = await prisma.lease.create({
         data: {
+            propertyGroupId: pg1.id, propertyId: prop1.id,
             tenantId: tenant1.id, unitId: unit1.id,
             leaseType: 'MONTHLY', billingDay: 5, advanceMonths: 1, gracePeriodDays: 3,
             moveInDate: new Date('2025-09-01'), rentAmount: 3500, securityDeposit: 3500,
@@ -432,6 +428,7 @@ async function main() {
 
     const lease2 = await prisma.lease.create({
         data: {
+            propertyGroupId: pg1.id, propertyId: prop1.id,
             tenantId: tenant2.id, unitId: unit2.id,
             leaseType: 'MONTHLY', billingDay: 5, advanceMonths: 1, gracePeriodDays: 3,
             moveInDate: new Date('2025-11-01'), rentAmount: 3500, securityDeposit: 3500,
@@ -441,6 +438,7 @@ async function main() {
 
     const lease3 = await prisma.lease.create({
         data: {
+            propertyGroupId: pg1.id, propertyId: prop1.id,
             tenantId: tenant3.id, unitId: unit6.id,
             leaseType: 'MONTHLY', billingDay: 5, advanceMonths: 1, gracePeriodDays: 5,
             moveInDate: new Date('2026-01-01'), rentAmount: 1800, securityDeposit: 1800,
@@ -450,6 +448,7 @@ async function main() {
 
     const lease4 = await prisma.lease.create({
         data: {
+            propertyGroupId: pg1.id, propertyId: prop2.id,
             tenantId: tenant1.id, unitId: unit7.id, // re-used tenant1 with a different unit for demo
             leaseType: 'MONTHLY', billingDay: 1, advanceMonths: 2, gracePeriodDays: 3,
             moveInDate: new Date('2025-10-01'), rentAmount: 8500, securityDeposit: 8500,
@@ -459,6 +458,7 @@ async function main() {
 
     const lease5 = await prisma.lease.create({
         data: {
+            propertyGroupId: pg2.id, propertyId: prop3.id,
             tenantId: tenant5.id, unitId: unit9.id,
             leaseType: 'MONTHLY', billingDay: 10, advanceMonths: 1, gracePeriodDays: 3,
             moveInDate: new Date('2026-01-10'), rentAmount: 3000, securityDeposit: 3000,

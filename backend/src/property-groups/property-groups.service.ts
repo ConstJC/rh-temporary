@@ -309,7 +309,17 @@ export class PropertyGroupsService {
       this.prisma.unit.count({
         where: { property: { propertyGroupId }, deletedAt: null },
       }),
-      this.prisma.tenant.count({ where: { propertyGroupId, deletedAt: null } }),
+      this.prisma.lease
+        .findMany({
+          where: {
+            propertyGroupId,
+            deletedAt: null,
+            tenant: { deletedAt: null },
+          },
+          distinct: ['tenantId'],
+          select: { tenantId: true },
+        })
+        .then((rows) => rows.length),
     ]);
     return {
       status: sub.status,
@@ -324,7 +334,7 @@ export class PropertyGroupsService {
   }
 
   async getOverviewStats(propertyGroupId: string) {
-    const [totalProperties, allUnits, allTenants, activeLeases, allPayments] =
+    const [totalProperties, allUnits, tenantRows, activeLeases, allPayments] =
       await Promise.all([
         this.prisma.property.count({
           where: { propertyGroupId, deletedAt: null },
@@ -333,9 +343,14 @@ export class PropertyGroupsService {
           where: { property: { propertyGroupId }, deletedAt: null },
           select: { status: true },
         }),
-        this.prisma.tenant.findMany({
-          where: { propertyGroupId, deletedAt: null },
-          select: { status: true },
+        this.prisma.lease.findMany({
+          where: {
+            propertyGroupId,
+            deletedAt: null,
+            tenant: { deletedAt: null },
+          },
+          distinct: ['tenantId'],
+          select: { tenant: { select: { status: true } } },
         }),
         this.prisma.lease.count({
           where: {
@@ -361,9 +376,9 @@ export class PropertyGroupsService {
       (u) => u.status === 'AVAILABLE',
     ).length;
 
-    const totalTenants = allTenants.length;
-    const activeTenants = allTenants.filter(
-      (t) => t.status === 'ACTIVE',
+    const totalTenants = tenantRows.length;
+    const activeTenants = tenantRows.filter(
+      (t) => t.tenant.status === 'ACTIVE',
     ).length;
 
     const totalRevenue = allPayments

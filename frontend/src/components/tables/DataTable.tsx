@@ -1,11 +1,15 @@
 'use client';
 
 import {
+  getSortedRowModel,
   flexRender,
   getCoreRowModel,
   useReactTable,
+  type SortingState,
   type ColumnDef,
 } from '@tanstack/react-table';
+import { ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 export function DataTable<TData>({
@@ -19,10 +23,15 @@ export function DataTable<TData>({
   className?: string;
   onRowClick?: (row: TData) => void;
 }) {
+  const [sorting, setSorting] = useState<SortingState>([]);
+
   const table = useReactTable({
     data,
     columns,
+    state: { sorting },
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   });
 
   return (
@@ -37,9 +46,26 @@ export function DataTable<TData>({
                     key={header.id}
                     className="whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.isPlaceholder ? null : (
+                      header.column.getCanSort() ? (
+                        <button
+                          type="button"
+                          onClick={header.column.getToggleSortingHandler()}
+                          className="inline-flex items-center gap-1.5"
+                        >
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {header.column.getIsSorted() === 'asc' ? (
+                            <ChevronUp className="h-3.5 w-3.5" />
+                          ) : header.column.getIsSorted() === 'desc' ? (
+                            <ChevronDown className="h-3.5 w-3.5" />
+                          ) : (
+                            <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
+                          )}
+                        </button>
+                      ) : (
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      )
+                    )}
                   </th>
                 ))}
               </tr>
@@ -68,4 +94,3 @@ export function DataTable<TData>({
     </div>
   );
 }
-

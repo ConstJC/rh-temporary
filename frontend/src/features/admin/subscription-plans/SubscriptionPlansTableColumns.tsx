@@ -16,11 +16,13 @@ export function getSubscriptionPlansColumns({
     {
       header: 'Plan Name',
       id: 'name',
+      accessorKey: 'name',
       cell: ({ row }) => <span className="font-semibold text-slate-900">{row.original.name}</span>,
     },
     {
       header: 'Price / mo',
       id: 'priceMonthly',
+      accessorKey: 'priceMonthly',
       cell: ({ row }) => (
         <span className="text-slate-700">{formatCurrency(row.original.priceMonthly, 'PHP')}</span>
       ),
@@ -28,26 +30,31 @@ export function getSubscriptionPlansColumns({
     {
       header: 'Max Units',
       id: 'maxUnits',
+      accessorKey: 'maxUnits',
       cell: ({ row }) => <span className="text-slate-700">{row.original.maxUnits}</span>,
     },
     {
       header: 'Max Properties',
       id: 'maxProperties',
+      accessorKey: 'maxProperties',
       cell: ({ row }) => <span className="text-slate-700">{row.original.maxProperties}</span>,
     },
     {
       header: 'Status',
       id: 'status',
+      accessorKey: 'status',
       cell: ({ row }) => <StatusBadge status={row.original.status} />,
     },
     {
       header: 'Created',
       id: 'createdAt',
+      accessorKey: 'createdAt',
       cell: ({ row }) => <span className="text-slate-600">{formatDate(row.original.createdAt)}</span>,
     },
     {
       header: 'Actions',
       id: 'actions',
+      enableSorting: false,
       cell: ({ row }) => (
         <div className="flex justify-end gap-2">
           <button

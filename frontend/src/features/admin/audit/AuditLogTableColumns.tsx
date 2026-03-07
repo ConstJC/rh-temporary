@@ -24,6 +24,7 @@ export function getAuditColumns(): ColumnDef<AuditLogEntry>[] {
     {
       header: 'Performed By',
       id: 'performedBy',
+      accessorFn: (a) => a.performedBy?.email ?? 'System',
       cell: ({ row }) =>
         row.original.performedBy ? (
           <span className="text-slate-700">{row.original.performedBy.email}</span>
@@ -48,4 +49,3 @@ export function getAuditColumns(): ColumnDef<AuditLogEntry>[] {
     },
   ];
 }
-

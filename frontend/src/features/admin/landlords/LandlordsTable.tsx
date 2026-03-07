@@ -12,6 +12,8 @@ import { getLandlordsColumns } from './LandlordsTableColumns';
 import type { AdminPropertyGroup } from '@/types/domain.types';
 import { PropertyGroupDetailSlideOver } from './PropertyGroupDetailSlideOver';
 import { SuspendOrgDialog } from './SuspendOrgDialog';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 export function LandlordsTable() {
   const [search, setSearch] = useState('');
@@ -83,6 +85,18 @@ export function LandlordsTable() {
           <option value="ACTIVE">Active</option>
           <option value="SUSPENDED">Suspended</option>
         </select>
+
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => {
+            void query.refetch();
+          }}
+          disabled={query.isFetching}
+        >
+          <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
       {query.isLoading ? (

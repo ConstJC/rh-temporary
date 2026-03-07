@@ -18,6 +18,7 @@ import type { SubscriptionPlanDto } from '@/lib/validations/admin.schema';
 import { getSubscriptionPlansColumns } from './SubscriptionPlansTableColumns';
 import { SubscriptionPlanFormSheet } from './SubscriptionPlanFormSheet';
 import { DeleteOrDeactivatePlanDialog } from './DeleteOrDeactivatePlanDialog';
+import { RefreshCw } from 'lucide-react';
 
 export function SubscriptionPlansTable() {
   const [search, setSearch] = useState('');
@@ -75,7 +76,7 @@ export function SubscriptionPlansTable() {
   return (
     <div className="space-y-4">
       <div className="rounded-lg border border-slate-200 bg-white p-4">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto_auto] md:items-center">
           <input
             value={search}
             onChange={(e) => {
@@ -98,6 +99,20 @@ export function SubscriptionPlansTable() {
             />
             Show inactive
           </label>
+
+          <button
+            type="button"
+            onClick={() => {
+              void query.refetch();
+            }}
+            className="h-10 rounded-md border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            disabled={query.isFetching}
+          >
+            <span className="inline-flex items-center">
+              <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+              Refresh
+            </span>
+          </button>
 
           <button
             type="button"

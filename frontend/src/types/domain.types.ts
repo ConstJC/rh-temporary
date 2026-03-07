@@ -269,7 +269,6 @@ export interface Unit {
 
 export interface Tenant {
   id: string;
-  propertyGroupId: string;
   userId?: string;
   firstName: string;
   lastName: string;
@@ -294,6 +293,8 @@ export interface Tenant {
 
 export interface Lease {
   id: string;
+  propertyGroupId?: string;
+  propertyId?: string;
   tenantId: string;
   unitId: string;
   leaseType: LeaseType;

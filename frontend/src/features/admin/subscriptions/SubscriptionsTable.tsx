@@ -13,6 +13,8 @@ import type { AdminSubscription, SubStatus } from '@/types/domain.types';
 import { SubscriptionDetailSlideOver } from './SubscriptionDetailSlideOver';
 import { PlanBreakdownChart } from './PlanBreakdownChart';
 import { ExpiryAlertBanner } from './ExpiryAlertBanner';
+import { Button } from '@/components/ui/button';
+import { RefreshCw } from 'lucide-react';
 
 function expiringIn7Days(expiresAt: string | null) {
   if (!expiresAt) return false;
@@ -90,7 +92,7 @@ export function SubscriptionsTable() {
       <div className="grid gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <div className="rounded-lg border border-slate-200 bg-white p-4">
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[200px_minmax(0,1fr)]">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[200px_minmax(0,1fr)_auto]">
               <select
                 value={status}
                 onChange={(e) => {
@@ -115,6 +117,18 @@ export function SubscriptionsTable() {
                 placeholder="Filter plan…"
                 className="h-10 w-full rounded-md border border-slate-200 bg-slate-50 px-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               />
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  void query.refetch();
+                }}
+                disabled={query.isFetching}
+              >
+                <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
             </div>
           </div>
 

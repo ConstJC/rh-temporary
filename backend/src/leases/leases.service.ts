@@ -35,7 +35,7 @@ export class LeasesService {
         include: { property: true },
       }),
       this.prisma.tenant.findFirst({
-        where: { id: dto.tenantId, propertyGroupId: pgId, deletedAt: null },
+        where: { id: dto.tenantId, deletedAt: null },
       }),
     ]);
     if (!unit || unit.property.propertyGroupId !== pgId) {
@@ -62,11 +62,14 @@ export class LeasesService {
     const billingDay = dto.billingDay ?? 1;
     const advanceMonths = dto.advanceMonths ?? 1;
     const gracePeriodDays = dto.gracePeriodDays ?? 3;
-    const propertyGroupId = tenant.propertyGroupId;
+    const propertyGroupId = unit.property.propertyGroupId;
+    const propertyId = unit.propertyId;
 
     const result = await this.prisma.$transaction(async (tx) => {
       const lease = await tx.lease.create({
         data: {
+          propertyGroupId,
+          propertyId,
           tenantId: dto.tenantId,
           unitId: dto.unitId,
           leaseType: dto.leaseType,
@@ -142,7 +145,7 @@ export class LeasesService {
     const { page = 1, limit = 20 } = pagination;
     const skip = (page - 1) * limit;
     const where: any = {
-      tenant: { propertyGroupId: pgId },
+      propertyGroupId: pgId,
       deletedAt: null,
     };
     if (filters?.status) where.status = filters.status;
@@ -158,8 +161,12 @@ export class LeasesService {
         include: {
           tenant: { select: { id: true, firstName: true, lastName: true } },
           unit: {
-            select: { id: true, unitName: true, floorNumber: true },
-            include: { property: { select: { propertyName: true } } },
+            select: {
+              id: true,
+              unitName: true,
+              floorNumber: true,
+              property: { select: { propertyName: true } },
+            },
           },
         },
       }),
@@ -203,7 +210,7 @@ export class LeasesService {
     if (!lease) {
       throw new NotFoundException('Lease not found');
     }
-    const pgId = lease.tenant.propertyGroupId;
+    const pgId = lease.propertyGroupId;
     const isLandlord = await this.prisma.propertyGroupMember.findFirst({
       where: { propertyGroupId: pgId, userId, deletedAt: null },
     });
@@ -224,7 +231,7 @@ export class LeasesService {
     }
     const member = await this.prisma.propertyGroupMember.findFirst({
       where: {
-        propertyGroupId: lease.tenant.propertyGroupId,
+        propertyGroupId: lease.propertyGroupId,
         userId,
         deletedAt: null,
       },
@@ -267,7 +274,7 @@ export class LeasesService {
     }
     const member = await this.prisma.propertyGroupMember.findFirst({
       where: {
-        propertyGroupId: lease.tenant.propertyGroupId,
+        propertyGroupId: lease.propertyGroupId,
         userId,
         deletedAt: null,
       },

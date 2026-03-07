@@ -186,7 +186,7 @@ export class PaymentsService {
         billingDay: dayOfMonth,
       },
       include: {
-        tenant: { select: { userId: true, propertyGroupId: true } },
+        tenant: { select: { userId: true } },
         unit: { select: { unitName: true } },
       },
     });
@@ -211,7 +211,7 @@ export class PaymentsService {
       await this.prisma.payment.create({
         data: {
           leaseId: lease.id,
-          propertyGroupId: lease.tenant.propertyGroupId,
+          propertyGroupId: lease.propertyGroupId,
           periodStart: firstOfMonth,
           periodEnd: lastOfMonth,
           dueDate,
@@ -223,7 +223,7 @@ export class PaymentsService {
         await this.prisma.notification.create({
           data: {
             userId: lease.tenant.userId,
-            propertyGroupId: lease.tenant.propertyGroupId,
+            propertyGroupId: lease.propertyGroupId,
             type: 'PAYMENT_REMINDER',
             channel: 'in_app',
             title: `Rent due on ${dueDate.toISOString().slice(0, 10)}`,
@@ -260,7 +260,7 @@ export class PaymentsService {
         const leaseWithTenant = await this.prisma.lease.findUnique({
           where: { id: lease.id },
           include: {
-            tenant: { select: { userId: true, propertyGroupId: true } },
+            tenant: { select: { userId: true } },
             unit: { select: { unitName: true } },
           },
         });
@@ -268,7 +268,7 @@ export class PaymentsService {
           await this.prisma.notification.create({
             data: {
               userId: leaseWithTenant.tenant.userId,
-              propertyGroupId: leaseWithTenant.tenant.propertyGroupId,
+              propertyGroupId: leaseWithTenant.propertyGroupId,
               type: 'OVERDUE_ALERT',
               channel: 'in_app',
               title: 'Payment overdue',

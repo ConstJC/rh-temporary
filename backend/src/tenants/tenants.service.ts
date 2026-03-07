@@ -19,7 +19,6 @@ export class TenantsService {
     await checkSubscriptionLimit(this.prisma, pgId, 'tenant');
     const tenant = await this.prisma.tenant.create({
       data: {
-        propertyGroupId: pgId,
         firstName: dto.firstName,
         lastName: dto.lastName,
         phone: dto.phone,
@@ -42,63 +41,124 @@ export class TenantsService {
   async findAll(pgId: string, pagination: PaginationDto, status?: string) {
     const { page = 1, limit = 20 } = pagination;
     const skip = (page - 1) * limit;
-    const where: any = { propertyGroupId: pgId, deletedAt: null };
-    if (status) where.status = status;
-    const [items, total] = await Promise.all([
-      this.prisma.tenant.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          leases: {
-            where: { status: 'ACTIVE', deletedAt: null },
-            take: 1,
-            include: {
-              unit: {
-                select: {
-                  unitName: true,
-                  property: {
-                    select: { id: true, propertyName: true },
-                  },
-                },
-              },
+    const where: any = {
+      deletedAt: null,
+      propertyGroupId: pgId,
+      tenant: { deletedAt: null, ...(status ? { status } : {}) },
+      unit: {
+        deletedAt: null,
+        property: { deletedAt: null },
+      },
+    };
+
+    const leases = await this.prisma.lease.findMany({
+      where,
+      orderBy: [{ createdAt: 'desc' }],
+      include: {
+        tenant: {
+          select: {
+            id: true,
+            userId: true,
+            firstName: true,
+            lastName: true,
+            phone: true,
+            email: true,
+            internalNotes: true,
+            emergencyContact: true,
+            status: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        unit: {
+          select: {
+            id: true,
+            unitName: true,
+            property: {
+              select: { id: true, propertyName: true },
             },
           },
         },
-      }),
-      this.prisma.tenant.count({ where }),
-    ]);
-    const data = items.map((t) => {
-      const { leases, ...rest } = t;
-      return {
-        ...rest,
-        leases: leases.map((lease) => ({
+      },
+    });
+
+    const preferredLeaseByTenant = new Map<string, (typeof leases)[number]>();
+    for (const lease of leases) {
+      const existing = preferredLeaseByTenant.get(lease.tenantId);
+      if (!existing) {
+        preferredLeaseByTenant.set(lease.tenantId, lease);
+        continue;
+      }
+
+      const currentIsActive = existing.status === 'ACTIVE';
+      const nextIsActive = lease.status === 'ACTIVE';
+      if (!currentIsActive && nextIsActive) {
+        preferredLeaseByTenant.set(lease.tenantId, lease);
+        continue;
+      }
+
+      const existingTs = existing.createdAt.getTime();
+      const nextTs = lease.createdAt.getTime();
+      if (nextTs > existingTs) {
+        preferredLeaseByTenant.set(lease.tenantId, lease);
+      }
+    }
+
+    const tenantLeaseRows = Array.from(preferredLeaseByTenant.values()).sort(
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+    );
+    const total = tenantLeaseRows.length;
+    const pageRows = tenantLeaseRows.slice(skip, skip + limit);
+
+    const data = pageRows.map((lease) => ({
+      id: lease.tenant.id,
+      userId: lease.tenant.userId,
+      firstName: lease.tenant.firstName,
+      lastName: lease.tenant.lastName,
+      phone: lease.tenant.phone,
+      email: lease.tenant.email,
+      internalNotes: lease.tenant.internalNotes,
+      emergencyContact: lease.tenant.emergencyContact,
+      status: lease.tenant.status,
+      createdAt: lease.tenant.createdAt,
+      updatedAt: lease.tenant.updatedAt,
+      leases: [
+        {
           id: lease.id,
           status: lease.status,
           unit: {
+            id: lease.unit.id,
             unitName: lease.unit.unitName,
             property: lease.unit.property,
           },
-        })),
-        activeLease: leases?.[0]
+        },
+      ],
+      activeLease:
+        lease.status === 'ACTIVE'
           ? {
-              unitName: leases[0].unit.unitName,
-              property: leases[0].unit.property,
+              id: lease.id,
+              unit: {
+                id: lease.unit.id,
+                unitName: lease.unit.unitName,
+                property: lease.unit.property,
+              },
             }
           : undefined,
-      };
-    });
+    }));
     const meta: PaginationMeta = { page, limit, total };
     return { data, meta };
   }
 
   async findOne(pgId: string, tenantId: string) {
     const tenant = await this.prisma.tenant.findFirst({
-      where: { id: tenantId, propertyGroupId: pgId, deletedAt: null },
+      where: {
+        id: tenantId,
+        deletedAt: null,
+        leases: { some: { propertyGroupId: pgId, deletedAt: null } },
+      },
       include: {
         leases: {
-          where: { deletedAt: null },
+          where: { propertyGroupId: pgId, deletedAt: null },
           include: {
             unit: {
               select: {
@@ -115,13 +175,16 @@ export class TenantsService {
       throw new NotFoundException('Tenant not found');
     }
     const paymentSummary = await this.prisma.payment.aggregate({
-      where: { lease: { tenantId }, deletedAt: null },
+      where: {
+        lease: { tenantId, propertyGroupId: pgId, deletedAt: null },
+        deletedAt: null,
+      },
       _sum: { amountDue: true, amountPaid: true },
       _count: true,
     });
     const overdueCount = await this.prisma.payment.count({
       where: {
-        lease: { tenantId },
+        lease: { tenantId, propertyGroupId: pgId, deletedAt: null },
         deletedAt: null,
         status: 'OVERDUE',
       },
@@ -141,7 +204,11 @@ export class TenantsService {
     dto: UpdateTenantDto,
   ) {
     const tenant = await this.prisma.tenant.findFirst({
-      where: { id: tenantId, propertyGroupId: pgId, deletedAt: null },
+      where: {
+        id: tenantId,
+        deletedAt: null,
+        leases: { some: { propertyGroupId: pgId, deletedAt: null } },
+      },
     });
     if (!tenant) {
       throw new NotFoundException('Tenant not found');
@@ -168,7 +235,11 @@ export class TenantsService {
 
   async remove(pgId: string, tenantId: string, userId: string) {
     const tenant = await this.prisma.tenant.findFirst({
-      where: { id: tenantId, propertyGroupId: pgId, deletedAt: null },
+      where: {
+        id: tenantId,
+        deletedAt: null,
+        leases: { some: { propertyGroupId: pgId, deletedAt: null } },
+      },
     });
     if (!tenant) {
       throw new NotFoundException('Tenant not found');

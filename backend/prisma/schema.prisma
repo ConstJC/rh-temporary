@@ -270,7 +270,7 @@ model PropertyGroup {
   members          PropertyGroupMember[]
   subscriptions    Subscription[]
   properties       Property[]
-  tenants          Tenant[]
+  leases           Lease[]
   payments         Payment[]             @relation("PropertyGroupPayments")
   notifications    Notification[]
   unitAddonCatalog UnitAddonCatalog[]
@@ -375,6 +375,7 @@ model Property {
 
   propertyGroup PropertyGroup @relation(fields: [propertyGroupId], references: [id], onDelete: Cascade)
   units         Unit[]
+  leases        Lease[]
 
   @@index([propertyGroupId])
   @@map("properties")
@@ -408,7 +409,6 @@ model Unit {
 
 model Tenant {
   id               String       @id @default(cuid())
-  propertyGroupId  String
   userId           String?      @unique
   firstName        String
   lastName         String
@@ -423,16 +423,17 @@ model Tenant {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  propertyGroup PropertyGroup @relation(fields: [propertyGroupId], references: [id], onDelete: Cascade)
-  user          User?         @relation("TenantUser", fields: [userId], references: [id], onDelete: SetNull)
-  leases        Lease[]
+  user   User?   @relation("TenantUser", fields: [userId], references: [id], onDelete: SetNull)
+  leases Lease[]
 
-  @@index([propertyGroupId, status])
+  @@index([status])
   @@map("tenants")
 }
 
 model Lease {
   id              String      @id @default(cuid())
+  propertyGroupId String
+  propertyId      String
   tenantId        String
   unitId          String
   leaseType       LeaseType
@@ -450,12 +451,16 @@ model Lease {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
+  propertyGroup   PropertyGroup    @relation(fields: [propertyGroupId], references: [id], onDelete: Cascade)
+  property        Property         @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   tenant          Tenant           @relation(fields: [tenantId], references: [id])
   unit            Unit             @relation(fields: [unitId], references: [id])
   payments        Payment[]
   leaseAddonBills LeaseAddonBill[]
   utilityReadings UtilityReading[]
 
+  @@index([propertyGroupId, status])
+  @@index([propertyId])
   @@index([tenantId])
   @@index([unitId, status])
   @@map("leases")

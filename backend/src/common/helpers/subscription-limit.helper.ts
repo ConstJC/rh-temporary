@@ -39,9 +39,17 @@ export async function checkSubscriptionLimit(
       where: { property: { propertyGroupId }, deletedAt: null },
     });
   } else {
-    count = await prisma.tenant.count({
-      where: { propertyGroupId, deletedAt: null },
-    });
+    count = (
+      await prisma.lease.findMany({
+        where: {
+          propertyGroupId,
+          deletedAt: null,
+          tenant: { deletedAt: null },
+        },
+        distinct: ['tenantId'],
+        select: { tenantId: true },
+      })
+    ).length;
   }
   if (count >= limit) {
     throw new HttpException(

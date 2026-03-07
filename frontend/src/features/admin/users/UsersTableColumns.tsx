@@ -43,11 +43,13 @@ export function getUsersColumns({
     {
       header: 'Status',
       id: 'status',
+      accessorFn: (u) => userStatusKey(u),
       cell: ({ row }) => <StatusBadge status={userStatusKey(row.original)} />,
     },
     {
       header: 'Email Verified',
       id: 'emailVerified',
+      accessorFn: (u) => (u.isEmailVerified ? 'ACTIVE' : 'PENDING'),
       cell: ({ row }) => (
         <StatusBadge status={row.original.isEmailVerified ? 'ACTIVE' : 'PENDING'} />
       ),
@@ -60,6 +62,7 @@ export function getUsersColumns({
     {
       header: 'Actions',
       id: 'actions',
+      enableSorting: false,
       cell: ({ row }) => {
         const u = row.original;
         const canToggle = !currentUserId || u.id !== currentUserId;
@@ -87,4 +90,3 @@ export function getUsersColumns({
     },
   ];
 }
-

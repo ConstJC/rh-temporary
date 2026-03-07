@@ -2,7 +2,7 @@
 
 import type { Unit } from '@/types/domain.types';
 import { StatusBadge } from '@/components/common/StatusBadge';
-import { formatCurrency } from '@/lib/utils';
+import { formatCurrency, toFiniteNumber } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 const UNIT_TYPE_LABEL: Record<string, string> = {
@@ -47,7 +47,7 @@ export function UnitGrid({
             <StatusBadge status={unit.status} />
           </div>
           <p className="mt-1 text-sm text-slate-500">
-            {UNIT_TYPE_LABEL[unit.unitType] ?? unit.unitType} · {formatCurrency(Number(unit.monthlyRent), currencyCode)}/mo
+            {UNIT_TYPE_LABEL[unit.unitType] ?? unit.unitType} · {formatCurrency(toFiniteNumber(unit.monthlyRent), currencyCode)}/mo
           </p>
           {unit.activeTenantName && (
             <p className="mt-1 text-xs text-slate-600">Tenant: {unit.activeTenantName}</p>

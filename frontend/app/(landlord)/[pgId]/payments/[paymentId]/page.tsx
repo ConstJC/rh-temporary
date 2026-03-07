@@ -5,7 +5,7 @@ import { PageHeader } from '@/components/common/PageHeader';
 import { usePayment } from '@/features/landlord/hooks/usePayments';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { User, Home, Calendar, DollarSign, CreditCard } from 'lucide-react';
+import { User, Home, Calendar, CreditCard } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { CardSkeleton } from '@/components/common/LoadingSkeleton';
@@ -121,14 +121,12 @@ export default function PaymentDetailPage({
               <div>
                 <label className="text-sm font-medium text-slate-600">Amount Due</label>
                 <div className="mt-1 flex items-center text-slate-900 font-semibold text-lg">
-                  <DollarSign className="w-5 h-5 mr-2 text-slate-400" />
                   {formatPeso(payment.amountDue)}
                 </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-slate-600">Amount Paid</label>
                 <div className="mt-1 flex items-center text-slate-900 font-semibold text-lg">
-                  <DollarSign className="w-5 h-5 mr-2 text-slate-400" />
                   {formatPeso(payment.amountPaid)}
                 </div>
               </div>

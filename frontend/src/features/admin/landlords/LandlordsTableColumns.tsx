@@ -27,16 +27,19 @@ export function getLandlordsColumns({
     {
       header: 'Owner Email',
       id: 'ownerEmail',
+      accessorFn: (g) => g.owner.email,
       cell: ({ row }) => <span className="text-slate-700">{row.original.owner.email}</span>,
     },
     {
       header: 'Plan',
       id: 'plan',
+      accessorFn: (g) => g.subscription.planName,
       cell: ({ row }) => <span className="text-slate-700">{row.original.subscription.planName}</span>,
     },
     {
       header: 'Status',
       id: 'status',
+      accessorFn: (g) => (g.status === 'SUSPENDED' ? 'USER_INACTIVE' : 'USER_ACTIVE'),
       cell: ({ row }) => (
         <StatusBadge status={row.original.status === 'SUSPENDED' ? 'USER_INACTIVE' : 'USER_ACTIVE'} />
       ),
@@ -44,16 +47,19 @@ export function getLandlordsColumns({
     {
       header: 'Sub Status',
       id: 'subStatus',
+      accessorFn: (g) => subKey(g.subscription.status),
       cell: ({ row }) => <StatusBadge status={subKey(row.original.subscription.status)} />,
     },
     {
       header: 'Units',
       id: 'units',
+      accessorFn: (g) => g._count.units,
       cell: ({ row }) => <span className="font-semibold text-slate-900">{row.original._count.units}</span>,
     },
     {
       header: 'Properties',
       id: 'properties',
+      accessorFn: (g) => g._count.properties,
       cell: ({ row }) => <span className="font-semibold text-slate-900">{row.original._count.properties}</span>,
     },
     {
@@ -64,6 +70,7 @@ export function getLandlordsColumns({
     {
       header: 'Actions',
       id: 'actions',
+      enableSorting: false,
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-2">
           <button

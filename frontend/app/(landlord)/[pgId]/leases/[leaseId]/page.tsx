@@ -6,7 +6,7 @@ import { useLease } from '@/features/landlord/hooks/useLeases';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { User, Home, Calendar, DollarSign } from 'lucide-react';
+import { User, Home, Calendar, DollarSign, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { CardSkeleton } from '@/components/common/LoadingSkeleton';
@@ -19,7 +19,7 @@ export default function LeaseDetailPage({
   params: Promise<{ pgId: string; leaseId: string }>;
 }) {
   const { pgId, leaseId } = use(params);
-  const { data: lease, isLoading } = useLease(pgId, leaseId);
+  const { data: lease, isLoading, isFetching, refetch } = useLease(pgId, leaseId);
   const router = useRouter();
   const formatDateSafe = (value: unknown, pattern: string) => {
     const d = toDateOrNull(value);
@@ -59,6 +59,17 @@ export default function LeaseDetailPage({
         description={`${lease.tenant.firstName} ${lease.tenant.lastName}`}
         action={
           <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                void refetch();
+              }}
+              disabled={isFetching}
+            >
+              <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
             <Button variant="outline" onClick={() => router.push(`/${pgId}/leases`)}>
               Back
             </Button>

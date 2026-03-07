@@ -14,6 +14,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import type { LeaseType } from '@/types/domain.types';
+import { toFiniteNumber } from '@/lib/utils';
 
 const leaseTypeOptions: Array<{ value: LeaseType; label: string }> = [
   { value: 'MONTHLY', label: 'Monthly' },
@@ -55,16 +56,16 @@ export default function NewLeasePage() {
   const selectedTenantId = tenantId || tenants?.[0]?.id || '';
   const selectedUnitId = unitId || availableUnits[0]?.id || '';
   const selectedUnit = availableUnits.find((item) => item.id === selectedUnitId);
-  const resolvedRentAmount = rentAmount || (selectedUnit ? String(selectedUnit.monthlyRent) : '');
+  const resolvedRentAmount = rentAmount || (selectedUnit ? String(toFiniteNumber(selectedUnit.monthlyRent)) : '');
   const resolvedSecurityDeposit =
-    securityDeposit || (selectedUnit ? String(selectedUnit.monthlyRent) : '');
+    securityDeposit || (selectedUnit ? String(toFiniteNumber(selectedUnit.monthlyRent)) : '');
 
   function onUnitChange(nextUnitId: string) {
     setUnitId(nextUnitId);
     const unit = availableUnits.find((item) => item.id === nextUnitId);
     if (!unit) return;
-    setRentAmount(String(unit.monthlyRent));
-    setSecurityDeposit(String(unit.monthlyRent));
+    setRentAmount(String(toFiniteNumber(unit.monthlyRent)));
+    setSecurityDeposit(String(toFiniteNumber(unit.monthlyRent)));
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

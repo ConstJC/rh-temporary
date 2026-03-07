@@ -14,7 +14,7 @@ export interface Unit {
   maxOccupants?: number;
   status: string;
   isFeatured: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   property?: {
@@ -39,7 +39,7 @@ export interface CreateUnitDto {
   maxOccupants?: number;
   status?: string;
   isFeatured?: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export function useUnits(pgId: string, propertyId?: string) {
@@ -65,7 +65,7 @@ export function useCreateUnit(pgId: string, propertyId: string) {
     mutationFn: (dto: Parameters<typeof landlordApi.createUnit>[2]) =>
       landlordApi.createUnit(pgId, propertyId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: landlordKeys.units(pgId) });
+      queryClient.invalidateQueries({ queryKey: ['landlord', 'units', pgId] });
       queryClient.invalidateQueries({ queryKey: landlordKeys.property(pgId, propertyId) });
       queryClient.invalidateQueries({ queryKey: landlordKeys.overview(pgId) });
     },
@@ -79,7 +79,7 @@ export function useUpdateUnit(pgId: string, unitId: string) {
     mutationFn: (dto: Parameters<typeof landlordApi.updateUnit>[2]) =>
       landlordApi.updateUnit(pgId, unitId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: landlordKeys.units(pgId) });
+      queryClient.invalidateQueries({ queryKey: ['landlord', 'units', pgId] });
       queryClient.invalidateQueries({ queryKey: landlordKeys.unit(pgId, unitId) });
       queryClient.invalidateQueries({ queryKey: landlordKeys.overview(pgId) });
     },
@@ -92,7 +92,7 @@ export function useDeleteUnit(pgId: string) {
   return useMutation({
     mutationFn: (unitId: string) => landlordApi.deleteUnit(pgId, unitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: landlordKeys.units(pgId) });
+      queryClient.invalidateQueries({ queryKey: ['landlord', 'units', pgId] });
       queryClient.invalidateQueries({ queryKey: landlordKeys.overview(pgId) });
     },
   });
