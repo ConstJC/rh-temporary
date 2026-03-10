@@ -396,7 +396,7 @@ export default function PropertyDetailPage({
                           Status {renderSortIcon('status')}
                         </button>
                       </TableHead>
-                      <TableHead className="text-right">Action</TableHead>
+                      <TableHead className="text-center">Action</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -410,7 +410,7 @@ export default function PropertyDetailPage({
                         <TableCell>
                           <StatusBadge status={unit.status} />
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-center">
                           <Button
                             variant="outline"
                             size="sm"

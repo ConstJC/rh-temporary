@@ -193,7 +193,7 @@ export default function TenantsPage() {
                       Property & Unit {renderSortIcon('lease')}
                     </button>
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -236,7 +236,7 @@ export default function TenantsPage() {
                           <span className="text-sm text-slate-500">No lease</span>
                         )}
                       </TableCell>
-                      <TableCell className="text-right">
+                      <TableCell className="text-center">
                         <Button
                           variant="outline"
                           size="sm"

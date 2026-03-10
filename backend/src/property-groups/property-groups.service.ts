@@ -13,6 +13,10 @@ import { UpdatePropertyGroupDto } from './dto/update-property-group.dto';
 import { InviteMemberDto } from './dto/invite-member.dto';
 import { UpdateMemberRoleDto } from './dto/update-member-role.dto';
 
+function formatPgCode(pgNumber: number) {
+  return `PG-${String(pgNumber).padStart(3, '0')}`;
+}
+
 @Injectable()
 export class PropertyGroupsService {
   constructor(private prisma: PrismaService) {}
@@ -79,7 +83,13 @@ export class PropertyGroupsService {
         },
       },
     });
-    return withSubscription;
+    if (!withSubscription) {
+      return null;
+    }
+    return {
+      ...withSubscription,
+      pgCode: formatPgCode(withSubscription.pgNumber),
+    };
   }
 
   async findAll(userId: string) {
@@ -102,6 +112,8 @@ export class PropertyGroupsService {
     const subByPg = new Map(subscriptions.map((s) => [s.propertyGroupId, s]));
     return members.map((m) => ({
       id: m.propertyGroup.id,
+      pgNumber: m.propertyGroup.pgNumber,
+      pgCode: formatPgCode(m.propertyGroup.pgNumber),
       groupName: m.propertyGroup.groupName,
       currencyCode: m.propertyGroup.currencyCode,
       timezone: m.propertyGroup.timezone,

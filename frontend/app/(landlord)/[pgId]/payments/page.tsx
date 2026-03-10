@@ -200,7 +200,7 @@ export default function PaymentsPage() {
                       Status {renderSortIcon('status')}
                     </button>
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -228,7 +228,7 @@ export default function PaymentsPage() {
                     <TableCell>
                       <StatusBadge status={payment.status} />
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-center">
                       <Button
                         variant="outline"
                         size="sm"

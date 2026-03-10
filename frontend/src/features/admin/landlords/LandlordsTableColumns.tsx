@@ -20,6 +20,12 @@ export function getLandlordsColumns({
 }): ColumnDef<AdminPropertyGroup>[] {
   return [
     {
+      header: 'Property Group ID',
+      id: 'pgNumber',
+      accessorFn: (g) => g.pgNumber,
+      cell: ({ row }) => <span className="font-semibold text-slate-900">{row.original.pgNumber}</span>,
+    },
+    {
       header: 'Organization Name',
       accessorKey: 'groupName',
       cell: ({ row }) => <div className="font-semibold text-slate-900">{row.original.groupName}</div>,
@@ -72,7 +78,7 @@ export function getLandlordsColumns({
       id: 'actions',
       enableSorting: false,
       cell: ({ row }) => (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-center gap-2">
           <button
             type="button"
             onClick={() => onViewDetails(row.original)}

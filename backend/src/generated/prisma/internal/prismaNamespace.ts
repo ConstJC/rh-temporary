@@ -2004,6 +2004,7 @@ export type UserAddressScalarFieldEnum = (typeof UserAddressScalarFieldEnum)[key
 
 export const PropertyGroupScalarFieldEnum = {
   id: 'id',
+  pgNumber: 'pgNumber',
   groupName: 'groupName',
   currencyCode: 'currencyCode',
   timezone: 'timezone',

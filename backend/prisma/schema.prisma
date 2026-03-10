@@ -256,6 +256,7 @@ model UserAddress {
 
 model PropertyGroup {
   id           String @id @default(cuid())
+  pgNumber     Int    @unique @default(autoincrement())
   groupName    String
   currencyCode String @default("PHP")
   timezone     String @default("Asia/Manila")

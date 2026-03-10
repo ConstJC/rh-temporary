@@ -40,6 +40,8 @@ export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE';
 
 export interface AdminPropertyGroup {
   id: string;
+  pgNumber: number;
+  pgCode?: string;
   groupName: string;
   currencyCode: string;
   timezone: string;
@@ -93,6 +95,8 @@ export interface AdminSubscription {
   autoRenew: boolean;
   propertyGroup: {
     id: string;
+    pgNumber?: number;
+    pgCode?: string;
     groupName: string;
     owner: { email: string; firstName: string; lastName: string };
   };
@@ -179,6 +183,8 @@ export interface PropertyGroupSummary {
   id: string;
   name: string;
   groupName?: string;
+  pgNumber?: number;
+  pgCode?: string;
   currencyCode?: string;
   timezone?: string;
   subscription?: {

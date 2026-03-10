@@ -27,15 +27,18 @@ export type AggregatePropertyGroup = {
 }
 
 export type PropertyGroupAvgAggregateOutputType = {
+  pgNumber: number | null
   version: number | null
 }
 
 export type PropertyGroupSumAggregateOutputType = {
+  pgNumber: number | null
   version: number | null
 }
 
 export type PropertyGroupMinAggregateOutputType = {
   id: string | null
+  pgNumber: number | null
   groupName: string | null
   currencyCode: string | null
   timezone: string | null
@@ -48,6 +51,7 @@ export type PropertyGroupMinAggregateOutputType = {
 
 export type PropertyGroupMaxAggregateOutputType = {
   id: string | null
+  pgNumber: number | null
   groupName: string | null
   currencyCode: string | null
   timezone: string | null
@@ -60,6 +64,7 @@ export type PropertyGroupMaxAggregateOutputType = {
 
 export type PropertyGroupCountAggregateOutputType = {
   id: number
+  pgNumber: number
   groupName: number
   currencyCode: number
   timezone: number
@@ -73,15 +78,18 @@ export type PropertyGroupCountAggregateOutputType = {
 
 
 export type PropertyGroupAvgAggregateInputType = {
+  pgNumber?: true
   version?: true
 }
 
 export type PropertyGroupSumAggregateInputType = {
+  pgNumber?: true
   version?: true
 }
 
 export type PropertyGroupMinAggregateInputType = {
   id?: true
+  pgNumber?: true
   groupName?: true
   currencyCode?: true
   timezone?: true
@@ -94,6 +102,7 @@ export type PropertyGroupMinAggregateInputType = {
 
 export type PropertyGroupMaxAggregateInputType = {
   id?: true
+  pgNumber?: true
   groupName?: true
   currencyCode?: true
   timezone?: true
@@ -106,6 +115,7 @@ export type PropertyGroupMaxAggregateInputType = {
 
 export type PropertyGroupCountAggregateInputType = {
   id?: true
+  pgNumber?: true
   groupName?: true
   currencyCode?: true
   timezone?: true
@@ -205,6 +215,7 @@ export type PropertyGroupGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 
 export type PropertyGroupGroupByOutputType = {
   id: string
+  pgNumber: number
   groupName: string
   currencyCode: string
   timezone: string
@@ -240,6 +251,7 @@ export type PropertyGroupWhereInput = {
   OR?: Prisma.PropertyGroupWhereInput[]
   NOT?: Prisma.PropertyGroupWhereInput | Prisma.PropertyGroupWhereInput[]
   id?: Prisma.StringFilter<"PropertyGroup"> | string
+  pgNumber?: Prisma.IntFilter<"PropertyGroup"> | number
   groupName?: Prisma.StringFilter<"PropertyGroup"> | string
   currencyCode?: Prisma.StringFilter<"PropertyGroup"> | string
   timezone?: Prisma.StringFilter<"PropertyGroup"> | string
@@ -263,6 +275,7 @@ export type PropertyGroupWhereInput = {
 
 export type PropertyGroupOrderByWithRelationInput = {
   id?: Prisma.SortOrder
+  pgNumber?: Prisma.SortOrder
   groupName?: Prisma.SortOrder
   currencyCode?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -286,6 +299,7 @@ export type PropertyGroupOrderByWithRelationInput = {
 
 export type PropertyGroupWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  pgNumber?: number
   AND?: Prisma.PropertyGroupWhereInput | Prisma.PropertyGroupWhereInput[]
   OR?: Prisma.PropertyGroupWhereInput[]
   NOT?: Prisma.PropertyGroupWhereInput | Prisma.PropertyGroupWhereInput[]
@@ -308,10 +322,11 @@ export type PropertyGroupWhereUniqueInput = Prisma.AtLeast<{
   unitAddons?: Prisma.UnitAddonListRelationFilter
   leaseAddonBills?: Prisma.LeaseAddonBillListRelationFilter
   utilityReadings?: Prisma.UtilityReadingListRelationFilter
-}, "id">
+}, "id" | "pgNumber">
 
 export type PropertyGroupOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
+  pgNumber?: Prisma.SortOrder
   groupName?: Prisma.SortOrder
   currencyCode?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -332,6 +347,7 @@ export type PropertyGroupScalarWhereWithAggregatesInput = {
   OR?: Prisma.PropertyGroupScalarWhereWithAggregatesInput[]
   NOT?: Prisma.PropertyGroupScalarWhereWithAggregatesInput | Prisma.PropertyGroupScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PropertyGroup"> | string
+  pgNumber?: Prisma.IntWithAggregatesFilter<"PropertyGroup"> | number
   groupName?: Prisma.StringWithAggregatesFilter<"PropertyGroup"> | string
   currencyCode?: Prisma.StringWithAggregatesFilter<"PropertyGroup"> | string
   timezone?: Prisma.StringWithAggregatesFilter<"PropertyGroup"> | string
@@ -344,6 +360,7 @@ export type PropertyGroupScalarWhereWithAggregatesInput = {
 
 export type PropertyGroupCreateInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -366,6 +383,7 @@ export type PropertyGroupCreateInput = {
 
 export type PropertyGroupUncheckedCreateInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -410,6 +428,7 @@ export type PropertyGroupUpdateInput = {
 
 export type PropertyGroupUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -432,6 +451,7 @@ export type PropertyGroupUncheckedUpdateInput = {
 
 export type PropertyGroupCreateManyInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -455,6 +475,7 @@ export type PropertyGroupUpdateManyMutationInput = {
 
 export type PropertyGroupUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -477,6 +498,7 @@ export type PropertyGroupOrderByRelationAggregateInput = {
 
 export type PropertyGroupCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  pgNumber?: Prisma.SortOrder
   groupName?: Prisma.SortOrder
   currencyCode?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -488,11 +510,13 @@ export type PropertyGroupCountOrderByAggregateInput = {
 }
 
 export type PropertyGroupAvgOrderByAggregateInput = {
+  pgNumber?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
 export type PropertyGroupMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  pgNumber?: Prisma.SortOrder
   groupName?: Prisma.SortOrder
   currencyCode?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -505,6 +529,7 @@ export type PropertyGroupMaxOrderByAggregateInput = {
 
 export type PropertyGroupMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  pgNumber?: Prisma.SortOrder
   groupName?: Prisma.SortOrder
   currencyCode?: Prisma.SortOrder
   timezone?: Prisma.SortOrder
@@ -516,6 +541,7 @@ export type PropertyGroupMinOrderByAggregateInput = {
 }
 
 export type PropertyGroupSumOrderByAggregateInput = {
+  pgNumber?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
@@ -717,6 +743,7 @@ export type PropertyGroupUpdateOneRequiredWithoutUtilityReadingsNestedInput = {
 
 export type PropertyGroupCreateWithoutCreatorInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -738,6 +765,7 @@ export type PropertyGroupCreateWithoutCreatorInput = {
 
 export type PropertyGroupUncheckedCreateWithoutCreatorInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -788,6 +816,7 @@ export type PropertyGroupScalarWhereInput = {
   OR?: Prisma.PropertyGroupScalarWhereInput[]
   NOT?: Prisma.PropertyGroupScalarWhereInput | Prisma.PropertyGroupScalarWhereInput[]
   id?: Prisma.StringFilter<"PropertyGroup"> | string
+  pgNumber?: Prisma.IntFilter<"PropertyGroup"> | number
   groupName?: Prisma.StringFilter<"PropertyGroup"> | string
   currencyCode?: Prisma.StringFilter<"PropertyGroup"> | string
   timezone?: Prisma.StringFilter<"PropertyGroup"> | string
@@ -800,6 +829,7 @@ export type PropertyGroupScalarWhereInput = {
 
 export type PropertyGroupCreateWithoutMembersInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -821,6 +851,7 @@ export type PropertyGroupCreateWithoutMembersInput = {
 
 export type PropertyGroupUncheckedCreateWithoutMembersInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -879,6 +910,7 @@ export type PropertyGroupUpdateWithoutMembersInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutMembersInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -900,6 +932,7 @@ export type PropertyGroupUncheckedUpdateWithoutMembersInput = {
 
 export type PropertyGroupCreateWithoutSubscriptionsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -921,6 +954,7 @@ export type PropertyGroupCreateWithoutSubscriptionsInput = {
 
 export type PropertyGroupUncheckedCreateWithoutSubscriptionsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -979,6 +1013,7 @@ export type PropertyGroupUpdateWithoutSubscriptionsInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutSubscriptionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1000,6 +1035,7 @@ export type PropertyGroupUncheckedUpdateWithoutSubscriptionsInput = {
 
 export type PropertyGroupCreateWithoutPropertiesInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1021,6 +1057,7 @@ export type PropertyGroupCreateWithoutPropertiesInput = {
 
 export type PropertyGroupUncheckedCreateWithoutPropertiesInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1079,6 +1116,7 @@ export type PropertyGroupUpdateWithoutPropertiesInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutPropertiesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1100,6 +1138,7 @@ export type PropertyGroupUncheckedUpdateWithoutPropertiesInput = {
 
 export type PropertyGroupCreateWithoutLeasesInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1121,6 +1160,7 @@ export type PropertyGroupCreateWithoutLeasesInput = {
 
 export type PropertyGroupUncheckedCreateWithoutLeasesInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1179,6 +1219,7 @@ export type PropertyGroupUpdateWithoutLeasesInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutLeasesInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1200,6 +1241,7 @@ export type PropertyGroupUncheckedUpdateWithoutLeasesInput = {
 
 export type PropertyGroupCreateWithoutPaymentsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1221,6 +1263,7 @@ export type PropertyGroupCreateWithoutPaymentsInput = {
 
 export type PropertyGroupUncheckedCreateWithoutPaymentsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1279,6 +1322,7 @@ export type PropertyGroupUpdateWithoutPaymentsInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutPaymentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1300,6 +1344,7 @@ export type PropertyGroupUncheckedUpdateWithoutPaymentsInput = {
 
 export type PropertyGroupCreateWithoutNotificationsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1321,6 +1366,7 @@ export type PropertyGroupCreateWithoutNotificationsInput = {
 
 export type PropertyGroupUncheckedCreateWithoutNotificationsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1379,6 +1425,7 @@ export type PropertyGroupUpdateWithoutNotificationsInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutNotificationsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1400,6 +1447,7 @@ export type PropertyGroupUncheckedUpdateWithoutNotificationsInput = {
 
 export type PropertyGroupCreateWithoutUnitAddonCatalogInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1421,6 +1469,7 @@ export type PropertyGroupCreateWithoutUnitAddonCatalogInput = {
 
 export type PropertyGroupUncheckedCreateWithoutUnitAddonCatalogInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1479,6 +1528,7 @@ export type PropertyGroupUpdateWithoutUnitAddonCatalogInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutUnitAddonCatalogInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1500,6 +1550,7 @@ export type PropertyGroupUncheckedUpdateWithoutUnitAddonCatalogInput = {
 
 export type PropertyGroupCreateWithoutUnitAddonsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1521,6 +1572,7 @@ export type PropertyGroupCreateWithoutUnitAddonsInput = {
 
 export type PropertyGroupUncheckedCreateWithoutUnitAddonsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1579,6 +1631,7 @@ export type PropertyGroupUpdateWithoutUnitAddonsInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutUnitAddonsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1600,6 +1653,7 @@ export type PropertyGroupUncheckedUpdateWithoutUnitAddonsInput = {
 
 export type PropertyGroupCreateWithoutLeaseAddonBillsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1621,6 +1675,7 @@ export type PropertyGroupCreateWithoutLeaseAddonBillsInput = {
 
 export type PropertyGroupUncheckedCreateWithoutLeaseAddonBillsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1679,6 +1734,7 @@ export type PropertyGroupUpdateWithoutLeaseAddonBillsInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutLeaseAddonBillsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1700,6 +1756,7 @@ export type PropertyGroupUncheckedUpdateWithoutLeaseAddonBillsInput = {
 
 export type PropertyGroupCreateWithoutUtilityReadingsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1721,6 +1778,7 @@ export type PropertyGroupCreateWithoutUtilityReadingsInput = {
 
 export type PropertyGroupUncheckedCreateWithoutUtilityReadingsInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1779,6 +1837,7 @@ export type PropertyGroupUpdateWithoutUtilityReadingsInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutUtilityReadingsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1800,6 +1859,7 @@ export type PropertyGroupUncheckedUpdateWithoutUtilityReadingsInput = {
 
 export type PropertyGroupCreateManyCreatorInput = {
   id?: string
+  pgNumber?: number
   groupName: string
   currencyCode?: string
   timezone?: string
@@ -1832,6 +1892,7 @@ export type PropertyGroupUpdateWithoutCreatorInput = {
 
 export type PropertyGroupUncheckedUpdateWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1853,6 +1914,7 @@ export type PropertyGroupUncheckedUpdateWithoutCreatorInput = {
 
 export type PropertyGroupUncheckedUpdateManyWithoutCreatorInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  pgNumber?: Prisma.IntFieldUpdateOperationsInput | number
   groupName?: Prisma.StringFieldUpdateOperationsInput | string
   currencyCode?: Prisma.StringFieldUpdateOperationsInput | string
   timezone?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1976,6 +2038,7 @@ export type PropertyGroupCountOutputTypeCountUtilityReadingsArgs<ExtArgs extends
 
 export type PropertyGroupSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  pgNumber?: boolean
   groupName?: boolean
   currencyCode?: boolean
   timezone?: boolean
@@ -2000,6 +2063,7 @@ export type PropertyGroupSelect<ExtArgs extends runtime.Types.Extensions.Interna
 
 export type PropertyGroupSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  pgNumber?: boolean
   groupName?: boolean
   currencyCode?: boolean
   timezone?: boolean
@@ -2013,6 +2077,7 @@ export type PropertyGroupSelectCreateManyAndReturn<ExtArgs extends runtime.Types
 
 export type PropertyGroupSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
+  pgNumber?: boolean
   groupName?: boolean
   currencyCode?: boolean
   timezone?: boolean
@@ -2026,6 +2091,7 @@ export type PropertyGroupSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
 
 export type PropertyGroupSelectScalar = {
   id?: boolean
+  pgNumber?: boolean
   groupName?: boolean
   currencyCode?: boolean
   timezone?: boolean
@@ -2036,7 +2102,7 @@ export type PropertyGroupSelectScalar = {
   deletedAt?: boolean
 }
 
-export type PropertyGroupOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "groupName" | "currencyCode" | "timezone" | "createdBy" | "version" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["propertyGroup"]>
+export type PropertyGroupOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "pgNumber" | "groupName" | "currencyCode" | "timezone" | "createdBy" | "version" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["propertyGroup"]>
 export type PropertyGroupInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.PropertyGroup$membersArgs<ExtArgs>
@@ -2075,6 +2141,7 @@ export type $PropertyGroupPayload<ExtArgs extends runtime.Types.Extensions.Inter
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
+    pgNumber: number
     groupName: string
     currencyCode: string
     timezone: string
@@ -2518,6 +2585,7 @@ export interface Prisma__PropertyGroupClient<T, Null = never, ExtArgs extends ru
  */
 export interface PropertyGroupFieldRefs {
   readonly id: Prisma.FieldRef<"PropertyGroup", 'String'>
+  readonly pgNumber: Prisma.FieldRef<"PropertyGroup", 'Int'>
   readonly groupName: Prisma.FieldRef<"PropertyGroup", 'String'>
   readonly currencyCode: Prisma.FieldRef<"PropertyGroup", 'String'>
   readonly timezone: Prisma.FieldRef<"PropertyGroup", 'String'>

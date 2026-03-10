@@ -56,7 +56,7 @@ export function getSubscriptionPlansColumns({
       id: 'actions',
       enableSorting: false,
       cell: ({ row }) => (
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-center gap-2">
           <button
             type="button"
             onClick={() => onEdit(row.original)}

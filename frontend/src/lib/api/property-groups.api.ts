@@ -7,6 +7,7 @@ export async function listPropertyGroups(): Promise<PropertyGroupSummary[]> {
   return (data.data ?? []).map((g) => ({
     ...g,
     name: g.name ?? g.groupName ?? '',
+    pgCode: g.pgCode ?? (typeof g.pgNumber === 'number' ? `PG-${String(g.pgNumber).padStart(3, '0')}` : undefined),
   }));
 }
 
@@ -24,10 +25,20 @@ export interface UpdatePropertyGroupDto {
 
 export async function createPropertyGroup(payload: CreatePropertyGroupDto): Promise<PropertyGroupSummary> {
   const { data } = await apiClient.post<{ data: PropertyGroupSummary }>(API_ENDPOINTS.PROPERTY_GROUPS, payload);
-  return data.data;
+  const group = data.data;
+  return {
+    ...group,
+    name: group.name ?? group.groupName ?? '',
+    pgCode: group.pgCode ?? (typeof group.pgNumber === 'number' ? `PG-${String(group.pgNumber).padStart(3, '0')}` : undefined),
+  };
 }
 
 export async function updatePropertyGroup(id: string, payload: UpdatePropertyGroupDto): Promise<PropertyGroupSummary> {
   const { data } = await apiClient.patch<{ data: PropertyGroupSummary }>(`${API_ENDPOINTS.PROPERTY_GROUPS}/${id}`, payload);
-  return data.data;
+  const group = data.data;
+  return {
+    ...group,
+    name: group.name ?? group.groupName ?? '',
+    pgCode: group.pgCode ?? (typeof group.pgNumber === 'number' ? `PG-${String(group.pgNumber).padStart(3, '0')}` : undefined),
+  };
 }

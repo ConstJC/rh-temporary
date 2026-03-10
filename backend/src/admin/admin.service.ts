@@ -8,12 +8,17 @@ import { UserType, SubscriptionStatus } from '../generated/prisma/client';
 
 type Order = 'asc' | 'desc';
 
+function formatPgCode(pgNumber: number) {
+  return `PG-${String(pgNumber).padStart(3, '0')}`;
+}
+
 @Injectable()
 export class AdminService {
   constructor(private prisma: PrismaService) {}
 
   private mapPropertyGroupSummary(group: {
     id: string;
+    pgNumber: number;
     groupName: string;
     currencyCode: string;
     timezone: string;
@@ -50,6 +55,8 @@ export class AdminService {
 
     return {
       id: group.id,
+      pgNumber: group.pgNumber,
+      pgCode: formatPgCode(group.pgNumber),
       groupName: group.groupName,
       currencyCode: group.currencyCode,
       timezone: group.timezone,
@@ -246,6 +253,7 @@ export class AdminService {
         orderBy,
         select: {
           id: true,
+          pgNumber: true,
           groupName: true,
           currencyCode: true,
           timezone: true,
@@ -298,6 +306,7 @@ export class AdminService {
       where: { id },
       select: {
         id: true,
+        pgNumber: true,
         groupName: true,
         currencyCode: true,
         timezone: true,
@@ -427,6 +436,7 @@ export class AdminService {
       },
       select: {
         id: true,
+        pgNumber: true,
         groupName: true,
         currencyCode: true,
         timezone: true,
@@ -437,6 +447,8 @@ export class AdminService {
 
     return {
       id: updated.id,
+      pgNumber: updated.pgNumber,
+      pgCode: formatPgCode(updated.pgNumber),
       groupName: updated.groupName,
       currencyCode: updated.currencyCode,
       timezone: updated.timezone,
@@ -485,6 +497,7 @@ export class AdminService {
           propertyGroup: {
             select: {
               id: true,
+              pgNumber: true,
               groupName: true,
               creator: {
                 select: { email: true, firstName: true, lastName: true },
@@ -514,6 +527,8 @@ export class AdminService {
         autoRenew: s.cancelledAt == null,
         propertyGroup: {
           id: s.propertyGroup.id,
+          pgNumber: s.propertyGroup.pgNumber,
+          pgCode: formatPgCode(s.propertyGroup.pgNumber),
           groupName: s.propertyGroup.groupName,
           owner: s.propertyGroup.creator,
         },

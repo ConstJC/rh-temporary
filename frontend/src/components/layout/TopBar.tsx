@@ -106,7 +106,7 @@ export function TopBar({ title, isAdmin, pgId }: { title?: string; isAdmin: bool
         <Menu className="h-5 w-5" />
       </button>
 
-      {title && <h1 className="text-lg font-semibold text-slate-900">{title}</h1>}
+      {/* {title && <h1 className="text-lg font-semibold text-slate-900">{title}</h1>} */}
 
       <div className="hidden flex-1 md:block">
         <div className="relative max-w-md">

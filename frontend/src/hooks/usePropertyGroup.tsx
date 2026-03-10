@@ -54,3 +54,7 @@ export function usePropertyGroup(): PropertyGroupContextValue {
   if (!ctx) throw new Error('usePropertyGroup must be used within PropertyGroupProvider');
   return ctx;
 }
+
+export function useOptionalPropertyGroup(): PropertyGroupContextValue | null {
+  return useContext(PropertyGroupContext);
+}

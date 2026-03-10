@@ -48,8 +48,8 @@ export default withAuth(
       if (isSystemAdmin(token)) return NextResponse.redirect(new URL('/dashboard', req.url));
       if (isLandlord(token)) return NextResponse.redirect(new URL('/', req.url));
       if (userType === 'TENANT') return NextResponse.redirect(new URL('/tenant-use-mobile', req.url));
-      // Authenticated but missing role metadata: keep user off auth pages.
-      return NextResponse.redirect(new URL('/', req.url));
+      // Authenticated but missing role metadata: allow auth page instead of /login <-> / loop.
+      return NextResponse.next();
     }
 
     if (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) {

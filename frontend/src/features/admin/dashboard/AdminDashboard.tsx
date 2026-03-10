@@ -7,6 +7,7 @@ import { KpiCard } from './KpiCard';
 import { RecentSignupsTable } from './RecentSignupsTable';
 import { ActivityFeed } from './ActivityFeed';
 import { PlanBreakdownChart } from './PlanBreakdownChart';
+import { formatCurrency } from '@/lib/utils';
 
 export function AdminDashboard() {
   const query = useAdminDashboard();
@@ -19,16 +20,28 @@ export function AdminDashboard() {
     return <EmptyState title="Failed to load dashboard" description="Please try again." />;
   }
 
-  const { recentLandlords, recentOrgs, subs, audit, activeSubscriptionsTotal, platformUnits, expiringSoon } =
+  const {
+    recentOrgs,
+    recentLandlords,
+    subs,
+    audit,
+    activeSubscriptionsTotal,
+    monthlyRevenue,
+    churnRate,
+    upcomingRenewals,
+    failedPayments,
+  } =
     query.data;
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <KpiCard label="Total Landlord Accounts" value={recentLandlords.meta.total} />
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-6">
+        <KpiCard label="Monthly Revenue" value={formatCurrency(monthlyRevenue, 'PHP')} />
+        <KpiCard label="Churn Rate" value={`${churnRate.toFixed(1)}%`} />
         <KpiCard label="Total Property Groups" value={recentOrgs.meta.total} />
         <KpiCard label="Active Subscriptions" value={activeSubscriptionsTotal} />
-        <KpiCard label="Platform Units" value={platformUnits ?? '—'} />
+        <KpiCard label="Upcoming Renewals" value={upcomingRenewals} />
+        <KpiCard label="Failed Payments" value={failedPayments} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
@@ -37,9 +50,9 @@ export function AdminDashboard() {
       </div>
 
       <div className="space-y-3">
-        {expiringSoon > 0 && (
+        {upcomingRenewals > 0 && (
           <div className="rounded-lg border border-warning-200 bg-warning-50 px-4 py-3 text-sm text-warning-700">
-            <span className="font-semibold">{expiringSoon}</span> subscription{expiringSoon === 1 ? '' : 's'} expiring within 7 days.
+            <span className="font-semibold">{upcomingRenewals}</span> subscription{upcomingRenewals === 1 ? '' : 's'} expiring within 30 days.
           </div>
         )}
         <PlanBreakdownChart subscriptions={subs.data} />
@@ -47,4 +60,3 @@ export function AdminDashboard() {
     </div>
   );
 }
-

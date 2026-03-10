@@ -67,7 +67,7 @@ export function getSubscriptionsColumns({
       id: 'actions',
       enableSorting: false,
       cell: ({ row }) => (
-        <div className="flex justify-end">
+        <div className="flex justify-center">
           <button
             type="button"
             onClick={() => onViewDetails(row.original)}

@@ -34,6 +34,15 @@ export function DataTable<TData>({
     getSortedRowModel: getSortedRowModel(),
   });
 
+  function alignClass(columnId: string, meta?: unknown) {
+    const resolvedMeta = (meta ?? {}) as { align?: 'left' | 'center' | 'right' };
+    if (resolvedMeta.align === 'center') return 'text-center';
+    if (resolvedMeta.align === 'right') return 'text-right';
+    if (resolvedMeta.align === 'left') return 'text-left';
+    if (columnId === 'actions') return 'text-center';
+    return 'text-left';
+  }
+
   return (
     <div className={cn('overflow-hidden rounded-lg border border-slate-200 bg-white', className)}>
       <div className="overflow-x-auto">
@@ -44,7 +53,10 @@ export function DataTable<TData>({
                 {hg.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500"
+                    className={cn(
+                      'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500',
+                      alignClass(header.column.id, header.column.columnDef.meta),
+                    )}
                   >
                     {header.isPlaceholder ? null : (
                       header.column.getCanSort() ? (
@@ -82,7 +94,13 @@ export function DataTable<TData>({
                 )}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-4 py-3 align-middle text-slate-700">
+                  <td
+                    key={cell.id}
+                    className={cn(
+                      'px-4 py-3 align-middle text-slate-700',
+                      alignClass(cell.column.id, cell.column.columnDef.meta),
+                    )}
+                  >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

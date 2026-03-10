@@ -207,7 +207,7 @@ export default function LeasesPage() {
                       Status {renderSortIcon('status')}
                     </button>
                   </TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -234,7 +234,7 @@ export default function LeasesPage() {
                     <TableCell>
                       <StatusBadge status={lease.status} />
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-center">
                       <Button
                         variant="outline"
                         size="sm"

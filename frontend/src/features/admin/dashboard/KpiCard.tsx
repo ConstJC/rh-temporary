@@ -12,10 +12,9 @@ export function KpiCard({
   className?: string;
 }) {
   return (
-    <div className={cn('rounded-xl border border-slate-200 bg-white p-6 shadow-sm', className)}>
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
-      <div className="mt-2 text-3xl font-extrabold text-slate-900">{value}</div>
+    <div className={cn('rounded-xl border border-slate-200 bg-white p-4 shadow-sm', className)}>
+      <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-slate-500">{label}</p>
+      <div className="mt-1 text-xl font-extrabold text-slate-900 xl:text-2xl">{value}</div>
     </div>
   );
 }
-

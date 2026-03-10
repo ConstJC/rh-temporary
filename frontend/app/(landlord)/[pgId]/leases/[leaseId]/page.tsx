@@ -171,7 +171,7 @@ export default function LeaseDetailPage({
                     <TableHead>Amount Due</TableHead>
                     <TableHead>Amount Paid</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -189,7 +189,7 @@ export default function LeaseDetailPage({
                       <TableCell>
                         <StatusBadge status={payment.status} />
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <Button
                           variant="outline"
                           size="sm"

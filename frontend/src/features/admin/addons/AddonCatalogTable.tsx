@@ -168,7 +168,7 @@ export function AddonCatalogTable() {
                       Unit {renderSortIcon('unitOfMeasure')}
                     </button>
                   </th>
-                  <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  <th className="px-4 py-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Actions
                   </th>
                 </tr>
@@ -185,7 +185,7 @@ export function AddonCatalogTable() {
                       {addon.defaultRate ? `₱${addon.defaultRate}` : '—'}
                     </td>
                     <td className="px-4 py-3 text-sm text-slate-600">{addon.unitOfMeasure ?? '—'}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3 text-center">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8">

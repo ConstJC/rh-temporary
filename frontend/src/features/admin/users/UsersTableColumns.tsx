@@ -67,7 +67,7 @@ export function getUsersColumns({
         const u = row.original;
         const canToggle = !currentUserId || u.id !== currentUserId;
         return (
-          <div className="flex items-center justify-end gap-2">
+          <div className="flex items-center justify-center gap-2">
             <button
               type="button"
               onClick={() => onViewDetails(u)}

@@ -4,6 +4,7 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { useSidebarStore } from '@/stores/sidebar.store';
 import { cn } from '@/lib/utils';
+import { AppBreadcrumb } from '@/components/common/AppBreadcrumb';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -20,7 +21,10 @@ export function AppShell({ children, title, pgId, isAdmin }: AppShellProps) {
       <Sidebar pgId={pgId} isAdmin={isAdmin} />
       <TopBar title={title} isAdmin={isAdmin} pgId={pgId} />
       <main className={cn('pt-14 transition-[margin] duration-300 ease-out', mainMargin)}>
-        <div className="p-3 sm:p-4 md:p-6">{children}</div>
+        <div className="p-3 sm:p-4 md:p-6">
+          <AppBreadcrumb isAdmin={isAdmin} />
+          {children}
+        </div>
       </main>
     </div>
   );

@@ -22,6 +22,11 @@ export default function OverviewPage() {
   const groupName = (group as { groupName?: string; name?: string } | null)?.groupName
     ?? (group as { name?: string } | null)?.name
     ?? 'Property Group';
+  const groupCode =
+    (group as { pgCode?: string } | null)?.pgCode
+    ?? (typeof (group as { pgNumber?: number } | null)?.pgNumber === 'number'
+      ? `PG-${String((group as { pgNumber?: number }).pgNumber).padStart(3, '0')}`
+      : null);
 
   const recentLeases = [...(leases ?? [])]
     .sort((a, b) => {
@@ -53,7 +58,7 @@ export default function OverviewPage() {
           <div className="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 sm:text-right">
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Organization</p>
             <p className="mt-1 text-base font-semibold text-slate-900 capitalize">{groupName}</p>
-            <p className="text-xs text-slate-500">Property Group ID: {pgId}</p>
+            <p className="text-xs text-slate-500">Property Group ID: {groupCode ?? pgId}</p>
           </div>
         )}
       />

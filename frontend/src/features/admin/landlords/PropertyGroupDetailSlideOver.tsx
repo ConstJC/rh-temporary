@@ -24,6 +24,7 @@ export function PropertyGroupDetailSlideOver({
   const [timezone, setTimezone] = useState(group?.timezone ?? '');
 
   const isEditMode = mode === 'edit';
+  const resolvedPgCode = group?.pgCode ?? (typeof group?.pgNumber === 'number' ? `PG-${String(group.pgNumber).padStart(3, '0')}` : null);
 
   return (
     <SlideOver
@@ -73,6 +74,10 @@ export function PropertyGroupDetailSlideOver({
                 <p className="mt-1 text-sm font-semibold text-slate-900">{group.groupName}</p>
                 <p className="mt-1 text-xs text-slate-500">
                   {group.currencyCode} · {group.timezone}
+                </p>
+                <p className="mt-1 text-xs text-slate-500">
+                  Property Group ID: {group.pgNumber}
+                  {resolvedPgCode ? ` (${resolvedPgCode})` : ''}
                 </p>
               </>
             )}
