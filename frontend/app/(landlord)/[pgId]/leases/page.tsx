@@ -7,7 +7,7 @@ import { useLeases } from '@/features/landlord/hooks/useLeases';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, FileText, Search, ArrowUpDown, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
+import { Plus, FileText, Search, ArrowUpDown, ChevronUp, ChevronDown, RefreshCw, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { TableSkeleton } from '@/components/common/LoadingSkeleton';
@@ -83,7 +83,7 @@ export default function LeasesPage() {
   if (isLoading) {
     return (
       <>
-        <PageHeader title="Leases" description="Manage tenant leases" />
+        <PageHeader title="Tenant Leases" description="Manage tenant leases and assignments" />
         <div className="mt-6 bg-white rounded-lg border border-slate-200 p-6">
           <TableSkeleton rows={5} />
         </div>
@@ -94,8 +94,8 @@ export default function LeasesPage() {
   return (
     <>
       <PageHeader
-        title="Leases"
-        description="Manage tenant leases"
+        title="Tenant Leases"
+        description="Manage tenant leases and assignments"
         action={
           <div className="flex items-center gap-2">
             <Button
@@ -109,6 +109,10 @@ export default function LeasesPage() {
               <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
+            <Button variant="outline" onClick={() => router.push(`/${pgId}/tenants/new`)}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              Add Tenant
+            </Button>
             <Button onClick={() => router.push(`/${pgId}/leases/new`)}>
               <Plus className="w-4 h-4 mr-2" />
               Create Lease
@@ -120,13 +124,19 @@ export default function LeasesPage() {
       {leases && leases.length === 0 ? (
         <EmptyState
           icon={<FileText className="w-12 h-12" />}
-          title="No leases yet"
-          description="Create your first lease agreement."
+          title="No tenant leases yet"
+          description="Start by adding a tenant or creating your first lease agreement."
           action={
-            <Button onClick={() => router.push(`/${pgId}/leases/new`)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Create Lease
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button variant="outline" onClick={() => router.push(`/${pgId}/tenants/new`)}>
+                <UserPlus className="w-4 h-4 mr-2" />
+                Add Tenant
+              </Button>
+              <Button onClick={() => router.push(`/${pgId}/leases/new`)}>
+                <Plus className="w-4 h-4 mr-2" />
+                Create Lease
+              </Button>
+            </div>
           }
           className="mt-6"
         />
@@ -218,7 +228,16 @@ export default function LeasesPage() {
                     onClick={() => router.push(`/${pgId}/leases/${lease.id}`)}
                   >
                     <TableCell className="font-medium">
-                      {lease.tenant.firstName} {lease.tenant.lastName}
+                      <button
+                        type="button"
+                        className="hover:underline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          router.push(`/${pgId}/tenants/${lease.tenant.id}`);
+                        }}
+                      >
+                        {lease.tenant.firstName} {lease.tenant.lastName}
+                      </button>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">

@@ -7,13 +7,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { usePropertyGroup } from '@/hooks/usePropertyGroup';
-import { useTenants } from '@/features/landlord/hooks/useTenants';
+import { useCreateTenant, useTenants } from '@/features/landlord/hooks/useTenants';
 import { useUnits } from '@/features/landlord/hooks/useUnits';
 import { useCreateLease } from '@/features/landlord/hooks/useLeases';
 import { EmptyState } from '@/components/common/EmptyState';
-import { FileText } from 'lucide-react';
+import { FileText, UserPlus } from 'lucide-react';
 import { toast } from 'sonner';
-import type { LeaseType } from '@/types/domain.types';
+import type { LeaseType, Tenant } from '@/types/domain.types';
 import { toFiniteNumber } from '@/lib/utils';
 
 const leaseTypeOptions: Array<{ value: LeaseType; label: string }> = [
@@ -27,7 +27,7 @@ function getErrorMessage(error: unknown) {
     const message = (error as { message?: unknown }).message;
     if (typeof message === 'string') return message;
   }
-  return 'Unable to create lease. Please try again.';
+  return 'Unable to process request. Please try again.';
 }
 
 export default function NewLeasePage() {
@@ -36,12 +36,41 @@ export default function NewLeasePage() {
 
   const { data: tenants, isLoading: tenantsLoading } = useTenants(pgId);
   const { data: units, isLoading: unitsLoading } = useUnits(pgId);
+  const createTenant = useCreateTenant(pgId);
   const createLease = useCreateLease(pgId);
+
+  const [createdTenants, setCreatedTenants] = useState<Tenant[]>([]);
 
   const availableUnits = useMemo(
     () => (units ?? []).filter((unit) => unit.status === 'AVAILABLE'),
     [units]
   );
+
+  const tenantOptions = useMemo(() => {
+    const map = new Map<string, Tenant>();
+    for (const tenant of tenants ?? []) {
+      map.set(tenant.id, tenant);
+    }
+    for (const tenant of createdTenants) {
+      map.set(tenant.id, tenant);
+    }
+    return Array.from(map.values());
+  }, [tenants, createdTenants]);
+
+  const eligibleTenants = useMemo(
+    () =>
+      tenantOptions.filter((tenant) => {
+        if (tenant.status === 'BLACKLISTED') return false;
+        return !(tenant.leases ?? []).some((lease) => lease.status === 'ACTIVE');
+      }),
+    [tenantOptions]
+  );
+
+  const [showQuickAddTenant, setShowQuickAddTenant] = useState(false);
+  const [newTenantFirstName, setNewTenantFirstName] = useState('');
+  const [newTenantLastName, setNewTenantLastName] = useState('');
+  const [newTenantPhone, setNewTenantPhone] = useState('');
+  const [newTenantEmail, setNewTenantEmail] = useState('');
 
   const [tenantId, setTenantId] = useState('');
   const [unitId, setUnitId] = useState('');
@@ -53,8 +82,12 @@ export default function NewLeasePage() {
   const [advanceMonths, setAdvanceMonths] = useState('1');
   const [gracePeriodDays, setGracePeriodDays] = useState('3');
 
-  const selectedTenantId = tenantId || tenants?.[0]?.id || '';
-  const selectedUnitId = unitId || availableUnits[0]?.id || '';
+  const selectedTenantId = eligibleTenants.some((tenant) => tenant.id === tenantId)
+    ? tenantId
+    : (eligibleTenants[0]?.id ?? '');
+  const selectedUnitId = availableUnits.some((unit) => unit.id === unitId)
+    ? unitId
+    : (availableUnits[0]?.id ?? '');
   const selectedUnit = availableUnits.find((item) => item.id === selectedUnitId);
   const resolvedRentAmount = rentAmount || (selectedUnit ? String(toFiniteNumber(selectedUnit.monthlyRent)) : '');
   const resolvedSecurityDeposit =
@@ -66,6 +99,44 @@ export default function NewLeasePage() {
     if (!unit) return;
     setRentAmount(String(toFiniteNumber(unit.monthlyRent)));
     setSecurityDeposit(String(toFiniteNumber(unit.monthlyRent)));
+  }
+
+  async function handleQuickAddTenant(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const firstName = newTenantFirstName.trim();
+    const lastName = newTenantLastName.trim();
+    const phone = newTenantPhone.trim();
+    const email = newTenantEmail.trim();
+
+    if (!firstName || !lastName || !phone) {
+      toast.error('First name, last name, and phone are required.');
+      return;
+    }
+
+    try {
+      const created = await createTenant.mutateAsync({
+        firstName,
+        lastName,
+        phone,
+        email: email || undefined,
+      });
+
+      setCreatedTenants((prev) => {
+        const map = new Map(prev.map((tenant) => [tenant.id, tenant] as const));
+        map.set(created.id, created);
+        return Array.from(map.values());
+      });
+      setTenantId(created.id);
+      setShowQuickAddTenant(false);
+      setNewTenantFirstName('');
+      setNewTenantLastName('');
+      setNewTenantPhone('');
+      setNewTenantEmail('');
+      toast.success('Tenant created. Continue creating the lease.');
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -87,6 +158,18 @@ export default function NewLeasePage() {
     }
     if (!Number.isFinite(securityDepositValue) || securityDepositValue < 0) {
       toast.error('Security deposit must be a valid non-negative amount.');
+      return;
+    }
+    if (!Number.isInteger(billingDayValue) || billingDayValue < 1 || billingDayValue > 28) {
+      toast.error('Billing day must be an integer between 1 and 28.');
+      return;
+    }
+    if (!Number.isInteger(advanceMonthsValue) || advanceMonthsValue < 0) {
+      toast.error('Advance months must be a whole number that is 0 or higher.');
+      return;
+    }
+    if (!Number.isInteger(gracePeriodDaysValue) || gracePeriodDaysValue < 0) {
+      toast.error('Grace period must be a whole number that is 0 or higher.');
       return;
     }
 
@@ -118,7 +201,7 @@ export default function NewLeasePage() {
     );
   }
 
-  if (!tenants?.length || !availableUnits.length) {
+  if (!availableUnits.length) {
     return (
       <>
         <PageHeader
@@ -126,7 +209,7 @@ export default function NewLeasePage() {
           description="Link a tenant to an available unit"
           action={
             <Button variant="outline" onClick={() => router.push(`/${pgId}/leases`)}>
-              Back to Leases
+              Back to Tenant Leases
             </Button>
           }
         />
@@ -134,20 +217,8 @@ export default function NewLeasePage() {
         <EmptyState
           icon={<FileText className="h-12 w-12" />}
           title="Lease setup needs more data"
-          description={
-            !tenants?.length
-              ? 'Create at least one tenant before creating a lease.'
-              : 'No available units found. Add a new unit or mark one as available.'
-          }
-          action={
-            <Button
-              onClick={() =>
-                router.push(!tenants?.length ? `/${pgId}/tenants/new` : `/${pgId}/properties`)
-              }
-            >
-              {!tenants?.length ? 'Add Tenant' : 'Manage Properties'}
-            </Button>
-          }
+          description="No available units found. Add a new unit or mark one as available."
+          action={<Button onClick={() => router.push(`/${pgId}/properties`)}>Manage Properties</Button>}
           className="mt-6"
         />
       </>
@@ -161,10 +232,90 @@ export default function NewLeasePage() {
         description="Link a tenant to an available unit"
         action={
           <Button variant="outline" onClick={() => router.push(`/${pgId}/leases`)}>
-            Cancel
+            Back to Tenant Leases
           </Button>
         }
       />
+
+      <Card className="mt-6 max-w-4xl">
+        <CardHeader>
+          <CardTitle className="text-lg">Tenant Setup</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+            <p className="text-sm text-slate-700">
+              {eligibleTenants.length
+                ? 'Need to add another tenant before creating this lease?'
+                : 'No eligible tenants available yet. Add one below to continue.'}
+            </p>
+            <Button type="button" variant="outline" size="sm" onClick={() => setShowQuickAddTenant((prev) => !prev)}>
+              <UserPlus className="mr-2 h-4 w-4" />
+              {showQuickAddTenant ? 'Close' : 'Quick Add Tenant'}
+            </Button>
+          </div>
+
+          {showQuickAddTenant && (
+            <form className="space-y-4 rounded-md border border-slate-200 p-4" onSubmit={handleQuickAddTenant}>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <label htmlFor="newTenantFirstName" className="text-sm font-medium text-slate-700">
+                    First Name
+                  </label>
+                  <Input
+                    id="newTenantFirstName"
+                    value={newTenantFirstName}
+                    onChange={(event) => setNewTenantFirstName(event.target.value)}
+                    placeholder="Maria"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="newTenantLastName" className="text-sm font-medium text-slate-700">
+                    Last Name
+                  </label>
+                  <Input
+                    id="newTenantLastName"
+                    value={newTenantLastName}
+                    onChange={(event) => setNewTenantLastName(event.target.value)}
+                    placeholder="Santos"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="newTenantPhone" className="text-sm font-medium text-slate-700">
+                    Phone
+                  </label>
+                  <Input
+                    id="newTenantPhone"
+                    value={newTenantPhone}
+                    onChange={(event) => setNewTenantPhone(event.target.value)}
+                    placeholder="09171234567"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="newTenantEmail" className="text-sm font-medium text-slate-700">
+                    Email (Optional)
+                  </label>
+                  <Input
+                    id="newTenantEmail"
+                    type="email"
+                    value={newTenantEmail}
+                    onChange={(event) => setNewTenantEmail(event.target.value)}
+                    placeholder="maria@example.com"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <Button type="submit" disabled={createTenant.isPending}>
+                  {createTenant.isPending ? 'Saving...' : 'Create Tenant'}
+                </Button>
+              </div>
+            </form>
+          )}
+        </CardContent>
+      </Card>
 
       <Card className="mt-6 max-w-4xl">
         <CardHeader>
@@ -182,13 +333,18 @@ export default function NewLeasePage() {
                   value={selectedTenantId}
                   onChange={(event) => setTenantId(event.target.value)}
                   className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                  disabled={!eligibleTenants.length}
                   required
                 >
-                  {tenants.map((tenant) => (
-                    <option key={tenant.id} value={tenant.id}>
-                      {tenant.firstName} {tenant.lastName}
-                    </option>
-                  ))}
+                  {!eligibleTenants.length ? (
+                    <option value="">No eligible tenants yet</option>
+                  ) : (
+                    eligibleTenants.map((tenant) => (
+                      <option key={tenant.id} value={tenant.id}>
+                        {tenant.firstName} {tenant.lastName}
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -283,6 +439,7 @@ export default function NewLeasePage() {
                   type="number"
                   min={1}
                   max={28}
+                  step={1}
                   value={billingDay}
                   onChange={(event) => setBillingDay(event.target.value)}
                   required
@@ -297,6 +454,7 @@ export default function NewLeasePage() {
                   id="advanceMonths"
                   type="number"
                   min={0}
+                  step={1}
                   value={advanceMonths}
                   onChange={(event) => setAdvanceMonths(event.target.value)}
                   required
@@ -311,6 +469,7 @@ export default function NewLeasePage() {
                   id="gracePeriodDays"
                   type="number"
                   min={0}
+                  step={1}
                   value={gracePeriodDays}
                   onChange={(event) => setGracePeriodDays(event.target.value)}
                   required
@@ -322,7 +481,7 @@ export default function NewLeasePage() {
               <Button type="button" variant="outline" onClick={() => router.push(`/${pgId}/leases`)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={createLease.isPending}>
+              <Button type="submit" disabled={createLease.isPending || !eligibleTenants.length}>
                 {createLease.isPending ? 'Saving...' : 'Create Lease'}
               </Button>
             </div>

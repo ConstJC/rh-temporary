@@ -45,7 +45,7 @@ export default function LeaseDetailPage({
         <div className="mt-6 text-center py-12 bg-white rounded-lg border border-slate-200">
           <p className="text-slate-500">Lease not found.</p>
           <Button onClick={() => router.push(`/${pgId}/leases`)} className="mt-4">
-            Back to Leases
+            Back to Tenant Leases
           </Button>
         </div>
       </>

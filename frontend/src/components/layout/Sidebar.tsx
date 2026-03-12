@@ -51,8 +51,7 @@ function getLandlordNav(pgId?: string): NavItem[] {
   return [
     { href: `/${pgId}/overview`, label: 'Overview', icon: LayoutDashboard },
     { href: `/${pgId}/properties`, label: 'Properties', icon: Building2 },
-    { href: `/${pgId}/tenants`, label: 'Tenants', icon: Users },
-    { href: `/${pgId}/leases`, label: 'Leases', icon: FileClock },
+    { href: `/${pgId}/leases`, label: 'Tenant Leases', icon: FileClock },
     { href: `/${pgId}/payments`, label: 'Payments', icon: CreditCard },
     { href: `/${pgId}/addons`, label: 'Add-ons', icon: Cable },
     { href: `/${pgId}/utilities`, label: 'Utilities', icon: Handshake },

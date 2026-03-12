@@ -33,7 +33,7 @@ const LANDLORD_LABELS: Record<string, string> = {
   properties: 'Properties',
   units: 'Units',
   tenants: 'Tenants',
-  leases: 'Leases',
+  leases: 'Tenant Leases',
   payments: 'Payments',
   addons: 'Add-ons',
   utilities: 'Utilities',

@@ -57,6 +57,12 @@ export class LeasesService {
     if (activeLease) {
       throw new ConflictException('Unit already has an ACTIVE lease');
     }
+    const tenantActiveLease = await this.prisma.lease.findFirst({
+      where: { tenantId: dto.tenantId, status: 'ACTIVE', deletedAt: null },
+    });
+    if (tenantActiveLease) {
+      throw new ConflictException('Tenant already has an ACTIVE lease');
+    }
 
     const moveInDate = new Date(dto.moveInDate);
     const billingDay = dto.billingDay ?? 1;
@@ -86,6 +92,10 @@ export class LeasesService {
       await tx.unit.update({
         where: { id: dto.unitId },
         data: { status: 'OCCUPIED' },
+      });
+      await tx.tenant.update({
+        where: { id: dto.tenantId },
+        data: { status: 'ACTIVE' },
       });
 
       for (let i = 0; i < advanceMonths; i++) {
