@@ -35,7 +35,7 @@ export interface CreateTenantDto {
   firstName: string;
   lastName: string;
   phone: string;
-  email?: string;
+  email: string;
   emergencyContact?: { name: string; phone: string; relation: string };
 }
 

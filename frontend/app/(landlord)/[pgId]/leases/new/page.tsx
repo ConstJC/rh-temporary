@@ -109,8 +109,8 @@ export default function NewLeasePage() {
     const phone = newTenantPhone.trim();
     const email = newTenantEmail.trim();
 
-    if (!firstName || !lastName || !phone) {
-      toast.error('First name, last name, and phone are required.');
+    if (!firstName || !lastName || !phone || !email) {
+      toast.error('First name, last name, phone, and email are required.');
       return;
     }
 
@@ -119,7 +119,7 @@ export default function NewLeasePage() {
         firstName,
         lastName,
         phone,
-        email: email || undefined,
+        email,
       });
 
       setCreatedTenants((prev) => {
@@ -133,7 +133,9 @@ export default function NewLeasePage() {
       setNewTenantLastName('');
       setNewTenantPhone('');
       setNewTenantEmail('');
-      toast.success('Tenant created. Continue creating the lease.');
+      toast.success(
+        'Tenant created. Setup email has been prepared. Continue creating the lease.',
+      );
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
@@ -295,7 +297,7 @@ export default function NewLeasePage() {
                 </div>
                 <div className="space-y-2">
                   <label htmlFor="newTenantEmail" className="text-sm font-medium text-slate-700">
-                    Email (Optional)
+                    Email
                   </label>
                   <Input
                     id="newTenantEmail"
@@ -303,6 +305,7 @@ export default function NewLeasePage() {
                     value={newTenantEmail}
                     onChange={(event) => setNewTenantEmail(event.target.value)}
                     placeholder="maria@example.com"
+                    required
                   />
                 </div>
               </div>

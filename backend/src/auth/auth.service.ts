@@ -310,6 +310,7 @@ export class AuthService {
       where: { id: user.id },
       data: {
         password: hashedPassword,
+        isActive: true,
         resetPasswordToken: null,
         resetPasswordExpires: null,
       },

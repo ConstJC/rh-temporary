@@ -35,10 +35,9 @@ export class CreateTenantDto {
   @MaxLength(30)
   phone: string;
 
-  @ApiPropertyOptional({ example: 'maria@example.com' })
-  @IsOptional()
+  @ApiProperty({ example: 'maria@example.com' })
   @IsEmail()
-  email?: string;
+  email: string;
 
   @ApiPropertyOptional({
     example: { name: 'Jose Santos', phone: '09179876543', relation: 'Father' },

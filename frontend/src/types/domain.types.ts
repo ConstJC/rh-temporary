@@ -398,7 +398,7 @@ export interface CreateTenantDto {
   firstName: string;
   lastName: string;
   phone: string;
-  email?: string;
+  email: string;
   internalNotes?: string;
   emergencyContact?: Record<string, any>;
 }

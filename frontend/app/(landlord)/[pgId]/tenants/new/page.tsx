@@ -30,14 +30,26 @@ export default function NewTenantPage() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const firstNameValue = firstName.trim();
+    const lastNameValue = lastName.trim();
+    const phoneValue = phone.trim();
+    const emailValue = email.trim();
+
+    if (!firstNameValue || !lastNameValue || !phoneValue || !emailValue) {
+      toast.error('First name, last name, phone, and email are required.');
+      return;
+    }
+
     try {
       const created = await createTenant.mutateAsync({
-        firstName,
-        lastName,
-        phone,
-        email: email || undefined,
+        firstName: firstNameValue,
+        lastName: lastNameValue,
+        phone: phoneValue,
+        email: emailValue,
       });
-      toast.success('Tenant created');
+      toast.success(
+        'Tenant created. Account setup email has been prepared for the tenant.',
+      );
       router.push(`/${pgId}/tenants/${created.id}`);
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -104,7 +116,7 @@ export default function NewTenantPage() {
 
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-700" htmlFor="email">
-                  Email (Optional)
+                  Email
                 </label>
                 <Input
                   id="email"
@@ -112,6 +124,7 @@ export default function NewTenantPage() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder="maria@example.com"
+                  required
                 />
               </div>
             </div>

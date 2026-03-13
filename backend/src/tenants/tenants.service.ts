@@ -1,40 +1,175 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuditAction } from '../generated/prisma/client';
+import { AuditAction, UserType } from '../generated/prisma/client';
 import { createAuditTrail } from '../common/helpers/audit.helper';
 import { checkSubscriptionLimit } from '../common/helpers/subscription-limit.helper';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
 import { PaginationDto, PaginationMeta } from '../common/dto/pagination.dto';
+import { MailService } from '../mail/mail.service';
+import { AUTH_CONSTANTS } from '../auth/constants/auth.constants';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+function normalizePhone(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
 
 @Injectable()
 export class TenantsService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(TenantsService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+  ) {}
 
   async create(pgId: string, userId: string, dto: CreateTenantDto) {
     await checkSubscriptionLimit(this.prisma, pgId, 'tenant');
-    const tenant = await this.prisma.tenant.create({
-      data: {
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-        phone: dto.phone,
-        email: dto.email ?? undefined,
-        emergencyContact: (dto.emergencyContact ?? undefined) as any,
-        status: 'ACTIVE',
-        userId: null,
-      },
+    const firstName = dto.firstName.trim();
+    const lastName = dto.lastName.trim();
+    const phone = dto.phone.trim();
+    const email = normalizeEmail(dto.email);
+    const normalizedPhone = normalizePhone(phone);
+
+    if (!normalizedPhone) {
+      throw new BadRequestException(
+        'Phone number must include at least one numeric digit',
+      );
+    }
+
+    const [landlord, existingUserByEmail, existingTenantByEmail, tenants] =
+      await Promise.all([
+        this.prisma.user.findUnique({
+          where: { id: userId },
+          select: { firstName: true, lastName: true, email: true },
+        }),
+        this.prisma.user.findUnique({
+          where: { email },
+          select: { id: true, deletedAt: true, userType: true },
+        }),
+        this.prisma.tenant.findFirst({
+          where: { email, deletedAt: null },
+          select: { id: true },
+        }),
+        this.prisma.tenant.findMany({
+          where: { deletedAt: null },
+          select: { id: true, phone: true },
+        }),
+      ]);
+
+    if (existingUserByEmail) {
+      if (existingUserByEmail.userType === UserType.TENANT) {
+        throw new ConflictException(
+          'A tenant account with this email already exists',
+        );
+      }
+      if (existingUserByEmail.deletedAt) {
+        throw new ConflictException(
+          'This email is already reserved by an archived account',
+        );
+      }
+      throw new ConflictException(
+        'This email is already used by another account',
+      );
+    }
+
+    if (existingTenantByEmail) {
+      throw new ConflictException('A tenant with this email already exists');
+    }
+
+    const duplicatePhoneTenant = tenants.find(
+      (tenant) => normalizePhone(tenant.phone) === normalizedPhone,
+    );
+    if (duplicatePhoneTenant) {
+      throw new ConflictException(
+        'A tenant with this phone number already exists',
+      );
+    }
+
+    const temporaryPassword = crypto.randomBytes(24).toString('base64url');
+    const passwordHash = await bcrypt.hash(
+      temporaryPassword,
+      AUTH_CONSTANTS.PASSWORD.SALT_ROUNDS,
+    );
+    const setupToken = crypto
+      .randomBytes(AUTH_CONSTANTS.TOKEN.PASSWORD_RESET_LENGTH)
+      .toString('hex');
+    const setupTokenExpires = new Date(
+      Date.now() + AUTH_CONSTANTS.EXPIRATION.EMAIL_VERIFICATION,
+    );
+
+    const tenant = await this.prisma.$transaction(async (tx) => {
+      const tenantUser = await tx.user.create({
+        data: {
+          email,
+          password: passwordHash,
+          firstName,
+          lastName,
+          role: 'USER',
+          userType: UserType.TENANT,
+          phone,
+          isActive: false,
+          resetPasswordToken: setupToken,
+          resetPasswordExpires: setupTokenExpires,
+        },
+        select: { id: true },
+      });
+
+      const createdTenant = await tx.tenant.create({
+        data: {
+          firstName,
+          lastName,
+          phone,
+          email,
+          emergencyContact: (dto.emergencyContact ?? undefined) as any,
+          status: 'ACTIVE',
+          userId: tenantUser.id,
+        },
+      });
+
+      await createAuditTrail(tx as any, {
+        userId,
+        action: AuditAction.INSERT,
+        tableName: 'tenants',
+        recordId: createdTenant.id,
+        newValues: createdTenant as any,
+      });
+
+      return createdTenant;
     });
-    await createAuditTrail(this.prisma, {
-      userId,
-      action: AuditAction.INSERT,
-      tableName: 'tenants',
-      recordId: tenant.id,
-      newValues: tenant as any,
-    });
+
+    const landlordName = [landlord?.firstName, landlord?.lastName]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+    const landlordDisplayName =
+      landlordName || landlord?.email || 'your landlord';
+
+    try {
+      await this.mailService.sendTenantAccountCreatedByLandlord({
+        email,
+        tenantFirstName: firstName,
+        landlordName: landlordDisplayName,
+        setupToken,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Tenant created but setup email failed for ${email}`,
+        error as Error,
+      );
+    }
+
     return tenant;
   }
 
@@ -105,7 +240,7 @@ export class TenantsService {
     }
 
     const tenantLeaseRows = Array.from(preferredLeaseByTenant.values()).sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
+      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
     );
     const total = tenantLeaseRows.length;
     const pageRows = tenantLeaseRows.slice(skip, skip + limit);
