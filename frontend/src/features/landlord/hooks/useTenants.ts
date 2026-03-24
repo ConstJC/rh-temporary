@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { landlordApi } from '@/lib/api/landlord.api';
-import { landlordKeys } from './landlord-keys';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { landlordApi } from "@/lib/api/landlord.api";
+import { landlordKeys } from "./landlord-keys";
 
 export function useTenants(pgId: string) {
   return useQuery({
@@ -41,7 +41,9 @@ export function useUpdateTenant(pgId: string, tenantId: string) {
       landlordApi.updateTenant(pgId, tenantId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: landlordKeys.tenants(pgId) });
-      queryClient.invalidateQueries({ queryKey: landlordKeys.tenant(pgId, tenantId) });
+      queryClient.invalidateQueries({
+        queryKey: landlordKeys.tenant(pgId, tenantId),
+      });
     },
   });
 }

@@ -17,7 +17,7 @@ export interface StandardErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: ErrorDetail[];
+    details?: unknown;
   };
 }
 
@@ -49,6 +49,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
       const body = exceptionResponse as Record<string, unknown>;
+
+      if (
+        body.error &&
+        typeof body.error === 'object' &&
+        body.error !== null &&
+        typeof (body.error as Record<string, unknown>).message === 'string'
+      ) {
+        response.status(status).json(body);
+        return;
+      }
+
       message = (body.message as string) ?? exception.message;
       if (Array.isArray(body.message)) {
         details = (body.message as string[]).map((m) => ({ message: m }));

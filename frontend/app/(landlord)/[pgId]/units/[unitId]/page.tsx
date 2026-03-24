@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { use } from 'react';
-import { useRouter } from 'next/navigation';
-import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { StatusBadge } from '@/components/common/StatusBadge';
-import { useUnit } from '@/features/landlord/hooks/useUnits';
-import { Home, User } from 'lucide-react';
-import { formatPeso } from '@/lib/utils';
+import { use } from "react";
+import { useRouter } from "next/navigation";
+import { PageHeader } from "@/components/common/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { useUnit } from "@/features/landlord/hooks/useUnits";
+import { Home, User } from "lucide-react";
+import { formatPeso } from "@/lib/utils";
 
 export default function UnitDetailPage({
   params,
@@ -34,8 +34,13 @@ export default function UnitDetailPage({
         <PageHeader title="Unit Not Found" />
         <Card className="mt-6 max-w-2xl">
           <CardContent className="p-6">
-            <p className="text-sm text-slate-600">The unit record could not be loaded.</p>
-            <Button className="mt-4" onClick={() => router.push(`/${pgId}/properties`)}>
+            <p className="text-sm text-slate-600">
+              The unit record could not be loaded.
+            </p>
+            <Button
+              className="mt-4"
+              onClick={() => router.push(`/${pgId}/properties`)}
+            >
               Back to Properties
             </Button>
           </CardContent>
@@ -44,13 +49,13 @@ export default function UnitDetailPage({
     );
   }
 
-  const activeLease = unit.leases?.find((lease) => lease.status === 'ACTIVE');
+  const activeLease = unit.leases?.find((lease) => lease.status === "ACTIVE");
 
   return (
     <>
       <PageHeader
         title={unit.unitName}
-        description={unit.property?.propertyName ?? 'Unit details'}
+        description={unit.property?.propertyName ?? "Unit details"}
         action={
           <Button
             variant="outline"
@@ -58,7 +63,7 @@ export default function UnitDetailPage({
               router.push(
                 unit.property?.id
                   ? `/${pgId}/properties/${unit.property.id}`
-                  : `/${pgId}/properties`
+                  : `/${pgId}/properties`,
               )
             }
           >
@@ -79,23 +84,33 @@ export default function UnitDetailPage({
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div>
                 <p className="text-sm text-slate-500">Property</p>
-                <p className="mt-1 font-medium text-slate-900">{unit.property?.propertyName ?? 'N/A'}</p>
+                <p className="mt-1 font-medium text-slate-900">
+                  {unit.property?.propertyName ?? "N/A"}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Unit Type</p>
-                <p className="mt-1 font-medium text-slate-900">{unit.unitType.replace(/_/g, ' ')}</p>
+                <p className="mt-1 font-medium text-slate-900">
+                  {unit.unitType.replace(/_/g, " ")}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Monthly Rent</p>
-                <p className="mt-1 font-medium text-slate-900">{formatPeso(unit.monthlyRent)}</p>
+                <p className="mt-1 font-medium text-slate-900">
+                  {formatPeso(unit.monthlyRent)}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Floor Number</p>
-                <p className="mt-1 font-medium text-slate-900">{unit.floorNumber ?? 'N/A'}</p>
+                <p className="mt-1 font-medium text-slate-900">
+                  {unit.floorNumber ?? "N/A"}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Max Occupants</p>
-                <p className="mt-1 font-medium text-slate-900">{unit.maxOccupants ?? 'N/A'}</p>
+                <p className="mt-1 font-medium text-slate-900">
+                  {unit.maxOccupants ?? "N/A"}
+                </p>
               </div>
             </div>
           </CardContent>
@@ -115,7 +130,9 @@ export default function UnitDetailPage({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => router.push(`/${pgId}/leases/${activeLease.id}`)}
+                  onClick={() =>
+                    router.push(`/${pgId}/leases/${activeLease.id}`)
+                  }
                 >
                   View Active Lease
                 </Button>

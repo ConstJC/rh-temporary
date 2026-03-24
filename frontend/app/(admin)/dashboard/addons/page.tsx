@@ -1,5 +1,8 @@
-import { PageHeader } from '@/components/common/PageHeader';
-import { AddonCatalogTable, AddAddonButton } from '@/features/admin/addons/AddonCatalogTable';
+import { PageHeader } from "@/components/common/PageHeader";
+import {
+  AddonCatalogTable,
+  AddAddonButton,
+} from "@/features/admin/addons/AddonCatalogTable";
 
 export default function AddonsPage() {
   return (

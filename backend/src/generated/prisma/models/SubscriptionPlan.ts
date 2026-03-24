@@ -30,7 +30,9 @@ export type SubscriptionPlanAvgAggregateOutputType = {
   priceMonthly: runtime.Decimal | null
   propertyLimit: number | null
   unitLimit: number | null
+  unitLimitPerProperty: number | null
   tenantLimit: number | null
+  accessPolicyVersion: number | null
   version: number | null
 }
 
@@ -38,7 +40,9 @@ export type SubscriptionPlanSumAggregateOutputType = {
   priceMonthly: runtime.Decimal | null
   propertyLimit: number | null
   unitLimit: number | null
+  unitLimitPerProperty: number | null
   tenantLimit: number | null
+  accessPolicyVersion: number | null
   version: number | null
 }
 
@@ -48,7 +52,9 @@ export type SubscriptionPlanMinAggregateOutputType = {
   priceMonthly: runtime.Decimal | null
   propertyLimit: number | null
   unitLimit: number | null
+  unitLimitPerProperty: number | null
   tenantLimit: number | null
+  accessPolicyVersion: number | null
   version: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -61,7 +67,9 @@ export type SubscriptionPlanMaxAggregateOutputType = {
   priceMonthly: runtime.Decimal | null
   propertyLimit: number | null
   unitLimit: number | null
+  unitLimitPerProperty: number | null
   tenantLimit: number | null
+  accessPolicyVersion: number | null
   version: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -74,7 +82,9 @@ export type SubscriptionPlanCountAggregateOutputType = {
   priceMonthly: number
   propertyLimit: number
   unitLimit: number
+  unitLimitPerProperty: number
   tenantLimit: number
+  accessPolicyVersion: number
   version: number
   createdAt: number
   updatedAt: number
@@ -87,7 +97,9 @@ export type SubscriptionPlanAvgAggregateInputType = {
   priceMonthly?: true
   propertyLimit?: true
   unitLimit?: true
+  unitLimitPerProperty?: true
   tenantLimit?: true
+  accessPolicyVersion?: true
   version?: true
 }
 
@@ -95,7 +107,9 @@ export type SubscriptionPlanSumAggregateInputType = {
   priceMonthly?: true
   propertyLimit?: true
   unitLimit?: true
+  unitLimitPerProperty?: true
   tenantLimit?: true
+  accessPolicyVersion?: true
   version?: true
 }
 
@@ -105,7 +119,9 @@ export type SubscriptionPlanMinAggregateInputType = {
   priceMonthly?: true
   propertyLimit?: true
   unitLimit?: true
+  unitLimitPerProperty?: true
   tenantLimit?: true
+  accessPolicyVersion?: true
   version?: true
   createdAt?: true
   updatedAt?: true
@@ -118,7 +134,9 @@ export type SubscriptionPlanMaxAggregateInputType = {
   priceMonthly?: true
   propertyLimit?: true
   unitLimit?: true
+  unitLimitPerProperty?: true
   tenantLimit?: true
+  accessPolicyVersion?: true
   version?: true
   createdAt?: true
   updatedAt?: true
@@ -131,7 +149,9 @@ export type SubscriptionPlanCountAggregateInputType = {
   priceMonthly?: true
   propertyLimit?: true
   unitLimit?: true
+  unitLimitPerProperty?: true
   tenantLimit?: true
+  accessPolicyVersion?: true
   version?: true
   createdAt?: true
   updatedAt?: true
@@ -231,7 +251,9 @@ export type SubscriptionPlanGroupByOutputType = {
   priceMonthly: runtime.Decimal
   propertyLimit: number
   unitLimit: number
+  unitLimitPerProperty: number
   tenantLimit: number
+  accessPolicyVersion: number
   version: number
   createdAt: Date
   updatedAt: Date
@@ -267,12 +289,16 @@ export type SubscriptionPlanWhereInput = {
   priceMonthly?: Prisma.DecimalFilter<"SubscriptionPlan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFilter<"SubscriptionPlan"> | number
   unitLimit?: Prisma.IntFilter<"SubscriptionPlan"> | number
+  unitLimitPerProperty?: Prisma.IntFilter<"SubscriptionPlan"> | number
   tenantLimit?: Prisma.IntFilter<"SubscriptionPlan"> | number
+  accessPolicyVersion?: Prisma.IntFilter<"SubscriptionPlan"> | number
   version?: Prisma.IntFilter<"SubscriptionPlan"> | number
   createdAt?: Prisma.DateTimeFilter<"SubscriptionPlan"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SubscriptionPlan"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"SubscriptionPlan"> | Date | string | null
   subscriptions?: Prisma.SubscriptionListRelationFilter
+  planMenus?: Prisma.SubscriptionPlanMenuListRelationFilter
+  planPermissions?: Prisma.SubscriptionPlanPermissionListRelationFilter
 }
 
 export type SubscriptionPlanOrderByWithRelationInput = {
@@ -281,12 +307,16 @@ export type SubscriptionPlanOrderByWithRelationInput = {
   priceMonthly?: Prisma.SortOrder
   propertyLimit?: Prisma.SortOrder
   unitLimit?: Prisma.SortOrder
+  unitLimitPerProperty?: Prisma.SortOrder
   tenantLimit?: Prisma.SortOrder
+  accessPolicyVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   subscriptions?: Prisma.SubscriptionOrderByRelationAggregateInput
+  planMenus?: Prisma.SubscriptionPlanMenuOrderByRelationAggregateInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionOrderByRelationAggregateInput
 }
 
 export type SubscriptionPlanWhereUniqueInput = Prisma.AtLeast<{
@@ -298,12 +328,16 @@ export type SubscriptionPlanWhereUniqueInput = Prisma.AtLeast<{
   priceMonthly?: Prisma.DecimalFilter<"SubscriptionPlan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFilter<"SubscriptionPlan"> | number
   unitLimit?: Prisma.IntFilter<"SubscriptionPlan"> | number
+  unitLimitPerProperty?: Prisma.IntFilter<"SubscriptionPlan"> | number
   tenantLimit?: Prisma.IntFilter<"SubscriptionPlan"> | number
+  accessPolicyVersion?: Prisma.IntFilter<"SubscriptionPlan"> | number
   version?: Prisma.IntFilter<"SubscriptionPlan"> | number
   createdAt?: Prisma.DateTimeFilter<"SubscriptionPlan"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"SubscriptionPlan"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"SubscriptionPlan"> | Date | string | null
   subscriptions?: Prisma.SubscriptionListRelationFilter
+  planMenus?: Prisma.SubscriptionPlanMenuListRelationFilter
+  planPermissions?: Prisma.SubscriptionPlanPermissionListRelationFilter
 }, "id" | "planName">
 
 export type SubscriptionPlanOrderByWithAggregationInput = {
@@ -312,7 +346,9 @@ export type SubscriptionPlanOrderByWithAggregationInput = {
   priceMonthly?: Prisma.SortOrder
   propertyLimit?: Prisma.SortOrder
   unitLimit?: Prisma.SortOrder
+  unitLimitPerProperty?: Prisma.SortOrder
   tenantLimit?: Prisma.SortOrder
+  accessPolicyVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -333,7 +369,9 @@ export type SubscriptionPlanScalarWhereWithAggregatesInput = {
   priceMonthly?: Prisma.DecimalWithAggregatesFilter<"SubscriptionPlan"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntWithAggregatesFilter<"SubscriptionPlan"> | number
   unitLimit?: Prisma.IntWithAggregatesFilter<"SubscriptionPlan"> | number
+  unitLimitPerProperty?: Prisma.IntWithAggregatesFilter<"SubscriptionPlan"> | number
   tenantLimit?: Prisma.IntWithAggregatesFilter<"SubscriptionPlan"> | number
+  accessPolicyVersion?: Prisma.IntWithAggregatesFilter<"SubscriptionPlan"> | number
   version?: Prisma.IntWithAggregatesFilter<"SubscriptionPlan"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"SubscriptionPlan"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"SubscriptionPlan"> | Date | string
@@ -346,12 +384,16 @@ export type SubscriptionPlanCreateInput = {
   priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: number
   unitLimit?: number
+  unitLimitPerProperty?: number
   tenantLimit?: number
+  accessPolicyVersion?: number
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutSubscriptionPlanInput
+  planMenus?: Prisma.SubscriptionPlanMenuCreateNestedManyWithoutSubscriptionPlanInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionCreateNestedManyWithoutSubscriptionPlanInput
 }
 
 export type SubscriptionPlanUncheckedCreateInput = {
@@ -360,12 +402,16 @@ export type SubscriptionPlanUncheckedCreateInput = {
   priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: number
   unitLimit?: number
+  unitLimitPerProperty?: number
   tenantLimit?: number
+  accessPolicyVersion?: number
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriptionPlanInput
+  planMenus?: Prisma.SubscriptionPlanMenuUncheckedCreateNestedManyWithoutSubscriptionPlanInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUncheckedCreateNestedManyWithoutSubscriptionPlanInput
 }
 
 export type SubscriptionPlanUpdateInput = {
@@ -374,12 +420,16 @@ export type SubscriptionPlanUpdateInput = {
   priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
   tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   subscriptions?: Prisma.SubscriptionUpdateManyWithoutSubscriptionPlanNestedInput
+  planMenus?: Prisma.SubscriptionPlanMenuUpdateManyWithoutSubscriptionPlanNestedInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUpdateManyWithoutSubscriptionPlanNestedInput
 }
 
 export type SubscriptionPlanUncheckedUpdateInput = {
@@ -388,12 +438,16 @@ export type SubscriptionPlanUncheckedUpdateInput = {
   priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
   tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
+  planMenus?: Prisma.SubscriptionPlanMenuUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
 }
 
 export type SubscriptionPlanCreateManyInput = {
@@ -402,7 +456,9 @@ export type SubscriptionPlanCreateManyInput = {
   priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: number
   unitLimit?: number
+  unitLimitPerProperty?: number
   tenantLimit?: number
+  accessPolicyVersion?: number
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -415,7 +471,9 @@ export type SubscriptionPlanUpdateManyMutationInput = {
   priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
   tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -428,7 +486,9 @@ export type SubscriptionPlanUncheckedUpdateManyInput = {
   priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
   tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -441,7 +501,9 @@ export type SubscriptionPlanCountOrderByAggregateInput = {
   priceMonthly?: Prisma.SortOrder
   propertyLimit?: Prisma.SortOrder
   unitLimit?: Prisma.SortOrder
+  unitLimitPerProperty?: Prisma.SortOrder
   tenantLimit?: Prisma.SortOrder
+  accessPolicyVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -452,7 +514,9 @@ export type SubscriptionPlanAvgOrderByAggregateInput = {
   priceMonthly?: Prisma.SortOrder
   propertyLimit?: Prisma.SortOrder
   unitLimit?: Prisma.SortOrder
+  unitLimitPerProperty?: Prisma.SortOrder
   tenantLimit?: Prisma.SortOrder
+  accessPolicyVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
@@ -462,7 +526,9 @@ export type SubscriptionPlanMaxOrderByAggregateInput = {
   priceMonthly?: Prisma.SortOrder
   propertyLimit?: Prisma.SortOrder
   unitLimit?: Prisma.SortOrder
+  unitLimitPerProperty?: Prisma.SortOrder
   tenantLimit?: Prisma.SortOrder
+  accessPolicyVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -475,7 +541,9 @@ export type SubscriptionPlanMinOrderByAggregateInput = {
   priceMonthly?: Prisma.SortOrder
   propertyLimit?: Prisma.SortOrder
   unitLimit?: Prisma.SortOrder
+  unitLimitPerProperty?: Prisma.SortOrder
   tenantLimit?: Prisma.SortOrder
+  accessPolicyVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -486,7 +554,9 @@ export type SubscriptionPlanSumOrderByAggregateInput = {
   priceMonthly?: Prisma.SortOrder
   propertyLimit?: Prisma.SortOrder
   unitLimit?: Prisma.SortOrder
+  unitLimitPerProperty?: Prisma.SortOrder
   tenantLimit?: Prisma.SortOrder
+  accessPolicyVersion?: Prisma.SortOrder
   version?: Prisma.SortOrder
 }
 
@@ -503,6 +573,34 @@ export type DecimalFieldUpdateOperationsInput = {
   divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
+export type SubscriptionPlanCreateNestedOneWithoutPlanMenusInput = {
+  create?: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanMenusInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanMenusInput>
+  connectOrCreate?: Prisma.SubscriptionPlanCreateOrConnectWithoutPlanMenusInput
+  connect?: Prisma.SubscriptionPlanWhereUniqueInput
+}
+
+export type SubscriptionPlanUpdateOneRequiredWithoutPlanMenusNestedInput = {
+  create?: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanMenusInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanMenusInput>
+  connectOrCreate?: Prisma.SubscriptionPlanCreateOrConnectWithoutPlanMenusInput
+  upsert?: Prisma.SubscriptionPlanUpsertWithoutPlanMenusInput
+  connect?: Prisma.SubscriptionPlanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubscriptionPlanUpdateToOneWithWhereWithoutPlanMenusInput, Prisma.SubscriptionPlanUpdateWithoutPlanMenusInput>, Prisma.SubscriptionPlanUncheckedUpdateWithoutPlanMenusInput>
+}
+
+export type SubscriptionPlanCreateNestedOneWithoutPlanPermissionsInput = {
+  create?: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanPermissionsInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanPermissionsInput>
+  connectOrCreate?: Prisma.SubscriptionPlanCreateOrConnectWithoutPlanPermissionsInput
+  connect?: Prisma.SubscriptionPlanWhereUniqueInput
+}
+
+export type SubscriptionPlanUpdateOneRequiredWithoutPlanPermissionsNestedInput = {
+  create?: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanPermissionsInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanPermissionsInput>
+  connectOrCreate?: Prisma.SubscriptionPlanCreateOrConnectWithoutPlanPermissionsInput
+  upsert?: Prisma.SubscriptionPlanUpsertWithoutPlanPermissionsInput
+  connect?: Prisma.SubscriptionPlanWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SubscriptionPlanUpdateToOneWithWhereWithoutPlanPermissionsInput, Prisma.SubscriptionPlanUpdateWithoutPlanPermissionsInput>, Prisma.SubscriptionPlanUncheckedUpdateWithoutPlanPermissionsInput>
+}
+
 export type SubscriptionPlanCreateNestedOneWithoutSubscriptionsInput = {
   create?: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutSubscriptionsInput, Prisma.SubscriptionPlanUncheckedCreateWithoutSubscriptionsInput>
   connectOrCreate?: Prisma.SubscriptionPlanCreateOrConnectWithoutSubscriptionsInput
@@ -517,17 +615,189 @@ export type SubscriptionPlanUpdateOneRequiredWithoutSubscriptionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SubscriptionPlanUpdateToOneWithWhereWithoutSubscriptionsInput, Prisma.SubscriptionPlanUpdateWithoutSubscriptionsInput>, Prisma.SubscriptionPlanUncheckedUpdateWithoutSubscriptionsInput>
 }
 
+export type SubscriptionPlanCreateWithoutPlanMenusInput = {
+  id?: string
+  planName: string
+  priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: number
+  unitLimit?: number
+  unitLimitPerProperty?: number
+  tenantLimit?: number
+  accessPolicyVersion?: number
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutSubscriptionPlanInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionCreateNestedManyWithoutSubscriptionPlanInput
+}
+
+export type SubscriptionPlanUncheckedCreateWithoutPlanMenusInput = {
+  id?: string
+  planName: string
+  priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: number
+  unitLimit?: number
+  unitLimitPerProperty?: number
+  tenantLimit?: number
+  accessPolicyVersion?: number
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriptionPlanInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUncheckedCreateNestedManyWithoutSubscriptionPlanInput
+}
+
+export type SubscriptionPlanCreateOrConnectWithoutPlanMenusInput = {
+  where: Prisma.SubscriptionPlanWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanMenusInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanMenusInput>
+}
+
+export type SubscriptionPlanUpsertWithoutPlanMenusInput = {
+  update: Prisma.XOR<Prisma.SubscriptionPlanUpdateWithoutPlanMenusInput, Prisma.SubscriptionPlanUncheckedUpdateWithoutPlanMenusInput>
+  create: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanMenusInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanMenusInput>
+  where?: Prisma.SubscriptionPlanWhereInput
+}
+
+export type SubscriptionPlanUpdateToOneWithWhereWithoutPlanMenusInput = {
+  where?: Prisma.SubscriptionPlanWhereInput
+  data: Prisma.XOR<Prisma.SubscriptionPlanUpdateWithoutPlanMenusInput, Prisma.SubscriptionPlanUncheckedUpdateWithoutPlanMenusInput>
+}
+
+export type SubscriptionPlanUpdateWithoutPlanMenusInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  planName?: Prisma.StringFieldUpdateOperationsInput | string
+  priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
+  tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutSubscriptionPlanNestedInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUpdateManyWithoutSubscriptionPlanNestedInput
+}
+
+export type SubscriptionPlanUncheckedUpdateWithoutPlanMenusInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  planName?: Prisma.StringFieldUpdateOperationsInput | string
+  priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
+  tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
+}
+
+export type SubscriptionPlanCreateWithoutPlanPermissionsInput = {
+  id?: string
+  planName: string
+  priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: number
+  unitLimit?: number
+  unitLimitPerProperty?: number
+  tenantLimit?: number
+  accessPolicyVersion?: number
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  subscriptions?: Prisma.SubscriptionCreateNestedManyWithoutSubscriptionPlanInput
+  planMenus?: Prisma.SubscriptionPlanMenuCreateNestedManyWithoutSubscriptionPlanInput
+}
+
+export type SubscriptionPlanUncheckedCreateWithoutPlanPermissionsInput = {
+  id?: string
+  planName: string
+  priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: number
+  unitLimit?: number
+  unitLimitPerProperty?: number
+  tenantLimit?: number
+  accessPolicyVersion?: number
+  version?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  subscriptions?: Prisma.SubscriptionUncheckedCreateNestedManyWithoutSubscriptionPlanInput
+  planMenus?: Prisma.SubscriptionPlanMenuUncheckedCreateNestedManyWithoutSubscriptionPlanInput
+}
+
+export type SubscriptionPlanCreateOrConnectWithoutPlanPermissionsInput = {
+  where: Prisma.SubscriptionPlanWhereUniqueInput
+  create: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanPermissionsInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanPermissionsInput>
+}
+
+export type SubscriptionPlanUpsertWithoutPlanPermissionsInput = {
+  update: Prisma.XOR<Prisma.SubscriptionPlanUpdateWithoutPlanPermissionsInput, Prisma.SubscriptionPlanUncheckedUpdateWithoutPlanPermissionsInput>
+  create: Prisma.XOR<Prisma.SubscriptionPlanCreateWithoutPlanPermissionsInput, Prisma.SubscriptionPlanUncheckedCreateWithoutPlanPermissionsInput>
+  where?: Prisma.SubscriptionPlanWhereInput
+}
+
+export type SubscriptionPlanUpdateToOneWithWhereWithoutPlanPermissionsInput = {
+  where?: Prisma.SubscriptionPlanWhereInput
+  data: Prisma.XOR<Prisma.SubscriptionPlanUpdateWithoutPlanPermissionsInput, Prisma.SubscriptionPlanUncheckedUpdateWithoutPlanPermissionsInput>
+}
+
+export type SubscriptionPlanUpdateWithoutPlanPermissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  planName?: Prisma.StringFieldUpdateOperationsInput | string
+  priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
+  tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptions?: Prisma.SubscriptionUpdateManyWithoutSubscriptionPlanNestedInput
+  planMenus?: Prisma.SubscriptionPlanMenuUpdateManyWithoutSubscriptionPlanNestedInput
+}
+
+export type SubscriptionPlanUncheckedUpdateWithoutPlanPermissionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  planName?: Prisma.StringFieldUpdateOperationsInput | string
+  priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
+  tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  version?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subscriptions?: Prisma.SubscriptionUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
+  planMenus?: Prisma.SubscriptionPlanMenuUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
+}
+
 export type SubscriptionPlanCreateWithoutSubscriptionsInput = {
   id?: string
   planName: string
   priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: number
   unitLimit?: number
+  unitLimitPerProperty?: number
   tenantLimit?: number
+  accessPolicyVersion?: number
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  planMenus?: Prisma.SubscriptionPlanMenuCreateNestedManyWithoutSubscriptionPlanInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionCreateNestedManyWithoutSubscriptionPlanInput
 }
 
 export type SubscriptionPlanUncheckedCreateWithoutSubscriptionsInput = {
@@ -536,11 +806,15 @@ export type SubscriptionPlanUncheckedCreateWithoutSubscriptionsInput = {
   priceMonthly: runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: number
   unitLimit?: number
+  unitLimitPerProperty?: number
   tenantLimit?: number
+  accessPolicyVersion?: number
   version?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  planMenus?: Prisma.SubscriptionPlanMenuUncheckedCreateNestedManyWithoutSubscriptionPlanInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUncheckedCreateNestedManyWithoutSubscriptionPlanInput
 }
 
 export type SubscriptionPlanCreateOrConnectWithoutSubscriptionsInput = {
@@ -565,11 +839,15 @@ export type SubscriptionPlanUpdateWithoutSubscriptionsInput = {
   priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
   tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planMenus?: Prisma.SubscriptionPlanMenuUpdateManyWithoutSubscriptionPlanNestedInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUpdateManyWithoutSubscriptionPlanNestedInput
 }
 
 export type SubscriptionPlanUncheckedUpdateWithoutSubscriptionsInput = {
@@ -578,11 +856,15 @@ export type SubscriptionPlanUncheckedUpdateWithoutSubscriptionsInput = {
   priceMonthly?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   propertyLimit?: Prisma.IntFieldUpdateOperationsInput | number
   unitLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  unitLimitPerProperty?: Prisma.IntFieldUpdateOperationsInput | number
   tenantLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  accessPolicyVersion?: Prisma.IntFieldUpdateOperationsInput | number
   version?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  planMenus?: Prisma.SubscriptionPlanMenuUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
+  planPermissions?: Prisma.SubscriptionPlanPermissionUncheckedUpdateManyWithoutSubscriptionPlanNestedInput
 }
 
 
@@ -592,10 +874,14 @@ export type SubscriptionPlanUncheckedUpdateWithoutSubscriptionsInput = {
 
 export type SubscriptionPlanCountOutputType = {
   subscriptions: number
+  planMenus: number
+  planPermissions: number
 }
 
 export type SubscriptionPlanCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subscriptions?: boolean | SubscriptionPlanCountOutputTypeCountSubscriptionsArgs
+  planMenus?: boolean | SubscriptionPlanCountOutputTypeCountPlanMenusArgs
+  planPermissions?: boolean | SubscriptionPlanCountOutputTypeCountPlanPermissionsArgs
 }
 
 /**
@@ -615,6 +901,20 @@ export type SubscriptionPlanCountOutputTypeCountSubscriptionsArgs<ExtArgs extend
   where?: Prisma.SubscriptionWhereInput
 }
 
+/**
+ * SubscriptionPlanCountOutputType without action
+ */
+export type SubscriptionPlanCountOutputTypeCountPlanMenusArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SubscriptionPlanMenuWhereInput
+}
+
+/**
+ * SubscriptionPlanCountOutputType without action
+ */
+export type SubscriptionPlanCountOutputTypeCountPlanPermissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.SubscriptionPlanPermissionWhereInput
+}
+
 
 export type SubscriptionPlanSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -622,12 +922,16 @@ export type SubscriptionPlanSelect<ExtArgs extends runtime.Types.Extensions.Inte
   priceMonthly?: boolean
   propertyLimit?: boolean
   unitLimit?: boolean
+  unitLimitPerProperty?: boolean
   tenantLimit?: boolean
+  accessPolicyVersion?: boolean
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
   subscriptions?: boolean | Prisma.SubscriptionPlan$subscriptionsArgs<ExtArgs>
+  planMenus?: boolean | Prisma.SubscriptionPlan$planMenusArgs<ExtArgs>
+  planPermissions?: boolean | Prisma.SubscriptionPlan$planPermissionsArgs<ExtArgs>
   _count?: boolean | Prisma.SubscriptionPlanCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["subscriptionPlan"]>
 
@@ -637,7 +941,9 @@ export type SubscriptionPlanSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   priceMonthly?: boolean
   propertyLimit?: boolean
   unitLimit?: boolean
+  unitLimitPerProperty?: boolean
   tenantLimit?: boolean
+  accessPolicyVersion?: boolean
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -650,7 +956,9 @@ export type SubscriptionPlanSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   priceMonthly?: boolean
   propertyLimit?: boolean
   unitLimit?: boolean
+  unitLimitPerProperty?: boolean
   tenantLimit?: boolean
+  accessPolicyVersion?: boolean
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -663,16 +971,20 @@ export type SubscriptionPlanSelectScalar = {
   priceMonthly?: boolean
   propertyLimit?: boolean
   unitLimit?: boolean
+  unitLimitPerProperty?: boolean
   tenantLimit?: boolean
+  accessPolicyVersion?: boolean
   version?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type SubscriptionPlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planName" | "priceMonthly" | "propertyLimit" | "unitLimit" | "tenantLimit" | "version" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["subscriptionPlan"]>
+export type SubscriptionPlanOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "planName" | "priceMonthly" | "propertyLimit" | "unitLimit" | "unitLimitPerProperty" | "tenantLimit" | "accessPolicyVersion" | "version" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["subscriptionPlan"]>
 export type SubscriptionPlanInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subscriptions?: boolean | Prisma.SubscriptionPlan$subscriptionsArgs<ExtArgs>
+  planMenus?: boolean | Prisma.SubscriptionPlan$planMenusArgs<ExtArgs>
+  planPermissions?: boolean | Prisma.SubscriptionPlan$planPermissionsArgs<ExtArgs>
   _count?: boolean | Prisma.SubscriptionPlanCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SubscriptionPlanIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -682,6 +994,8 @@ export type $SubscriptionPlanPayload<ExtArgs extends runtime.Types.Extensions.In
   name: "SubscriptionPlan"
   objects: {
     subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
+    planMenus: Prisma.$SubscriptionPlanMenuPayload<ExtArgs>[]
+    planPermissions: Prisma.$SubscriptionPlanPermissionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -689,7 +1003,9 @@ export type $SubscriptionPlanPayload<ExtArgs extends runtime.Types.Extensions.In
     priceMonthly: runtime.Decimal
     propertyLimit: number
     unitLimit: number
+    unitLimitPerProperty: number
     tenantLimit: number
+    accessPolicyVersion: number
     version: number
     createdAt: Date
     updatedAt: Date
@@ -1089,6 +1405,8 @@ readonly fields: SubscriptionPlanFieldRefs;
 export interface Prisma__SubscriptionPlanClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   subscriptions<T extends Prisma.SubscriptionPlan$subscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubscriptionPlan$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  planMenus<T extends Prisma.SubscriptionPlan$planMenusArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubscriptionPlan$planMenusArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubscriptionPlanMenuPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  planPermissions<T extends Prisma.SubscriptionPlan$planPermissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SubscriptionPlan$planPermissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubscriptionPlanPermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1123,7 +1441,9 @@ export interface SubscriptionPlanFieldRefs {
   readonly priceMonthly: Prisma.FieldRef<"SubscriptionPlan", 'Decimal'>
   readonly propertyLimit: Prisma.FieldRef<"SubscriptionPlan", 'Int'>
   readonly unitLimit: Prisma.FieldRef<"SubscriptionPlan", 'Int'>
+  readonly unitLimitPerProperty: Prisma.FieldRef<"SubscriptionPlan", 'Int'>
   readonly tenantLimit: Prisma.FieldRef<"SubscriptionPlan", 'Int'>
+  readonly accessPolicyVersion: Prisma.FieldRef<"SubscriptionPlan", 'Int'>
   readonly version: Prisma.FieldRef<"SubscriptionPlan", 'Int'>
   readonly createdAt: Prisma.FieldRef<"SubscriptionPlan", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"SubscriptionPlan", 'DateTime'>
@@ -1537,6 +1857,54 @@ export type SubscriptionPlan$subscriptionsArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.SubscriptionScalarFieldEnum | Prisma.SubscriptionScalarFieldEnum[]
+}
+
+/**
+ * SubscriptionPlan.planMenus
+ */
+export type SubscriptionPlan$planMenusArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SubscriptionPlanMenu
+   */
+  select?: Prisma.SubscriptionPlanMenuSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SubscriptionPlanMenu
+   */
+  omit?: Prisma.SubscriptionPlanMenuOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPlanMenuInclude<ExtArgs> | null
+  where?: Prisma.SubscriptionPlanMenuWhereInput
+  orderBy?: Prisma.SubscriptionPlanMenuOrderByWithRelationInput | Prisma.SubscriptionPlanMenuOrderByWithRelationInput[]
+  cursor?: Prisma.SubscriptionPlanMenuWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SubscriptionPlanMenuScalarFieldEnum | Prisma.SubscriptionPlanMenuScalarFieldEnum[]
+}
+
+/**
+ * SubscriptionPlan.planPermissions
+ */
+export type SubscriptionPlan$planPermissionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SubscriptionPlanPermission
+   */
+  select?: Prisma.SubscriptionPlanPermissionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SubscriptionPlanPermission
+   */
+  omit?: Prisma.SubscriptionPlanPermissionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SubscriptionPlanPermissionInclude<ExtArgs> | null
+  where?: Prisma.SubscriptionPlanPermissionWhereInput
+  orderBy?: Prisma.SubscriptionPlanPermissionOrderByWithRelationInput | Prisma.SubscriptionPlanPermissionOrderByWithRelationInput[]
+  cursor?: Prisma.SubscriptionPlanPermissionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.SubscriptionPlanPermissionScalarFieldEnum | Prisma.SubscriptionPlanPermissionScalarFieldEnum[]
 }
 
 /**

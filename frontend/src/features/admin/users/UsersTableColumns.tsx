@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import type { ColumnDef } from '@tanstack/react-table';
-import { formatDate } from '@/lib/utils';
-import { StatusBadge } from '@/components/common/StatusBadge';
-import type { AdminUser } from '@/types/domain.types';
+import type { ColumnDef } from "@tanstack/react-table";
+import { formatDate } from "@/lib/utils";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import type { AdminUser } from "@/types/domain.types";
 
 function userStatusKey(u: AdminUser) {
-  if (!u.isActive) return 'USER_INACTIVE';
-  if (!u.isEmailVerified) return 'USER_UNVERIFIED';
-  return 'USER_ACTIVE';
+  if (!u.isActive) return "USER_INACTIVE";
+  if (!u.isEmailVerified) return "USER_UNVERIFIED";
+  return "USER_ACTIVE";
 }
 
 export function getUsersColumns({
@@ -22,7 +22,7 @@ export function getUsersColumns({
 }): ColumnDef<AdminUser>[] {
   return [
     {
-      header: 'Name',
+      header: "Name",
       accessorFn: (u) => `${u.firstName} ${u.lastName}`,
       cell: ({ row }) => (
         <div className="font-semibold text-slate-900">
@@ -31,37 +31,45 @@ export function getUsersColumns({
       ),
     },
     {
-      header: 'Email',
-      accessorKey: 'email',
-      cell: ({ row }) => <span className="text-slate-700">{row.original.email}</span>,
+      header: "Email",
+      accessorKey: "email",
+      cell: ({ row }) => (
+        <span className="text-slate-700">{row.original.email}</span>
+      ),
     },
     {
-      header: 'UserType',
-      accessorKey: 'userType',
+      header: "UserType",
+      accessorKey: "userType",
       cell: ({ row }) => <StatusBadge status={row.original.userType} />,
     },
     {
-      header: 'Status',
-      id: 'status',
+      header: "Status",
+      id: "status",
       accessorFn: (u) => userStatusKey(u),
       cell: ({ row }) => <StatusBadge status={userStatusKey(row.original)} />,
     },
     {
-      header: 'Email Verified',
-      id: 'emailVerified',
-      accessorFn: (u) => (u.isEmailVerified ? 'ACTIVE' : 'PENDING'),
+      header: "Email Verified",
+      id: "emailVerified",
+      accessorFn: (u) => (u.isEmailVerified ? "ACTIVE" : "PENDING"),
       cell: ({ row }) => (
-        <StatusBadge status={row.original.isEmailVerified ? 'ACTIVE' : 'PENDING'} />
+        <StatusBadge
+          status={row.original.isEmailVerified ? "ACTIVE" : "PENDING"}
+        />
       ),
     },
     {
-      header: 'Joined',
-      accessorKey: 'createdAt',
-      cell: ({ row }) => <span className="text-slate-600">{formatDate(row.original.createdAt)}</span>,
+      header: "Joined",
+      accessorKey: "createdAt",
+      cell: ({ row }) => (
+        <span className="text-slate-600">
+          {formatDate(row.original.createdAt)}
+        </span>
+      ),
     },
     {
-      header: 'Actions',
-      id: 'actions',
+      header: "Actions",
+      id: "actions",
       enableSorting: false,
       cell: ({ row }) => {
         const u = row.original;
@@ -81,7 +89,7 @@ export function getUsersColumns({
                 onClick={() => onToggleStatus(u)}
                 className="rounded-md bg-primary-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-600"
               >
-                {u.isActive ? 'Disable' : 'Enable'}
+                {u.isActive ? "Disable" : "Enable"}
               </button>
             )}
           </div>

@@ -3,12 +3,12 @@
  */
 
 export const ROUTES = {
-  LOGIN: '/login',
-  REGISTER: '/register',
-  FORGOT_PASSWORD: '/forgot-password',
-  RESET_PASSWORD: '/reset-password',
-  VERIFY_EMAIL: '/verify-email',
-  DASHBOARD: '/dashboard',
+  LOGIN: "/login",
+  REGISTER: "/register",
+  FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/reset-password",
+  VERIFY_EMAIL: "/verify-email",
+  DASHBOARD: "/dashboard",
   LANDLORD_OVERVIEW: (pgId: string) => `/${pgId}/overview`,
 } as const;
 
@@ -19,15 +19,16 @@ export const PLAN_LIMITS = {
 
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/auth/login',
-    REGISTER: '/auth/register',
-    REFRESH: '/auth/refresh',
-    LOGOUT: '/auth/logout',
-    VERIFY_EMAIL: '/auth/verify-email',
-    FORGOT_PASSWORD: '/auth/forgot-password',
-    RESET_PASSWORD: '/auth/reset-password',
+    LOGIN: "/auth/login",
+    REGISTER: "/auth/register",
+    REFRESH: "/auth/refresh",
+    LOGOUT: "/auth/logout",
+    VERIFY_EMAIL: "/auth/verify-email",
+    FORGOT_PASSWORD: "/auth/forgot-password",
+    RESET_PASSWORD: "/auth/reset-password",
   },
-  PROPERTY_GROUPS: '/property-groups',
+  PROPERTY_GROUPS: "/property-groups",
   tenants: (pgId: string) => `/property-groups/${pgId}/tenants`,
-  tenant: (pgId: string, tenantId: string) => `/property-groups/${pgId}/tenants/${tenantId}`,
+  tenant: (pgId: string, tenantId: string) =>
+    `/property-groups/${pgId}/tenants/${tenantId}`,
 } as const;

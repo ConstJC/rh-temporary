@@ -1,27 +1,29 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { EmptyState } from '@/components/common/EmptyState';
-import { TableSkeleton } from '@/components/common/LoadingSkeleton';
-import { DataTable } from '@/components/tables/DataTable';
-import { DataTablePagination } from '@/components/tables/DataTablePagination';
-import { useDebounce } from '@/hooks/useDebounce';
-import { usePagination } from '@/hooks/usePagination';
+import { useState } from "react";
+import { EmptyState } from "@/components/common/EmptyState";
+import { TableSkeleton } from "@/components/common/LoadingSkeleton";
+import { DataTable } from "@/components/tables/DataTable";
+import { DataTablePagination } from "@/components/tables/DataTablePagination";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePagination } from "@/hooks/usePagination";
 import {
+  useAccessMenusCatalog,
+  useAccessPermissionsCatalog,
   useAdminSubscriptionPlans,
   useCreateSubscriptionPlan,
   useUpdateSubscriptionPlan,
   useUpdateSubscriptionPlanStatus,
-} from '@/features/admin/hooks/useAdminSubscriptionPlans';
-import type { AdminSubscriptionPlan } from '@/types/domain.types';
-import type { SubscriptionPlanDto } from '@/lib/validations/admin.schema';
-import { getSubscriptionPlansColumns } from './SubscriptionPlansTableColumns';
-import { SubscriptionPlanFormSheet } from './SubscriptionPlanFormSheet';
-import { DeleteOrDeactivatePlanDialog } from './DeleteOrDeactivatePlanDialog';
-import { RefreshCw } from 'lucide-react';
+} from "@/features/admin/hooks/useAdminSubscriptionPlans";
+import type { AdminSubscriptionPlan } from "@/types/domain.types";
+import type { SubscriptionPlanDto } from "@/lib/validations/admin.schema";
+import { getSubscriptionPlansColumns } from "./SubscriptionPlansTableColumns";
+import { SubscriptionPlanFormSheet } from "./SubscriptionPlanFormSheet";
+import { DeleteOrDeactivatePlanDialog } from "./DeleteOrDeactivatePlanDialog";
+import { RefreshCw } from "lucide-react";
 
 export function SubscriptionPlansTable() {
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState("");
   const [includeInactive, setIncludeInactive] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -35,16 +37,22 @@ export function SubscriptionPlansTable() {
     limit: pagination.limit,
     search: debouncedSearch || undefined,
     includeInactive,
-    sort: 'createdAt',
-    order: 'desc',
+    sort: "createdAt",
+    order: "desc",
   });
 
   const createMutation = useCreateSubscriptionPlan();
   const updateMutation = useUpdateSubscriptionPlan();
   const statusMutation = useUpdateSubscriptionPlanStatus();
+  const accessMenusQuery = useAccessMenusCatalog();
+  const accessPermissionsQuery = useAccessPermissionsCatalog();
 
   const rows = query.data?.data ?? [];
-  const meta = query.data?.meta ?? { total: 0, page: pagination.page, limit: pagination.limit };
+  const meta = query.data?.meta ?? {
+    total: 0,
+    page: pagination.page,
+    limit: pagination.limit,
+  };
 
   async function handleCreateOrUpdate(data: SubscriptionPlanDto) {
     if (selected) {
@@ -58,7 +66,7 @@ export function SubscriptionPlansTable() {
     if (!selected) return;
     await statusMutation.mutateAsync({
       id: selected.id,
-      status: selected.status === 'ACTIVE' ? 'SUSPENDED' : 'ACTIVE',
+      status: selected.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE",
     });
   }
 
@@ -109,7 +117,9 @@ export function SubscriptionPlansTable() {
             disabled={query.isFetching}
           >
             <span className="inline-flex items-center">
-              <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${query.isFetching ? "animate-spin" : ""}`}
+              />
               Refresh
             </span>
           </button>
@@ -130,7 +140,10 @@ export function SubscriptionPlansTable() {
       {query.isLoading ? (
         <TableSkeleton rows={6} />
       ) : rows.length === 0 ? (
-        <EmptyState title="No subscription plans found" description="Create a new plan to get started." />
+        <EmptyState
+          title="No subscription plans found"
+          description="Create a new plan to get started."
+        />
       ) : (
         <>
           <DataTable columns={columns} data={rows} />
@@ -144,11 +157,14 @@ export function SubscriptionPlansTable() {
       )}
 
       <SubscriptionPlanFormSheet
-        key={`${selected?.id ?? 'new'}-${formOpen ? 'open' : 'closed'}`}
+        key={`${selected?.id ?? "new"}-${formOpen ? "open" : "closed"}`}
         open={formOpen}
         onClose={() => setFormOpen(false)}
         initialData={selected}
         onSubmit={handleCreateOrUpdate}
+        menuCatalog={accessMenusQuery.data ?? []}
+        permissionCatalog={accessPermissionsQuery.data ?? []}
+        copySourcePlans={rows}
         loading={createMutation.isPending || updateMutation.isPending}
       />
 

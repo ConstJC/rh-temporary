@@ -1,31 +1,31 @@
-'use client';
+"use client";
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { usePropertyGroup } from '@/hooks/usePropertyGroup';
-import { useCreateProperty } from '@/features/landlord/hooks/useProperties';
-import { toast } from 'sonner';
-import type { PropertyType } from '@/types/domain.types';
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { PageHeader } from "@/components/common/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { usePropertyGroup } from "@/hooks/usePropertyGroup";
+import { useCreateProperty } from "@/features/landlord/hooks/useProperties";
+import { toast } from "sonner";
+import type { PropertyType } from "@/types/domain.types";
 
 const propertyTypeOptions: Array<{ value: PropertyType; label: string }> = [
-  { value: 'BOARDING_HOUSE', label: 'Boarding House' },
-  { value: 'APARTMENT_BUILDING', label: 'Apartment Building' },
-  { value: 'CONDO', label: 'Condo' },
-  { value: 'SINGLE_FAMILY', label: 'Single Family' },
-  { value: 'COMMERCIAL_MIXED', label: 'Commercial Mixed' },
-  { value: 'OTHER', label: 'Other' },
+  { value: "BOARDING_HOUSE", label: "Boarding House" },
+  { value: "APARTMENT_BUILDING", label: "Apartment Building" },
+  { value: "CONDO", label: "Condo" },
+  { value: "SINGLE_FAMILY", label: "Single Family" },
+  { value: "COMMERCIAL_MIXED", label: "Commercial Mixed" },
+  { value: "OTHER", label: "Other" },
 ];
 
 function getErrorMessage(error: unknown) {
-  if (error && typeof error === 'object' && 'message' in error) {
+  if (error && typeof error === "object" && "message" in error) {
     const message = (error as { message?: unknown }).message;
-    if (typeof message === 'string') return message;
+    if (typeof message === "string") return message;
   }
-  return 'Unable to create property. Please try again.';
+  return "Unable to create property. Please try again.";
 }
 
 export default function NewPropertyPage() {
@@ -33,12 +33,13 @@ export default function NewPropertyPage() {
   const router = useRouter();
   const createProperty = useCreateProperty(pgId);
 
-  const [propertyType, setPropertyType] = useState<PropertyType>('BOARDING_HOUSE');
-  const [propertyName, setPropertyName] = useState('');
-  const [addressLine, setAddressLine] = useState('');
-  const [city, setCity] = useState('');
-  const [province, setProvince] = useState('');
-  const [postalCode, setPostalCode] = useState('');
+  const [propertyType, setPropertyType] =
+    useState<PropertyType>("BOARDING_HOUSE");
+  const [propertyName, setPropertyName] = useState("");
+  const [addressLine, setAddressLine] = useState("");
+  const [city, setCity] = useState("");
+  const [province, setProvince] = useState("");
+  const [postalCode, setPostalCode] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -51,7 +52,7 @@ export default function NewPropertyPage() {
         province: province || undefined,
         postalCode: postalCode || undefined,
       });
-      toast.success('Property created');
+      toast.success("Property created");
       router.push(`/${pgId}/properties/${created.id}`);
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -64,7 +65,10 @@ export default function NewPropertyPage() {
         title="Add Property"
         description="Create a new property under this organization"
         action={
-          <Button variant="outline" onClick={() => router.push(`/${pgId}/properties`)}>
+          <Button
+            variant="outline"
+            onClick={() => router.push(`/${pgId}/properties`)}
+          >
             Cancel
           </Button>
         }
@@ -78,13 +82,18 @@ export default function NewPropertyPage() {
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="propertyType">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="propertyType"
+                >
                   Property Type
                 </label>
                 <select
                   id="propertyType"
                   value={propertyType}
-                  onChange={(event) => setPropertyType(event.target.value as PropertyType)}
+                  onChange={(event) =>
+                    setPropertyType(event.target.value as PropertyType)
+                  }
                   className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                   required
                 >
@@ -97,7 +106,10 @@ export default function NewPropertyPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="propertyName">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="propertyName"
+                >
                   Property Name
                 </label>
                 <Input
@@ -110,7 +122,10 @@ export default function NewPropertyPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="addressLine">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="addressLine"
+                >
                   Address
                 </label>
                 <Input
@@ -123,7 +138,10 @@ export default function NewPropertyPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="city">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="city"
+                >
                   City
                 </label>
                 <Input
@@ -136,7 +154,10 @@ export default function NewPropertyPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="province">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="province"
+                >
                   Province (Optional)
                 </label>
                 <Input
@@ -148,7 +169,10 @@ export default function NewPropertyPage() {
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="postalCode">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="postalCode"
+                >
                   Postal Code (Optional)
                 </label>
                 <Input
@@ -169,7 +193,7 @@ export default function NewPropertyPage() {
                 Cancel
               </Button>
               <Button type="submit" disabled={createProperty.isPending}>
-                {createProperty.isPending ? 'Saving...' : 'Create Property'}
+                {createProperty.isPending ? "Saving..." : "Create Property"}
               </Button>
             </div>
           </form>

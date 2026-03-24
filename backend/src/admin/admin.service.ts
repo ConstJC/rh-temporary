@@ -4,7 +4,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserType, SubscriptionStatus } from '../generated/prisma/client';
+import {
+  AuditAction,
+  UserType,
+  SubscriptionStatus,
+} from '../generated/prisma/client';
+import { createAuditTrail } from '../common/helpers/audit.helper';
 
 type Order = 'asc' | 'desc';
 
@@ -43,7 +48,9 @@ export class AdminService {
       subscriptionPlan: {
         planName: string;
         unitLimit: number;
+        unitLimitPerProperty: number;
         propertyLimit: number;
+        tenantLimit: number;
       };
     }>;
   }) {
@@ -71,20 +78,134 @@ export class AdminService {
               ? subscription.endsAt.toISOString()
               : null,
             maxUnits: subscription.subscriptionPlan.unitLimit,
+            maxUnitsPerProperty:
+              subscription.subscriptionPlan.unitLimitPerProperty,
             maxProperties: subscription.subscriptionPlan.propertyLimit,
+            maxTenants: subscription.subscriptionPlan.tenantLimit,
           }
         : {
             planName: 'UNKNOWN',
             status: 'EXPIRED',
             expiresAt: null,
             maxUnits: 0,
+            maxUnitsPerProperty: 0,
             maxProperties: 0,
+            maxTenants: 0,
           },
       _count: {
         properties: group.properties.length,
         units,
         members: group.members.length,
       },
+    };
+  }
+
+  private async resolveCatalogCodes(data: {
+    menuCodes?: string[];
+    permissionCodes?: string[];
+  }) {
+    const menuCodes = data.menuCodes ?? [];
+    const permissionCodes = data.permissionCodes ?? [];
+
+    const [menus, permissions] = await Promise.all([
+      this.prisma.featureMenu.findMany({
+        where: {
+          code: { in: menuCodes },
+          deletedAt: null,
+        },
+        select: { id: true, code: true },
+      }),
+      this.prisma.featurePermission.findMany({
+        where: {
+          code: { in: permissionCodes },
+          deletedAt: null,
+        },
+        select: { id: true, code: true },
+      }),
+    ]);
+
+    const missingMenus = menuCodes.filter(
+      (code) => !menus.some((menu) => menu.code === code),
+    );
+    if (missingMenus.length > 0) {
+      throw new BadRequestException(
+        `Unknown menu codes: ${missingMenus.join(', ')}`,
+      );
+    }
+
+    const missingPermissions = permissionCodes.filter(
+      (code) => !permissions.some((permission) => permission.code === code),
+    );
+    if (missingPermissions.length > 0) {
+      throw new BadRequestException(
+        `Unknown permission codes: ${missingPermissions.join(', ')}`,
+      );
+    }
+
+    return { menus, permissions };
+  }
+
+  private async listPlanEntitlements(planId: string) {
+    const [menus, permissions] = await Promise.all([
+      this.prisma.subscriptionPlanMenu.findMany({
+        where: {
+          subscriptionPlanId: planId,
+          deletedAt: null,
+          isEnabled: true,
+          menu: { deletedAt: null },
+        },
+        orderBy: [{ menu: { sortOrder: 'asc' } }, { menu: { label: 'asc' } }],
+        select: { menu: { select: { code: true } } },
+      }),
+      this.prisma.subscriptionPlanPermission.findMany({
+        where: {
+          subscriptionPlanId: planId,
+          deletedAt: null,
+          isEnabled: true,
+          permission: { deletedAt: null },
+        },
+        orderBy: [
+          { permission: { moduleCode: 'asc' } },
+          { permission: { action: 'asc' } },
+        ],
+        select: { permission: { select: { code: true } } },
+      }),
+    ]);
+
+    return {
+      menuCodes: menus.map((row) => row.menu.code),
+      permissionCodes: permissions.map((row) => row.permission.code),
+    };
+  }
+
+  private mapPlanWithAccess(
+    plan: {
+      id: string;
+      planName: string;
+      priceMonthly: number | { toString: () => string };
+      propertyLimit: number;
+      unitLimit: number;
+      unitLimitPerProperty: number;
+      tenantLimit: number;
+      createdAt: Date;
+      updatedAt: Date;
+      deletedAt: Date | null;
+    },
+    access: { menuCodes: string[]; permissionCodes: string[] },
+  ) {
+    return {
+      id: plan.id,
+      name: plan.planName,
+      priceMonthly: Number(plan.priceMonthly),
+      maxUnits: plan.unitLimit,
+      maxUnitsPerProperty: plan.unitLimitPerProperty,
+      maxProperties: plan.propertyLimit,
+      maxTenants: plan.tenantLimit,
+      menuCodes: access.menuCodes,
+      permissionCodes: access.permissionCodes,
+      status: plan.deletedAt ? 'SUSPENDED' : 'ACTIVE',
+      createdAt: plan.createdAt.toISOString(),
+      updatedAt: plan.updatedAt.toISOString(),
     };
   }
 
@@ -285,7 +406,9 @@ export class AdminService {
                 select: {
                   planName: true,
                   unitLimit: true,
+                  unitLimitPerProperty: true,
                   propertyLimit: true,
+                  tenantLimit: true,
                 },
               },
             },
@@ -357,7 +480,9 @@ export class AdminService {
               select: {
                 planName: true,
                 unitLimit: true,
+                unitLimitPerProperty: true,
                 propertyLimit: true,
+                tenantLimit: true,
               },
             },
           },
@@ -510,7 +635,9 @@ export class AdminService {
               planName: true,
               priceMonthly: true,
               unitLimit: true,
+              unitLimitPerProperty: true,
               propertyLimit: true,
+              tenantLimit: true,
             },
           },
         },
@@ -537,19 +664,28 @@ export class AdminService {
           name: s.subscriptionPlan.planName,
           priceMonthly: Number(s.subscriptionPlan.priceMonthly),
           maxUnits: s.subscriptionPlan.unitLimit,
+          maxUnitsPerProperty: s.subscriptionPlan.unitLimitPerProperty,
           maxProperties: s.subscriptionPlan.propertyLimit,
+          maxTenants: s.subscriptionPlan.tenantLimit,
         },
       })),
       meta: { total, page, limit },
     };
   }
 
-  async createSubscriptionPlan(data: {
-    name: string;
-    priceMonthly: number;
-    maxUnits: number;
-    maxProperties: number;
-  }) {
+  async createSubscriptionPlan(
+    userId: string | null,
+    data: {
+      name: string;
+      priceMonthly: number;
+      maxUnits: number;
+      maxUnitsPerProperty: number;
+      maxProperties: number;
+      maxTenants: number;
+      menuCodes: string[];
+      permissionCodes: string[];
+    },
+  ) {
     const existing = await this.prisma.subscriptionPlan.findFirst({
       where: { planName: data.name.trim() },
       select: { id: true },
@@ -558,36 +694,74 @@ export class AdminService {
       throw new BadRequestException('Subscription plan name already exists');
     }
 
-    const created = await this.prisma.subscriptionPlan.create({
-      data: {
-        planName: data.name.trim(),
-        priceMonthly: data.priceMonthly,
-        unitLimit: data.maxUnits,
-        propertyLimit: data.maxProperties,
-        tenantLimit: 0,
-      },
-      select: {
-        id: true,
-        planName: true,
-        priceMonthly: true,
-        unitLimit: true,
-        propertyLimit: true,
-        createdAt: true,
-        updatedAt: true,
-        deletedAt: true,
-      },
+    const { menus, permissions } = await this.resolveCatalogCodes(data);
+
+    const created = await this.prisma.$transaction(async (tx) => {
+      const plan = await tx.subscriptionPlan.create({
+        data: {
+          planName: data.name.trim(),
+          priceMonthly: data.priceMonthly,
+          unitLimit: data.maxUnits,
+          unitLimitPerProperty: data.maxUnitsPerProperty,
+          propertyLimit: data.maxProperties,
+          tenantLimit: data.maxTenants,
+          accessPolicyVersion: 1,
+        },
+        select: {
+          id: true,
+          planName: true,
+          priceMonthly: true,
+          propertyLimit: true,
+          unitLimit: true,
+          unitLimitPerProperty: true,
+          tenantLimit: true,
+          createdAt: true,
+          updatedAt: true,
+          deletedAt: true,
+        },
+      });
+
+      if (menus.length > 0) {
+        await tx.subscriptionPlanMenu.createMany({
+          data: menus.map((menu) => ({
+            subscriptionPlanId: plan.id,
+            menuId: menu.id,
+            isEnabled: true,
+          })),
+        });
+      }
+      if (permissions.length > 0) {
+        await tx.subscriptionPlanPermission.createMany({
+          data: permissions.map((permission) => ({
+            subscriptionPlanId: plan.id,
+            permissionId: permission.id,
+            isEnabled: true,
+          })),
+        });
+      }
+
+      await createAuditTrail(tx as any, {
+        userId,
+        action: AuditAction.INSERT,
+        tableName: 'subscription_plans',
+        recordId: plan.id,
+        newValues: {
+          name: data.name.trim(),
+          priceMonthly: data.priceMonthly,
+          maxUnits: data.maxUnits,
+          maxUnitsPerProperty: data.maxUnitsPerProperty,
+          maxProperties: data.maxProperties,
+          maxTenants: data.maxTenants,
+          menuCodes: data.menuCodes,
+          permissionCodes: data.permissionCodes,
+        } as any,
+      });
+
+      return plan;
     });
 
-    return {
-      id: created.id,
-      name: created.planName,
-      priceMonthly: Number(created.priceMonthly),
-      maxUnits: created.unitLimit,
-      maxProperties: created.propertyLimit,
-      status: created.deletedAt ? 'SUSPENDED' : 'ACTIVE',
-      createdAt: created.createdAt.toISOString(),
-      updatedAt: created.updatedAt.toISOString(),
-    };
+    const access = await this.listPlanEntitlements(created.id);
+    return this.mapPlanWithAccess(created, access);
   }
 
   async getSubscriptionPlans(params: {
@@ -627,7 +801,29 @@ export class AdminService {
           priceMonthly: true,
           propertyLimit: true,
           unitLimit: true,
+          unitLimitPerProperty: true,
           tenantLimit: true,
+          planMenus: {
+            where: {
+              deletedAt: null,
+              isEnabled: true,
+              menu: { deletedAt: null },
+            },
+            orderBy: [{ menu: { sortOrder: 'asc' } }, { menu: { label: 'asc' } }],
+            select: { menu: { select: { code: true } } },
+          },
+          planPermissions: {
+            where: {
+              deletedAt: null,
+              isEnabled: true,
+              permission: { deletedAt: null },
+            },
+            orderBy: [
+              { permission: { moduleCode: 'asc' } },
+              { permission: { action: 'asc' } },
+            ],
+            select: { permission: { select: { code: true } } },
+          },
           createdAt: true,
           updatedAt: true,
           deletedAt: true,
@@ -642,8 +838,11 @@ export class AdminService {
         name: plan.planName,
         priceMonthly: Number(plan.priceMonthly),
         maxUnits: plan.unitLimit,
+        maxUnitsPerProperty: plan.unitLimitPerProperty,
         maxProperties: plan.propertyLimit,
         maxTenants: plan.tenantLimit,
+        menuCodes: plan.planMenus.map((row) => row.menu.code),
+        permissionCodes: plan.planPermissions.map((row) => row.permission.code),
         status: plan.deletedAt ? 'SUSPENDED' : 'ACTIVE',
         createdAt: plan.createdAt.toISOString(),
         updatedAt: plan.updatedAt.toISOString(),
@@ -653,17 +852,31 @@ export class AdminService {
   }
 
   async updateSubscriptionPlan(
+    userId: string | null,
     id: string,
     data: {
       name?: string;
       priceMonthly?: number;
       maxUnits?: number;
+      maxUnitsPerProperty?: number;
       maxProperties?: number;
+      maxTenants?: number;
+      menuCodes?: string[];
+      permissionCodes?: string[];
     },
   ) {
     const existing = await this.prisma.subscriptionPlan.findUnique({
       where: { id },
-      select: { id: true, planName: true },
+      select: {
+        id: true,
+        planName: true,
+        priceMonthly: true,
+        propertyLimit: true,
+        unitLimit: true,
+        unitLimitPerProperty: true,
+        tenantLimit: true,
+        accessPolicyVersion: true,
+      },
     });
     if (!existing) throw new NotFoundException('Subscription plan not found');
 
@@ -677,44 +890,129 @@ export class AdminService {
       }
     }
 
-    const updated = await this.prisma.subscriptionPlan.update({
-      where: { id },
-      data: {
-        ...(data.name ? { planName: data.name.trim() } : {}),
-        ...(typeof data.priceMonthly === 'number'
-          ? { priceMonthly: data.priceMonthly }
-          : {}),
-        ...(typeof data.maxUnits === 'number'
-          ? { unitLimit: data.maxUnits }
-          : {}),
-        ...(typeof data.maxProperties === 'number'
-          ? { propertyLimit: data.maxProperties }
-          : {}),
-      },
-      select: {
-        id: true,
-        planName: true,
-        priceMonthly: true,
-        propertyLimit: true,
-        unitLimit: true,
-        tenantLimit: true,
-        createdAt: true,
-        updatedAt: true,
-        deletedAt: true,
-      },
+    const shouldUpdateMenus = Array.isArray(data.menuCodes);
+    const shouldUpdatePermissions = Array.isArray(data.permissionCodes);
+    const shouldBumpPolicyVersion = shouldUpdateMenus || shouldUpdatePermissions;
+
+    const oldAccess = await this.listPlanEntitlements(id);
+
+    const { menus, permissions } = await this.resolveCatalogCodes({
+      menuCodes: data.menuCodes,
+      permissionCodes: data.permissionCodes,
     });
 
-    return {
-      id: updated.id,
-      name: updated.planName,
-      priceMonthly: Number(updated.priceMonthly),
-      maxUnits: updated.unitLimit,
-      maxProperties: updated.propertyLimit,
-      maxTenants: updated.tenantLimit,
-      status: updated.deletedAt ? 'SUSPENDED' : 'ACTIVE',
-      createdAt: updated.createdAt.toISOString(),
-      updatedAt: updated.updatedAt.toISOString(),
-    };
+    const updated = await this.prisma.$transaction(async (tx) => {
+      if (shouldUpdateMenus) {
+        await tx.subscriptionPlanMenu.deleteMany({
+          where: { subscriptionPlanId: id },
+        });
+        if (menus.length > 0) {
+          await tx.subscriptionPlanMenu.createMany({
+            data: menus.map((menu) => ({
+              subscriptionPlanId: id,
+              menuId: menu.id,
+              isEnabled: true,
+            })),
+          });
+        }
+      }
+
+      if (shouldUpdatePermissions) {
+        await tx.subscriptionPlanPermission.deleteMany({
+          where: { subscriptionPlanId: id },
+        });
+        if (permissions.length > 0) {
+          await tx.subscriptionPlanPermission.createMany({
+            data: permissions.map((permission) => ({
+              subscriptionPlanId: id,
+              permissionId: permission.id,
+              isEnabled: true,
+            })),
+          });
+        }
+      }
+
+      const plan = await tx.subscriptionPlan.update({
+        where: { id },
+        data: {
+          ...(data.name ? { planName: data.name.trim() } : {}),
+          ...(typeof data.priceMonthly === 'number'
+            ? { priceMonthly: data.priceMonthly }
+            : {}),
+          ...(typeof data.maxUnits === 'number'
+            ? { unitLimit: data.maxUnits }
+            : {}),
+          ...(typeof data.maxUnitsPerProperty === 'number'
+            ? { unitLimitPerProperty: data.maxUnitsPerProperty }
+            : {}),
+          ...(typeof data.maxProperties === 'number'
+            ? { propertyLimit: data.maxProperties }
+            : {}),
+          ...(typeof data.maxTenants === 'number'
+            ? { tenantLimit: data.maxTenants }
+            : {}),
+          ...(shouldBumpPolicyVersion
+            ? { accessPolicyVersion: { increment: 1 } }
+            : {}),
+        },
+        select: {
+          id: true,
+          planName: true,
+          priceMonthly: true,
+          propertyLimit: true,
+          unitLimit: true,
+          unitLimitPerProperty: true,
+          tenantLimit: true,
+          createdAt: true,
+          updatedAt: true,
+          deletedAt: true,
+        },
+      });
+
+      const nextMenuCodes = shouldUpdateMenus
+        ? [...(data.menuCodes ?? [])]
+        : oldAccess.menuCodes;
+      const nextPermissionCodes = shouldUpdatePermissions
+        ? [...(data.permissionCodes ?? [])]
+        : oldAccess.permissionCodes;
+
+      await createAuditTrail(tx as any, {
+        userId,
+        action: AuditAction.UPDATE,
+        tableName: 'subscription_plans',
+        recordId: id,
+        oldValues: {
+          name: existing.planName,
+          priceMonthly: Number(existing.priceMonthly),
+          maxUnits: existing.unitLimit,
+          maxUnitsPerProperty: existing.unitLimitPerProperty,
+          maxProperties: existing.propertyLimit,
+          maxTenants: existing.tenantLimit,
+          menuCodes: oldAccess.menuCodes,
+          permissionCodes: oldAccess.permissionCodes,
+          accessPolicyVersion: existing.accessPolicyVersion,
+        } as any,
+        newValues: {
+          name: plan.planName,
+          priceMonthly: Number(plan.priceMonthly),
+          maxUnits: plan.unitLimit,
+          maxUnitsPerProperty: plan.unitLimitPerProperty,
+          maxProperties: plan.propertyLimit,
+          maxTenants: plan.tenantLimit,
+          menuCodes: nextMenuCodes,
+          permissionCodes: nextPermissionCodes,
+          accessPolicyVersion:
+            shouldBumpPolicyVersion
+              ? existing.accessPolicyVersion + 1
+              : existing.accessPolicyVersion,
+        } as any,
+      });
+
+      return plan;
+    });
+
+    const access = await this.listPlanEntitlements(id);
+    return this.mapPlanWithAccess(updated, access);
   }
 
   async updateSubscriptionPlanStatus(
@@ -741,6 +1039,50 @@ export class AdminService {
       status: updated.deletedAt ? 'SUSPENDED' : 'ACTIVE',
       updatedAt: updated.updatedAt.toISOString(),
     };
+  }
+
+  async getAccessMenus() {
+    const rows = await this.prisma.featureMenu.findMany({
+      where: { deletedAt: null, isActive: true },
+      orderBy: [{ sortOrder: 'asc' }, { label: 'asc' }],
+      select: {
+        id: true,
+        code: true,
+        label: true,
+        routePattern: true,
+        sortOrder: true,
+      },
+    });
+
+    return rows.map((row) => ({
+      id: row.id,
+      code: row.code,
+      label: row.label,
+      routePattern: row.routePattern,
+      sortOrder: row.sortOrder,
+    }));
+  }
+
+  async getAccessPermissions() {
+    const rows = await this.prisma.featurePermission.findMany({
+      where: { deletedAt: null, isActive: true },
+      orderBy: [{ moduleCode: 'asc' }, { action: 'asc' }],
+      select: {
+        id: true,
+        code: true,
+        moduleCode: true,
+        action: true,
+        description: true,
+      },
+    });
+
+    return rows.map((row) => ({
+      id: row.id,
+      code: row.code,
+      moduleCode: row.moduleCode,
+      action: row.action,
+      description: row.description,
+    }));
   }
 
   async getAudit(params: {

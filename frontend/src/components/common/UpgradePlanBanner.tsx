@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from "next/link";
 
 export function UpgradePlanBanner() {
   return (
@@ -6,7 +6,10 @@ export function UpgradePlanBanner() {
       <p className="text-sm font-medium text-warning-700">
         You&apos;ve reached your plan limit. Upgrade to add more.
       </p>
-      <Link href="/upgrade" className="mt-2 inline-block text-sm font-medium text-warning-700 underline">
+      <Link
+        href="/upgrade"
+        className="mt-2 inline-block text-sm font-medium text-warning-700 underline"
+      >
         Upgrade plan
       </Link>
     </div>

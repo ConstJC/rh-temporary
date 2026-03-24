@@ -1,25 +1,64 @@
 import {
   Injectable,
-  ForbiddenException,
+  Logger,
   ConflictException,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuditAction } from '../generated/prisma/client';
+import { AuditAction, UserType } from '../generated/prisma/client';
 import { createAuditTrail } from '../common/helpers/audit.helper';
 import { CreatePropertyGroupDto } from './dto/create-property-group.dto';
 import { UpdatePropertyGroupDto } from './dto/update-property-group.dto';
 import { InviteMemberDto } from './dto/invite-member.dto';
 import { UpdateMemberRoleDto } from './dto/update-member-role.dto';
+import { MailService } from '../mail/mail.service';
+import { AUTH_CONSTANTS } from '../auth/constants/auth.constants';
+import { AccessControlService } from '../access-control/access-control.service';
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 function formatPgCode(pgNumber: number) {
   return `PG-${String(pgNumber).padStart(3, '0')}`;
 }
 
+function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+function deriveNameFromEmail(email: string): {
+  firstName: string;
+  lastName: string;
+} {
+  const localPart = email.split('@')[0] ?? '';
+  const words = localPart
+    .replace(/[^a-zA-Z0-9]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  const [firstWord, ...restWords] = words;
+  const firstName =
+    firstWord && firstWord.length > 0
+      ? firstWord.charAt(0).toUpperCase() + firstWord.slice(1).toLowerCase()
+      : 'Invited';
+  const lastRaw = restWords.join(' ');
+  const lastName =
+    lastRaw.length > 0
+      ? lastRaw.charAt(0).toUpperCase() + lastRaw.slice(1).toLowerCase()
+      : 'Member';
+
+  return { firstName, lastName };
+}
+
 @Injectable()
 export class PropertyGroupsService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(PropertyGroupsService.name);
+
+  constructor(
+    private prisma: PrismaService,
+    private mailService: MailService,
+    private accessControlService: AccessControlService,
+  ) {}
 
   async create(userId: string, dto: CreatePropertyGroupDto) {
     const ownerRole = await this.prisma.orgRole.findFirst({
@@ -180,26 +219,62 @@ export class PropertyGroupsService {
     userId: string,
     dto: InviteMemberDto,
   ) {
-    const orgRole = await this.prisma.orgRole.findFirst({
-      where: { code: dto.roleCode, deletedAt: null },
-    });
+    const email = normalizeEmail(dto.email);
+    const [orgRole, propertyGroup, invitingUser, existingUser] =
+      await Promise.all([
+        this.prisma.orgRole.findFirst({
+          where: { code: dto.roleCode, deletedAt: null },
+        }),
+        this.prisma.propertyGroup.findFirst({
+          where: { id: propertyGroupId, deletedAt: null },
+          select: { id: true, groupName: true },
+        }),
+        this.prisma.user.findUnique({
+          where: { id: userId },
+          select: { firstName: true, lastName: true, email: true },
+        }),
+        this.prisma.user.findUnique({
+          where: { email },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            deletedAt: true,
+            userType: true,
+          },
+        }),
+      ]);
+
     if (!orgRole) {
       throw new BadRequestException('Invalid roleCode');
     }
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-    const existingMember = await this.prisma.propertyGroupMember.findFirst({
-      where: {
-        propertyGroupId,
-        deletedAt: null,
-        ...(existingUser ? { userId: existingUser.id } : {}),
-      },
-    });
-    if (existingUser && existingMember) {
+    if (!propertyGroup) {
+      throw new NotFoundException('Property group not found');
+    }
+    if (existingUser?.deletedAt) {
+      throw new ConflictException('User account is archived');
+    }
+    if (existingUser?.userType === UserType.TENANT) {
+      throw new ConflictException(
+        'Tenant accounts cannot be added as property group members',
+      );
+    }
+
+    const existingMember = existingUser?.id
+      ? await this.prisma.propertyGroupMember.findFirst({
+          where: {
+            propertyGroupId,
+            deletedAt: null,
+            userId: existingUser.id,
+          },
+        })
+      : null;
+    if (existingUser?.id && existingMember) {
       throw new ConflictException('User is already a member');
     }
-    if (existingUser) {
+
+    if (existingUser?.id) {
       const member = await this.prisma.propertyGroupMember.create({
         data: {
           propertyGroupId,
@@ -218,12 +293,93 @@ export class PropertyGroupsService {
         action: AuditAction.INSERT,
         tableName: 'property_group_members',
         recordId: member.id,
-        newValues: { email: dto.email, roleCode: dto.roleCode } as any,
+        newValues: { email, roleCode: dto.roleCode },
       });
       return member;
     }
-    // Phase 2: send invite email and store pending invite. For Phase 1 we just throw.
-    throw new NotFoundException('User not found. Invite by email is Phase 2.');
+
+    const { firstName, lastName } = deriveNameFromEmail(email);
+    const temporaryPassword = crypto.randomBytes(24).toString('base64url');
+    const passwordHash = await bcrypt.hash(
+      temporaryPassword,
+      AUTH_CONSTANTS.PASSWORD.SALT_ROUNDS,
+    );
+    const setupToken = crypto
+      .randomBytes(AUTH_CONSTANTS.TOKEN.PASSWORD_RESET_LENGTH)
+      .toString('hex');
+    const setupTokenExpires = new Date(
+      Date.now() + AUTH_CONSTANTS.EXPIRATION.EMAIL_VERIFICATION,
+    );
+
+    const invitedMember = await this.prisma.$transaction(async (tx) => {
+      const invitedUser = await tx.user.create({
+        data: {
+          email,
+          password: passwordHash,
+          firstName,
+          lastName,
+          role: 'USER',
+          userType: UserType.LANDLORD,
+          isActive: false,
+          resetPasswordToken: setupToken,
+          resetPasswordExpires: setupTokenExpires,
+        },
+        select: { id: true },
+      });
+
+      const member = await tx.propertyGroupMember.create({
+        data: {
+          propertyGroupId,
+          userId: invitedUser.id,
+          roleId: orgRole.id,
+        },
+        include: {
+          user: {
+            select: { id: true, email: true, firstName: true, lastName: true },
+          },
+          role: { select: { code: true, name: true } },
+        },
+      });
+
+      await createAuditTrail(tx as any, {
+        userId,
+        action: AuditAction.INSERT,
+        tableName: 'property_group_members',
+        recordId: member.id,
+        newValues: {
+          email,
+          roleCode: dto.roleCode,
+          invited: true,
+        },
+      });
+
+      return member;
+    });
+
+    const inviterFullName = [invitingUser?.firstName, invitingUser?.lastName]
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+    const inviterDisplayName =
+      inviterFullName || invitingUser?.email || 'your landlord';
+
+    try {
+      await this.mailService.sendPropertyGroupMemberInvite({
+        email,
+        invitedFirstName: firstName,
+        invitedByName: inviterDisplayName,
+        propertyGroupName: propertyGroup.groupName,
+        roleCode: dto.roleCode,
+        setupToken,
+      });
+    } catch (error) {
+      this.logger.error(
+        `Member invite created but email failed for ${email}`,
+        error as Error,
+      );
+    }
+
+    return invitedMember;
   }
 
   async updateMemberRole(
@@ -333,13 +489,23 @@ export class PropertyGroupsService {
         })
         .then((rows) => rows.length),
     ]);
+
+    const access = await this.accessControlService.getAccessContext(
+      propertyGroupId,
+    );
+
     return {
       status: sub.status,
       plan: {
         planName: sub.subscriptionPlan.planName,
         propertyLimit: sub.subscriptionPlan.propertyLimit,
         unitLimit: sub.subscriptionPlan.unitLimit,
+        unitLimitPerProperty: sub.subscriptionPlan.unitLimitPerProperty,
         tenantLimit: sub.subscriptionPlan.tenantLimit,
+        access: {
+          menus: access.menus,
+          permissions: access.permissions,
+        },
       },
       usage: { properties, units, tenants },
     };

@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { adminApi, type AuditFilters } from '@/lib/api/admin.api';
+import { useQuery } from "@tanstack/react-query";
+import { adminApi, type AuditFilters } from "@/lib/api/admin.api";
 
 export const auditLogKeys = {
-  all: () => ['adminAuditLog'] as const,
-  list: (f: AuditFilters) => ['adminAuditLog', 'list', f] as const,
+  all: () => ["adminAuditLog"] as const,
+  list: (f: AuditFilters) => ["adminAuditLog", "list", f] as const,
 };
 
 export function useAuditLog(filters: AuditFilters) {
@@ -14,4 +14,3 @@ export function useAuditLog(filters: AuditFilters) {
     placeholderData: (prev) => prev,
   });
 }
-

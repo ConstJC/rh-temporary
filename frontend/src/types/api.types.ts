@@ -33,12 +33,19 @@ export interface ApiError {
 }
 
 export function normalizeApiError(err: unknown): ApiError {
-  if (err && typeof err === 'object' && 'response' in err) {
-    const ax = err as { response?: { data?: { error?: { code?: string; message?: string; details?: ErrorDetail[] } }; status?: number } };
+  if (err && typeof err === "object" && "response" in err) {
+    const ax = err as {
+      response?: {
+        data?: {
+          error?: { code?: string; message?: string; details?: ErrorDetail[] };
+        };
+        status?: number;
+      };
+    };
     const status = ax.response?.status ?? 500;
     const body = ax.response?.data?.error;
     return {
-      message: body?.message ?? 'An error occurred',
+      message: body?.message ?? "An error occurred",
       statusCode: status,
       code: body?.code,
       errors: body?.details,
@@ -47,5 +54,5 @@ export function normalizeApiError(err: unknown): ApiError {
   if (err instanceof Error) {
     return { message: err.message, statusCode: 500 };
   }
-  return { message: 'An error occurred', statusCode: 500 };
+  return { message: "An error occurred", statusCode: 500 };
 }

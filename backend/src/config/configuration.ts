@@ -13,6 +13,8 @@ export default () => ({
     url: process.env.APP_URL || 'http://localhost:3002',
     frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3001',
     nodeEnv: process.env.NODE_ENV || 'development',
+    planEntitlementsEnabled:
+      process.env.PLAN_ENTITLEMENTS_ENABLED === 'true',
   },
   smtp: {
     host: process.env.SMTP_HOST,

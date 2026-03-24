@@ -1,0 +1,65 @@
+<svg width="1600" height="1200" viewBox="0 0 1600 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="1200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8DB4E8"/>
+      <stop offset="1" stop-color="#2A4F82"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="800" y1="120" x2="800" y2="1080" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FCFF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#CFE2FF" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1600" height="1200" fill="url(#bg)"/>
+
+  <circle cx="1420" cy="170" r="190" fill="#FFFFFF" fill-opacity="0.12"/>
+  <circle cx="170" cy="250" r="120" fill="#FFFFFF" fill-opacity="0.12"/>
+  <circle cx="320" cy="980" r="220" fill="#FFFFFF" fill-opacity="0.1"/>
+
+  <path d="M1600 820V1200H0V980C170 930 320 905 460 906C689 908 866 1022 1086 1020C1263 1018 1400 922 1600 820Z" fill="#0D2D59" fill-opacity="0.35"/>
+
+  <g opacity="0.85">
+    <rect x="240" y="360" width="330" height="520" rx="24" fill="url(#glass)"/>
+    <rect x="620" y="260" width="370" height="620" rx="24" fill="url(#glass)"/>
+    <rect x="1040" y="420" width="300" height="460" rx="24" fill="url(#glass)"/>
+  </g>
+
+  <g opacity="0.5" stroke="#FFFFFF">
+    <path d="M280 470H530"/>
+    <path d="M280 530H530"/>
+    <path d="M280 590H530"/>
+    <path d="M280 650H530"/>
+    <path d="M280 710H530"/>
+    <path d="M280 770H530"/>
+
+    <path d="M660 360H950"/>
+    <path d="M660 430H950"/>
+    <path d="M660 500H950"/>
+    <path d="M660 570H950"/>
+    <path d="M660 640H950"/>
+    <path d="M660 710H950"/>
+    <path d="M660 780H950"/>
+
+    <path d="M1080 520H1300"/>
+    <path d="M1080 590H1300"/>
+    <path d="M1080 660H1300"/>
+    <path d="M1080 730H1300"/>
+    <path d="M1080 800H1300"/>
+  </g>
+
+  <g fill="#FFFFFF" fill-opacity="0.3">
+    <rect x="300" y="430" width="34" height="34" rx="6"/>
+    <rect x="350" y="430" width="34" height="34" rx="6"/>
+    <rect x="400" y="430" width="34" height="34" rx="6"/>
+    <rect x="450" y="430" width="34" height="34" rx="6"/>
+
+    <rect x="700" y="320" width="38" height="38" rx="6"/>
+    <rect x="752" y="320" width="38" height="38" rx="6"/>
+    <rect x="804" y="320" width="38" height="38" rx="6"/>
+    <rect x="856" y="320" width="38" height="38" rx="6"/>
+
+    <rect x="1120" y="480" width="32" height="32" rx="6"/>
+    <rect x="1165" y="480" width="32" height="32" rx="6"/>
+    <rect x="1210" y="480" width="32" height="32" rx="6"/>
+  </g>
+</svg>

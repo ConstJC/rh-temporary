@@ -114,8 +114,11 @@ export class AdminController {
   }
 
   @Post('subscription-plans')
-  async createSubscriptionPlan(@Body() dto: CreateSubscriptionPlanDto) {
-    return this.adminService.createSubscriptionPlan(dto);
+  async createSubscriptionPlan(
+    @GetUser('id') currentUserId: string,
+    @Body() dto: CreateSubscriptionPlanDto,
+  ) {
+    return this.adminService.createSubscriptionPlan(currentUserId, dto);
   }
 
   @Get('subscription-plans')
@@ -139,10 +142,11 @@ export class AdminController {
 
   @Patch('subscription-plans/:id')
   async updateSubscriptionPlan(
+    @GetUser('id') currentUserId: string,
     @Param('id') id: string,
     @Body() dto: UpdateSubscriptionPlanDto,
   ) {
-    return this.adminService.updateSubscriptionPlan(id, dto);
+    return this.adminService.updateSubscriptionPlan(currentUserId, id, dto);
   }
 
   @Patch('subscription-plans/:id/status')
@@ -151,6 +155,16 @@ export class AdminController {
     @Body() dto: UpdateSubscriptionPlanStatusDto,
   ) {
     return this.adminService.updateSubscriptionPlanStatus(id, dto.status);
+  }
+
+  @Get('access/menus')
+  async getAccessMenus() {
+    return this.adminService.getAccessMenus();
+  }
+
+  @Get('access/permissions')
+  async getAccessPermissions() {
+    return this.adminService.getAccessPermissions();
   }
 
   @Get('audit')

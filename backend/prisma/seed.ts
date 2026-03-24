@@ -9,6 +9,154 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const adapter = new PrismaPg(pool)
 const prisma = new PrismaClient({ adapter })
 
+const planSeedRecords = [
+    {
+        planName: 'Free',
+        priceMonthly: 0,
+        propertyLimit: 1,
+        unitLimit: 20,
+        unitLimitPerProperty: 20,
+        tenantLimit: 20,
+    },
+    {
+        planName: 'Basic',
+        priceMonthly: 499,
+        propertyLimit: 3,
+        unitLimit: 150,
+        unitLimitPerProperty: 50,
+        tenantLimit: 120,
+    },
+    {
+        planName: 'Pro',
+        priceMonthly: 999,
+        propertyLimit: 10,
+        unitLimit: 600,
+        unitLimitPerProperty: 120,
+        tenantLimit: 500,
+    },
+    {
+        planName: 'Business',
+        priceMonthly: 1799,
+        propertyLimit: 30,
+        unitLimit: 2500,
+        unitLimitPerProperty: 300,
+        tenantLimit: 2000,
+    },
+    {
+        planName: 'Enterprise',
+        priceMonthly: 2499,
+        propertyLimit: 0,
+        unitLimit: 0,
+        unitLimitPerProperty: 0,
+        tenantLimit: 0,
+    },
+] as const
+
+const menuCatalogSeed = [
+    { code: 'LANDLORD_DASHBOARD', label: 'Dashboard', routePattern: '/:pgId/overview', sortOrder: 10 },
+    { code: 'LANDLORD_PROPERTIES', label: 'Properties', routePattern: '/:pgId/properties*', sortOrder: 20 },
+    { code: 'LANDLORD_TENANTS', label: 'Tenants', routePattern: '/:pgId/tenants*', sortOrder: 30 },
+    { code: 'LANDLORD_LEASES', label: 'Tenant Leases', routePattern: '/:pgId/leases*', sortOrder: 40 },
+    { code: 'LANDLORD_PAYMENTS', label: 'Payments', routePattern: '/:pgId/payments*', sortOrder: 50 },
+    { code: 'LANDLORD_ADDONS', label: 'Add-ons', routePattern: '/:pgId/addons*', sortOrder: 60 },
+    { code: 'LANDLORD_UTILITIES', label: 'Utilities', routePattern: '/:pgId/utilities*', sortOrder: 70 },
+    { code: 'LANDLORD_REPORTS', label: 'Reports', routePattern: '/:pgId/reports*', sortOrder: 80 },
+    { code: 'LANDLORD_SUBSCRIPTION', label: 'Subscription', routePattern: '/:pgId/subscription*', sortOrder: 90 },
+    { code: 'LANDLORD_SETTINGS', label: 'Settings', routePattern: '/:pgId/settings*', sortOrder: 100 },
+] as const
+
+const permissionCatalogSeed = [
+    { moduleCode: 'PROPERTIES', code: 'PROPERTY_VIEW', action: 'VIEW' },
+    { moduleCode: 'PROPERTIES', code: 'PROPERTY_CREATE', action: 'CREATE' },
+    { moduleCode: 'PROPERTIES', code: 'PROPERTY_UPDATE', action: 'UPDATE' },
+    { moduleCode: 'PROPERTIES', code: 'PROPERTY_DELETE', action: 'DELETE' },
+    { moduleCode: 'UNITS', code: 'UNIT_VIEW', action: 'VIEW' },
+    { moduleCode: 'UNITS', code: 'UNIT_CREATE', action: 'CREATE' },
+    { moduleCode: 'UNITS', code: 'UNIT_UPDATE', action: 'UPDATE' },
+    { moduleCode: 'UNITS', code: 'UNIT_DELETE', action: 'DELETE' },
+    { moduleCode: 'TENANTS', code: 'TENANT_VIEW', action: 'VIEW' },
+    { moduleCode: 'TENANTS', code: 'TENANT_CREATE', action: 'CREATE' },
+    { moduleCode: 'TENANTS', code: 'TENANT_UPDATE', action: 'UPDATE' },
+    { moduleCode: 'TENANTS', code: 'TENANT_DELETE', action: 'DELETE' },
+    { moduleCode: 'LEASES', code: 'LEASE_VIEW', action: 'VIEW' },
+    { moduleCode: 'LEASES', code: 'LEASE_CREATE', action: 'CREATE' },
+    { moduleCode: 'LEASES', code: 'LEASE_UPDATE', action: 'UPDATE' },
+    { moduleCode: 'LEASES', code: 'LEASE_CLOSE', action: 'CLOSE' },
+    { moduleCode: 'PAYMENTS', code: 'PAYMENT_VIEW', action: 'VIEW' },
+    { moduleCode: 'PAYMENTS', code: 'PAYMENT_RECORD_MANUAL', action: 'RECORD_MANUAL' },
+    { moduleCode: 'ADDONS', code: 'ADDON_VIEW', action: 'VIEW' },
+    { moduleCode: 'ADDONS', code: 'ADDON_MANAGE', action: 'MANAGE' },
+    { moduleCode: 'UTILITIES', code: 'UTILITY_READING_VIEW', action: 'VIEW' },
+    { moduleCode: 'UTILITIES', code: 'UTILITY_READING_RECORD', action: 'RECORD' },
+    { moduleCode: 'REPORTS', code: 'REPORT_VIEW', action: 'VIEW' },
+    { moduleCode: 'REPORTS', code: 'REPORT_EXPORT', action: 'EXPORT' },
+    { moduleCode: 'MEMBERS', code: 'MEMBER_VIEW', action: 'VIEW' },
+    { moduleCode: 'MEMBERS', code: 'MEMBER_INVITE', action: 'INVITE' },
+    { moduleCode: 'MEMBERS', code: 'MEMBER_ROLE_UPDATE', action: 'ROLE_UPDATE' },
+] as const
+
+const freeMenuCodes = [
+    'LANDLORD_DASHBOARD',
+    'LANDLORD_PROPERTIES',
+    'LANDLORD_TENANTS',
+    'LANDLORD_LEASES',
+    'LANDLORD_SUBSCRIPTION',
+] as const
+
+const proMenuCodes = [...freeMenuCodes, 'LANDLORD_PAYMENTS', 'LANDLORD_ADDONS', 'LANDLORD_UTILITIES'] as const
+const businessMenuCodes = [...proMenuCodes, 'LANDLORD_REPORTS', 'LANDLORD_SETTINGS'] as const
+
+const freePermissionCodes = [
+    'PROPERTY_VIEW',
+    'PROPERTY_CREATE',
+    'PROPERTY_UPDATE',
+    'UNIT_VIEW',
+    'UNIT_CREATE',
+    'UNIT_UPDATE',
+    'TENANT_VIEW',
+    'TENANT_CREATE',
+    'TENANT_UPDATE',
+    'LEASE_VIEW',
+    'LEASE_CREATE',
+    'LEASE_UPDATE',
+] as const
+
+const basicPermissionCodes = [...freePermissionCodes, 'PROPERTY_DELETE', 'UNIT_DELETE', 'TENANT_DELETE'] as const
+const proPermissionCodes = [
+    ...basicPermissionCodes,
+    'PAYMENT_VIEW',
+    'PAYMENT_RECORD_MANUAL',
+    'ADDON_VIEW',
+    'ADDON_MANAGE',
+    'UTILITY_READING_VIEW',
+    'UTILITY_READING_RECORD',
+] as const
+
+const businessPermissionCodes = [
+    ...proPermissionCodes,
+    'REPORT_VIEW',
+    'REPORT_EXPORT',
+    'MEMBER_VIEW',
+    'MEMBER_INVITE',
+    'MEMBER_ROLE_UPDATE',
+] as const
+
+const planMenuMatrix: Record<string, readonly string[]> = {
+    Free: freeMenuCodes,
+    Basic: freeMenuCodes,
+    Pro: proMenuCodes,
+    Business: businessMenuCodes,
+    Enterprise: menuCatalogSeed.map((menu) => menu.code),
+}
+
+const planPermissionMatrix: Record<string, readonly string[]> = {
+    Free: freePermissionCodes,
+    Basic: basicPermissionCodes,
+    Pro: proPermissionCodes,
+    Business: businessPermissionCodes,
+    Enterprise: permissionCatalogSeed.map((permission) => permission.code),
+}
+
 async function main() {
     console.log('🌱  Starting RentHub seed...\n')
 
@@ -25,6 +173,10 @@ async function main() {
     await prisma.unit.deleteMany()
     await prisma.property.deleteMany()
     await prisma.subscription.deleteMany()
+    await prisma.subscriptionPlanPermission.deleteMany()
+    await prisma.subscriptionPlanMenu.deleteMany()
+    await prisma.featurePermission.deleteMany()
+    await prisma.featureMenu.deleteMany()
     await prisma.subscriptionPlan.deleteMany()
     await prisma.propertyGroupMember.deleteMany()
     await prisma.propertyGroup.deleteMany()
@@ -45,21 +197,142 @@ async function main() {
     await prisma.orgRole.create({ data: { code: 'STAFF', name: 'Staff Member' } })
     console.log('   ✓ 3 org roles\n')
 
-    // ── 3. Subscription Plans ──────────────────────────────────────────────────
-    console.log('💳  Creating subscription plans...')
-    const planFree = await prisma.subscriptionPlan.create({
-        data: { planName: 'Free', priceMonthly: 0, propertyLimit: 1, unitLimit: 5, tenantLimit: 5 },
+    // ── 3. Subscription Plans + Access Catalog ────────────────────────────────
+    console.log('💳  Creating canonical subscription plans and access catalogs...')
+
+    const plans = await Promise.all(
+        planSeedRecords.map((plan) =>
+            prisma.subscriptionPlan.upsert({
+                where: { planName: plan.planName },
+                create: {
+                    planName: plan.planName,
+                    priceMonthly: plan.priceMonthly,
+                    propertyLimit: plan.propertyLimit,
+                    unitLimit: plan.unitLimit,
+                    unitLimitPerProperty: plan.unitLimitPerProperty,
+                    tenantLimit: plan.tenantLimit,
+                    accessPolicyVersion: 1,
+                },
+                update: {
+                    priceMonthly: plan.priceMonthly,
+                    propertyLimit: plan.propertyLimit,
+                    unitLimit: plan.unitLimit,
+                    unitLimitPerProperty: plan.unitLimitPerProperty,
+                    tenantLimit: plan.tenantLimit,
+                    accessPolicyVersion: 1,
+                    deletedAt: null,
+                },
+            }),
+        ),
+    )
+
+    const featureMenus = await Promise.all(
+        menuCatalogSeed.map((menu) =>
+            prisma.featureMenu.upsert({
+                where: { code: menu.code },
+                create: {
+                    code: menu.code,
+                    label: menu.label,
+                    routePattern: menu.routePattern,
+                    sortOrder: menu.sortOrder,
+                    isActive: true,
+                },
+                update: {
+                    label: menu.label,
+                    routePattern: menu.routePattern,
+                    sortOrder: menu.sortOrder,
+                    isActive: true,
+                    deletedAt: null,
+                },
+            }),
+        ),
+    )
+
+    const featurePermissions = await Promise.all(
+        permissionCatalogSeed.map((permission) =>
+            prisma.featurePermission.upsert({
+                where: { code: permission.code },
+                create: {
+                    code: permission.code,
+                    moduleCode: permission.moduleCode,
+                    action: permission.action,
+                    description: `${permission.moduleCode} ${permission.action}`,
+                    isActive: true,
+                },
+                update: {
+                    moduleCode: permission.moduleCode,
+                    action: permission.action,
+                    description: `${permission.moduleCode} ${permission.action}`,
+                    isActive: true,
+                    deletedAt: null,
+                },
+            }),
+        ),
+    )
+
+    const planByName = new Map(plans.map((plan) => [plan.planName, plan]))
+    const menuByCode = new Map(featureMenus.map((menu) => [menu.code, menu]))
+    const permissionByCode = new Map(featurePermissions.map((permission) => [permission.code, permission]))
+
+    await prisma.subscriptionPlanMenu.deleteMany()
+    await prisma.subscriptionPlanPermission.deleteMany()
+
+    const menuMappings = Object.entries(planMenuMatrix).flatMap(([planName, menuCodes]) => {
+        const plan = planByName.get(planName)
+        if (!plan) {
+            throw new Error(`Missing seeded subscription plan: ${planName}`)
+        }
+
+        return menuCodes.map((menuCode) => {
+            const menu = menuByCode.get(menuCode)
+            if (!menu) {
+                throw new Error(`Missing seeded menu code: ${menuCode}`)
+            }
+            return {
+                subscriptionPlanId: plan.id,
+                menuId: menu.id,
+                isEnabled: true,
+            }
+        })
     })
-    const planBasic = await prisma.subscriptionPlan.create({
-        data: { planName: 'Basic', priceMonthly: 499, propertyLimit: 3, unitLimit: 20, tenantLimit: 25 },
+
+    const permissionMappings = Object.entries(planPermissionMatrix).flatMap(([planName, permissionCodes]) => {
+        const plan = planByName.get(planName)
+        if (!plan) {
+            throw new Error(`Missing seeded subscription plan: ${planName}`)
+        }
+
+        return permissionCodes.map((permissionCode) => {
+            const permission = permissionByCode.get(permissionCode)
+            if (!permission) {
+                throw new Error(`Missing seeded permission code: ${permissionCode}`)
+            }
+            return {
+                subscriptionPlanId: plan.id,
+                permissionId: permission.id,
+                isEnabled: true,
+            }
+        })
     })
-    await prisma.subscriptionPlan.create({
-        data: { planName: 'Pro', priceMonthly: 999, propertyLimit: 10, unitLimit: 100, tenantLimit: 120 },
-    })
-    await prisma.subscriptionPlan.create({
-        data: { planName: 'Enterprise', priceMonthly: 2499, propertyLimit: 0, unitLimit: 0, tenantLimit: 0 },
-    })
-    console.log('   ✓ 4 plans (Free · Basic · Pro · Enterprise)\n')
+
+    if (menuMappings.length > 0) {
+        await prisma.subscriptionPlanMenu.createMany({ data: menuMappings })
+    }
+    if (permissionMappings.length > 0) {
+        await prisma.subscriptionPlanPermission.createMany({ data: permissionMappings })
+    }
+
+    const planFree = planByName.get('Free')
+    const planBasic = planByName.get('Basic')
+    if (!planFree || !planBasic) {
+        throw new Error('Missing required seeded plans: Free and Basic')
+    }
+
+    console.log('   ✓ 5 plans (Free · Basic · Pro · Business · Enterprise)')
+    console.log(`   ✓ ${featureMenus.length} menu catalog rows`)
+    console.log(`   ✓ ${featurePermissions.length} permission catalog rows`)
+    console.log(`   ✓ ${menuMappings.length} plan-menu mappings`)
+    console.log(`   ✓ ${permissionMappings.length} plan-permission mappings\n`)
 
     // ── 4. Users ───────────────────────────────────────────────────────────────
     console.log('👤  Creating users...')

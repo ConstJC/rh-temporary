@@ -48,7 +48,12 @@ export class PaymentsService {
                 select: {
                   id: true,
                   unitName: true,
-                  property: { select: { id: true, propertyName: true } },
+                  property: {
+                    select: {
+                      id: true,
+                      propertyName: true,
+                    },
+                  },
                 },
               },
             },

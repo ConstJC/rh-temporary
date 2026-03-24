@@ -1,34 +1,36 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { useSession } from 'next-auth/react';
-import { DataTable } from '@/components/tables/DataTable';
-import { DataTablePagination } from '@/components/tables/DataTablePagination';
-import { EmptyState } from '@/components/common/EmptyState';
-import { TableSkeleton } from '@/components/common/LoadingSkeleton';
-import { useDebounce } from '@/hooks/useDebounce';
-import { usePagination } from '@/hooks/usePagination';
-import { useAdminUsers } from '@/features/admin/hooks/useAdminUsers';
-import { getUsersColumns } from './UsersTableColumns';
-import type { AdminUser, UserType } from '@/types/domain.types';
-import { UserDetailSlideOver } from './UserDetailSlideOver';
-import { ToggleUserStatusDialog } from './ToggleUserStatusDialog';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
+import { DataTable } from "@/components/tables/DataTable";
+import { DataTablePagination } from "@/components/tables/DataTablePagination";
+import { EmptyState } from "@/components/common/EmptyState";
+import { TableSkeleton } from "@/components/common/LoadingSkeleton";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePagination } from "@/hooks/usePagination";
+import { useAdminUsers } from "@/features/admin/hooks/useAdminUsers";
+import { getUsersColumns } from "./UsersTableColumns";
+import type { AdminUser, UserType } from "@/types/domain.types";
+import { UserDetailSlideOver } from "./UserDetailSlideOver";
+import { ToggleUserStatusDialog } from "./ToggleUserStatusDialog";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 export function UsersTable() {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
 
-  const [search, setSearch] = useState('');
-  const [userType, setUserType] = useState<UserType | ''>('');
-  const [status, setStatus] = useState<'ALL' | 'ACTIVE' | 'INACTIVE' | 'UNVERIFIED'>('ALL');
+  const [search, setSearch] = useState("");
+  const [userType, setUserType] = useState<UserType | "">("");
+  const [status, setStatus] = useState<
+    "ALL" | "ACTIVE" | "INACTIVE" | "UNVERIFIED"
+  >("ALL");
 
   const debouncedSearch = useDebounce(search, 300);
   const pagination = usePagination({ page: 1, limit: 20 });
 
   const isActive =
-    status === 'ACTIVE' ? true : status === 'INACTIVE' ? false : undefined;
+    status === "ACTIVE" ? true : status === "INACTIVE" ? false : undefined;
 
   const query = useAdminUsers({
     page: pagination.page,
@@ -36,8 +38,8 @@ export function UsersTable() {
     search: debouncedSearch || undefined,
     userType: userType || undefined,
     isActive,
-    sort: 'createdAt',
-    order: 'desc',
+    sort: "createdAt",
+    order: "desc",
   });
 
   const [detailOpen, setDetailOpen] = useState(false);
@@ -45,7 +47,11 @@ export function UsersTable() {
   const [selected, setSelected] = useState<AdminUser | null>(null);
 
   const rows = query.data?.data ?? [];
-  const meta = query.data?.meta ?? { total: 0, page: pagination.page, limit: pagination.limit };
+  const meta = query.data?.meta ?? {
+    total: 0,
+    page: pagination.page,
+    limit: pagination.limit,
+  };
 
   const columns = useMemo(
     () =>
@@ -80,7 +86,7 @@ export function UsersTable() {
           <select
             value={userType}
             onChange={(e) => {
-              setUserType(e.target.value as UserType | '');
+              setUserType(e.target.value as UserType | "");
               pagination.reset();
             }}
             className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
@@ -113,7 +119,9 @@ export function UsersTable() {
             }}
             disabled={query.isFetching}
           >
-            <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`mr-2 h-4 w-4 ${query.isFetching ? "animate-spin" : ""}`}
+            />
             Refresh
           </Button>
         </div>
@@ -122,7 +130,10 @@ export function UsersTable() {
       {query.isLoading ? (
         <TableSkeleton rows={6} />
       ) : rows.length === 0 ? (
-        <EmptyState title="No users found" description="Try adjusting your filters." />
+        <EmptyState
+          title="No users found"
+          description="Try adjusting your filters."
+        />
       ) : (
         <>
           <DataTable columns={columns} data={rows} />

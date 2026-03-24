@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import type { AuditAction } from '@/types/domain.types';
+import type { AuditAction } from "@/types/domain.types";
 
 export function AuditFilters({
   tableName,
@@ -14,8 +14,8 @@ export function AuditFilters({
 }: {
   tableName: string;
   setTableName: (v: string) => void;
-  action: AuditAction | '';
-  setAction: (v: AuditAction | '') => void;
+  action: AuditAction | "";
+  setAction: (v: AuditAction | "") => void;
   dateFrom: string;
   setDateFrom: (v: string) => void;
   dateTo: string;
@@ -32,7 +32,7 @@ export function AuditFilters({
 
       <select
         value={action}
-        onChange={(e) => setAction(e.target.value as AuditAction | '')}
+        onChange={(e) => setAction(e.target.value as AuditAction | "")}
         className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
       >
         <option value="">All actions</option>
@@ -63,4 +63,3 @@ export function AuditFilters({
     </div>
   );
 }
-

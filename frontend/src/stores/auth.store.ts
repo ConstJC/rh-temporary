@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { create } from 'zustand';
-import type { UserType } from '@/types/domain.types';
+import { create } from "zustand";
+import type { UserType } from "@/types/domain.types";
 
 interface AuthUser {
   id: string;
@@ -30,8 +30,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 export function useAuth() {
   const { user, isLoading, setUser, clearUser, setLoading } = useAuthStore();
   const userType = user?.userType;
-  const isAdmin = user?.role === 'ADMIN' && userType === 'SYSTEM_ADMIN';
-  const isLandlord = userType === 'LANDLORD';
+  const isAdmin = user?.role === "ADMIN" && userType === "SYSTEM_ADMIN";
+  const isLandlord = userType === "LANDLORD";
   return {
     user,
     isLoading,

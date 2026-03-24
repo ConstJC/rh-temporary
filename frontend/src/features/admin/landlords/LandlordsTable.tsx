@@ -1,23 +1,26 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { DataTable } from '@/components/tables/DataTable';
-import { DataTablePagination } from '@/components/tables/DataTablePagination';
-import { EmptyState } from '@/components/common/EmptyState';
-import { TableSkeleton } from '@/components/common/LoadingSkeleton';
-import { useDebounce } from '@/hooks/useDebounce';
-import { usePagination } from '@/hooks/usePagination';
-import { useAdminPropertyGroupDetails, useAdminPropertyGroups } from '@/features/admin/hooks/usePropertyGroups';
-import { getLandlordsColumns } from './LandlordsTableColumns';
-import type { AdminPropertyGroup } from '@/types/domain.types';
-import { PropertyGroupDetailSlideOver } from './PropertyGroupDetailSlideOver';
-import { SuspendOrgDialog } from './SuspendOrgDialog';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { useMemo, useState } from "react";
+import { DataTable } from "@/components/tables/DataTable";
+import { DataTablePagination } from "@/components/tables/DataTablePagination";
+import { EmptyState } from "@/components/common/EmptyState";
+import { TableSkeleton } from "@/components/common/LoadingSkeleton";
+import { useDebounce } from "@/hooks/useDebounce";
+import { usePagination } from "@/hooks/usePagination";
+import {
+  useAdminPropertyGroupDetails,
+  useAdminPropertyGroups,
+} from "@/features/admin/hooks/usePropertyGroups";
+import { getLandlordsColumns } from "./LandlordsTableColumns";
+import type { AdminPropertyGroup } from "@/types/domain.types";
+import { PropertyGroupDetailSlideOver } from "./PropertyGroupDetailSlideOver";
+import { SuspendOrgDialog } from "./SuspendOrgDialog";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 export function LandlordsTable() {
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState<'ALL' | 'ACTIVE' | 'SUSPENDED'>('ALL');
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState<"ALL" | "ACTIVE" | "SUSPENDED">("ALL");
   const debouncedSearch = useDebounce(search, 300);
   const pagination = usePagination({ page: 1, limit: 20 });
 
@@ -25,17 +28,21 @@ export function LandlordsTable() {
     page: pagination.page,
     limit: pagination.limit,
     search: debouncedSearch || undefined,
-    status: status === 'ALL' ? undefined : status,
-    sort: 'createdAt',
-    order: 'desc',
+    status: status === "ALL" ? undefined : status,
+    sort: "createdAt",
+    order: "desc",
   });
 
   const rows = query.data?.data ?? [];
-  const meta = query.data?.meta ?? { total: 0, page: pagination.page, limit: pagination.limit };
+  console.log(rows);
+  const meta = query.data?.meta ?? {
+    total: 0,
+    page: pagination.page,
+    limit: pagination.limit,
+  };
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [suspendOpen, setSuspendOpen] = useState(false);
-  const [detailMode, setDetailMode] = useState<'view' | 'edit'>('view');
   const [selected, setSelected] = useState<AdminPropertyGroup | null>(null);
   const detailsQuery = useAdminPropertyGroupDetails(selected?.id, detailOpen);
 
@@ -44,12 +51,6 @@ export function LandlordsTable() {
       getLandlordsColumns({
         onViewDetails: (g) => {
           setSelected(g);
-          setDetailMode('view');
-          setDetailOpen(true);
-        },
-        onEdit: (g) => {
-          setSelected(g);
-          setDetailMode('edit');
           setDetailOpen(true);
         },
         onToggleSuspend: (g) => {
@@ -94,7 +95,9 @@ export function LandlordsTable() {
           }}
           disabled={query.isFetching}
         >
-          <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`mr-2 h-4 w-4 ${query.isFetching ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
@@ -102,7 +105,10 @@ export function LandlordsTable() {
       {query.isLoading ? (
         <TableSkeleton rows={6} />
       ) : rows.length === 0 ? (
-        <EmptyState title="No property groups found" description="Try adjusting your filters." />
+        <EmptyState
+          title="No property groups found"
+          description="Try adjusting your filters."
+        />
       ) : (
         <>
           <DataTable columns={columns} data={rows} />
@@ -116,13 +122,16 @@ export function LandlordsTable() {
       )}
 
       <PropertyGroupDetailSlideOver
-        key={`${selected?.id ?? 'none'}-${detailMode}-${detailOpen ? 'open' : 'closed'}`}
+        key={`${selected?.id ?? "none"}-${detailOpen ? "open" : "closed"}`}
         group={detailsQuery.data ?? null}
         open={detailOpen}
         onClose={() => setDetailOpen(false)}
-        mode={detailMode}
       />
-      <SuspendOrgDialog group={selected} open={suspendOpen} onClose={() => setSuspendOpen(false)} />
+      <SuspendOrgDialog
+        group={selected}
+        open={suspendOpen}
+        onClose={() => setSuspendOpen(false)}
+      />
     </div>
   );
 }

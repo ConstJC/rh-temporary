@@ -1,77 +1,115 @@
-'use client';
+"use client";
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { usePropertyGroup } from '@/hooks/usePropertyGroup';
-import { useCreateProperty } from '@/features/landlord/hooks/useProperties';
-import { toast } from 'sonner';
-import type { PropertyType } from '@/types/domain.types';
+import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { usePropertyGroup } from "@/hooks/usePropertyGroup";
+import {
+  useCreateProperty,
+  useUpdateProperty,
+} from "@/features/landlord/hooks/useProperties";
+import { toast } from "sonner";
+import type { Property, PropertyType } from "@/types/domain.types";
 
 const propertyTypeOptions: Array<{ value: PropertyType; label: string }> = [
-  { value: 'BOARDING_HOUSE', label: 'Boarding House' },
-  { value: 'APARTMENT_BUILDING', label: 'Apartment Building' },
-  { value: 'CONDO', label: 'Condo' },
-  { value: 'SINGLE_FAMILY', label: 'Single Family' },
-  { value: 'COMMERCIAL_MIXED', label: 'Commercial Mixed' },
-  { value: 'OTHER', label: 'Other' },
+  { value: "BOARDING_HOUSE", label: "Boarding House" },
+  { value: "APARTMENT_BUILDING", label: "Apartment Building" },
+  { value: "CONDO", label: "Condo" },
+  { value: "SINGLE_FAMILY", label: "Single Family" },
+  { value: "COMMERCIAL_MIXED", label: "Commercial Mixed" },
+  { value: "OTHER", label: "Other" },
 ];
 
 function getErrorMessage(error: unknown) {
-  if (error && typeof error === 'object' && 'message' in error) {
+  if (error && typeof error === "object" && "message" in error) {
     const message = (error as { message?: unknown }).message;
-    if (typeof message === 'string') return message;
+    if (typeof message === "string") return message;
   }
-  return 'Unable to create property. Please try again.';
+  return "Unable to create property. Please try again.";
 }
 
 interface AddPropertyFormProps {
   onClose: () => void;
+  propertyToEdit?: Property | null;
+  onSaved?: (property: Property) => void;
 }
 
-export function AddPropertyForm({ onClose }: AddPropertyFormProps) {
+export function AddPropertyForm({
+  onClose,
+  propertyToEdit = null,
+  onSaved,
+}: AddPropertyFormProps) {
   const { pgId } = usePropertyGroup();
   const router = useRouter();
   const createProperty = useCreateProperty(pgId);
+  const updateProperty = useUpdateProperty(pgId, propertyToEdit?.id ?? "");
+  const isEditMode = !!propertyToEdit;
 
-  const [propertyType, setPropertyType] = useState<PropertyType>('BOARDING_HOUSE');
-  const [propertyName, setPropertyName] = useState('');
-  const [addressLine, setAddressLine] = useState('');
-  const [city, setCity] = useState('');
-  const [province, setProvince] = useState('');
-  const [postalCode, setPostalCode] = useState('');
+  const [propertyType, setPropertyType] = useState<PropertyType>(
+    propertyToEdit?.propertyType ?? "BOARDING_HOUSE",
+  );
+  const [propertyName, setPropertyName] = useState(
+    propertyToEdit?.propertyName ?? "",
+  );
+  const [addressLine, setAddressLine] = useState(
+    propertyToEdit?.addressLine ?? "",
+  );
+  const [city, setCity] = useState(propertyToEdit?.city ?? "");
+  const [province, setProvince] = useState(propertyToEdit?.province ?? "");
+  const [postalCode, setPostalCode] = useState(
+    propertyToEdit?.postalCode ?? "",
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
-      const created = await createProperty.mutateAsync({
+      const payload = {
         propertyType,
         propertyName,
         addressLine,
         city,
         province: province || undefined,
         postalCode: postalCode || undefined,
-      });
-      toast.success('Property created');
+      };
+      const saved =
+        isEditMode && propertyToEdit
+          ? await updateProperty.mutateAsync(payload)
+          : await createProperty.mutateAsync(payload);
+
+      toast.success(isEditMode ? "Property updated" : "Property created");
+      onSaved?.(saved);
       onClose();
-      router.push(`/${pgId}/properties/${created.id}`);
+      if (!isEditMode) {
+        router.push(`/${pgId}/properties/${saved.id}`);
+      }
     } catch (error) {
-      toast.error(getErrorMessage(error));
+      toast.error(
+        isEditMode
+          ? "Unable to update property. Please try again."
+          : getErrorMessage(error),
+      );
     }
   }
+
+  const isSubmitting = createProperty.isPending || updateProperty.isPending;
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="propertyType">
+          <label
+            className="text-sm font-medium text-slate-700"
+            htmlFor="propertyType"
+          >
             Property Type
           </label>
           <select
             id="propertyType"
             value={propertyType}
-            onChange={(event) => setPropertyType(event.target.value as PropertyType)}
+            onChange={(event) =>
+              setPropertyType(event.target.value as PropertyType)
+            }
             className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
             required
           >
@@ -84,7 +122,10 @@ export function AddPropertyForm({ onClose }: AddPropertyFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="propertyName">
+          <label
+            className="text-sm font-medium text-slate-700"
+            htmlFor="propertyName"
+          >
             Property Name
           </label>
           <Input
@@ -97,7 +138,10 @@ export function AddPropertyForm({ onClose }: AddPropertyFormProps) {
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="addressLine">
+          <label
+            className="text-sm font-medium text-slate-700"
+            htmlFor="addressLine"
+          >
             Address
           </label>
           <Input
@@ -123,7 +167,10 @@ export function AddPropertyForm({ onClose }: AddPropertyFormProps) {
         </div>
 
         <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="province">
+          <label
+            className="text-sm font-medium text-slate-700"
+            htmlFor="province"
+          >
             Province (Optional)
           </label>
           <Input
@@ -135,7 +182,10 @@ export function AddPropertyForm({ onClose }: AddPropertyFormProps) {
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <label className="text-sm font-medium text-slate-700" htmlFor="postalCode">
+          <label
+            className="text-sm font-medium text-slate-700"
+            htmlFor="postalCode"
+          >
             Postal Code (Optional)
           </label>
           <Input
@@ -148,15 +198,15 @@ export function AddPropertyForm({ onClose }: AddPropertyFormProps) {
       </div>
 
       <div className="flex justify-end gap-2 pt-2">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={onClose}
-        >
+        <Button type="button" variant="outline" onClick={onClose}>
           Cancel
         </Button>
-        <Button type="submit" disabled={createProperty.isPending}>
-          {createProperty.isPending ? 'Saving...' : 'Create Property'}
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting
+            ? "Saving..."
+            : isEditMode
+              ? "Save Changes"
+              : "Create Property"}
         </Button>
       </div>
     </form>

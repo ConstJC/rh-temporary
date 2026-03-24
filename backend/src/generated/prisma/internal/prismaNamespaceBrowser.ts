@@ -58,6 +58,10 @@ export const ModelName = {
   OrgRole: 'OrgRole',
   PropertyGroupMember: 'PropertyGroupMember',
   SubscriptionPlan: 'SubscriptionPlan',
+  FeatureMenu: 'FeatureMenu',
+  FeaturePermission: 'FeaturePermission',
+  SubscriptionPlanMenu: 'SubscriptionPlanMenu',
+  SubscriptionPlanPermission: 'SubscriptionPlanPermission',
   Subscription: 'Subscription',
   Property: 'Property',
   Unit: 'Unit',
@@ -198,7 +202,9 @@ export const SubscriptionPlanScalarFieldEnum = {
   priceMonthly: 'priceMonthly',
   propertyLimit: 'propertyLimit',
   unitLimit: 'unitLimit',
+  unitLimitPerProperty: 'unitLimitPerProperty',
   tenantLimit: 'tenantLimit',
+  accessPolicyVersion: 'accessPolicyVersion',
   version: 'version',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -206,6 +212,66 @@ export const SubscriptionPlanScalarFieldEnum = {
 } as const
 
 export type SubscriptionPlanScalarFieldEnum = (typeof SubscriptionPlanScalarFieldEnum)[keyof typeof SubscriptionPlanScalarFieldEnum]
+
+
+export const FeatureMenuScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  label: 'label',
+  routePattern: 'routePattern',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type FeatureMenuScalarFieldEnum = (typeof FeatureMenuScalarFieldEnum)[keyof typeof FeatureMenuScalarFieldEnum]
+
+
+export const FeaturePermissionScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  moduleCode: 'moduleCode',
+  action: 'action',
+  description: 'description',
+  isActive: 'isActive',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type FeaturePermissionScalarFieldEnum = (typeof FeaturePermissionScalarFieldEnum)[keyof typeof FeaturePermissionScalarFieldEnum]
+
+
+export const SubscriptionPlanMenuScalarFieldEnum = {
+  id: 'id',
+  subscriptionPlanId: 'subscriptionPlanId',
+  menuId: 'menuId',
+  isEnabled: 'isEnabled',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type SubscriptionPlanMenuScalarFieldEnum = (typeof SubscriptionPlanMenuScalarFieldEnum)[keyof typeof SubscriptionPlanMenuScalarFieldEnum]
+
+
+export const SubscriptionPlanPermissionScalarFieldEnum = {
+  id: 'id',
+  subscriptionPlanId: 'subscriptionPlanId',
+  permissionId: 'permissionId',
+  isEnabled: 'isEnabled',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type SubscriptionPlanPermissionScalarFieldEnum = (typeof SubscriptionPlanPermissionScalarFieldEnum)[keyof typeof SubscriptionPlanPermissionScalarFieldEnum]
 
 
 export const SubscriptionScalarFieldEnum = {

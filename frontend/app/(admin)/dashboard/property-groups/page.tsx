@@ -1,5 +1,5 @@
-import { PageHeader } from '@/components/common/PageHeader';
-import { LandlordsTable } from '@/features/admin/landlords/LandlordsTable';
+import { PageHeader } from "@/components/common/PageHeader";
+import { LandlordsTable } from "@/features/admin/landlords/LandlordsTable";
 
 export default function AdminPropertyGroupsPage() {
   return (

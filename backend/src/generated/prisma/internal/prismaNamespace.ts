@@ -391,6 +391,10 @@ export const ModelName = {
   OrgRole: 'OrgRole',
   PropertyGroupMember: 'PropertyGroupMember',
   SubscriptionPlan: 'SubscriptionPlan',
+  FeatureMenu: 'FeatureMenu',
+  FeaturePermission: 'FeaturePermission',
+  SubscriptionPlanMenu: 'SubscriptionPlanMenu',
+  SubscriptionPlanPermission: 'SubscriptionPlanPermission',
   Subscription: 'Subscription',
   Property: 'Property',
   Unit: 'Unit',
@@ -419,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "userAddress" | "propertyGroup" | "orgRole" | "propertyGroupMember" | "subscriptionPlan" | "subscription" | "property" | "unit" | "tenant" | "lease" | "payment" | "paymentTransaction" | "notification" | "auditTrail" | "unitAddonCatalog" | "unitAddon" | "leaseAddonBill" | "utilityReading"
+    modelProps: "user" | "refreshToken" | "userAddress" | "propertyGroup" | "orgRole" | "propertyGroupMember" | "subscriptionPlan" | "featureMenu" | "featurePermission" | "subscriptionPlanMenu" | "subscriptionPlanPermission" | "subscription" | "property" | "unit" | "tenant" | "lease" | "payment" | "paymentTransaction" | "notification" | "auditTrail" | "unitAddonCatalog" | "unitAddon" | "leaseAddonBill" | "utilityReading"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -938,6 +942,302 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.SubscriptionPlanCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.SubscriptionPlanCountAggregateOutputType> | number
+        }
+      }
+    }
+    FeatureMenu: {
+      payload: Prisma.$FeatureMenuPayload<ExtArgs>
+      fields: Prisma.FeatureMenuFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FeatureMenuFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FeatureMenuFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>
+        }
+        findFirst: {
+          args: Prisma.FeatureMenuFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FeatureMenuFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>
+        }
+        findMany: {
+          args: Prisma.FeatureMenuFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>[]
+        }
+        create: {
+          args: Prisma.FeatureMenuCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>
+        }
+        createMany: {
+          args: Prisma.FeatureMenuCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FeatureMenuCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>[]
+        }
+        delete: {
+          args: Prisma.FeatureMenuDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>
+        }
+        update: {
+          args: Prisma.FeatureMenuUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>
+        }
+        deleteMany: {
+          args: Prisma.FeatureMenuDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FeatureMenuUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FeatureMenuUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>[]
+        }
+        upsert: {
+          args: Prisma.FeatureMenuUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeatureMenuPayload>
+        }
+        aggregate: {
+          args: Prisma.FeatureMenuAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFeatureMenu>
+        }
+        groupBy: {
+          args: Prisma.FeatureMenuGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FeatureMenuGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FeatureMenuCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FeatureMenuCountAggregateOutputType> | number
+        }
+      }
+    }
+    FeaturePermission: {
+      payload: Prisma.$FeaturePermissionPayload<ExtArgs>
+      fields: Prisma.FeaturePermissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.FeaturePermissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.FeaturePermissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>
+        }
+        findFirst: {
+          args: Prisma.FeaturePermissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.FeaturePermissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>
+        }
+        findMany: {
+          args: Prisma.FeaturePermissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>[]
+        }
+        create: {
+          args: Prisma.FeaturePermissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>
+        }
+        createMany: {
+          args: Prisma.FeaturePermissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.FeaturePermissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>[]
+        }
+        delete: {
+          args: Prisma.FeaturePermissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>
+        }
+        update: {
+          args: Prisma.FeaturePermissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.FeaturePermissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.FeaturePermissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.FeaturePermissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.FeaturePermissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$FeaturePermissionPayload>
+        }
+        aggregate: {
+          args: Prisma.FeaturePermissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateFeaturePermission>
+        }
+        groupBy: {
+          args: Prisma.FeaturePermissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FeaturePermissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.FeaturePermissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.FeaturePermissionCountAggregateOutputType> | number
+        }
+      }
+    }
+    SubscriptionPlanMenu: {
+      payload: Prisma.$SubscriptionPlanMenuPayload<ExtArgs>
+      fields: Prisma.SubscriptionPlanMenuFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SubscriptionPlanMenuFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SubscriptionPlanMenuFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>
+        }
+        findFirst: {
+          args: Prisma.SubscriptionPlanMenuFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SubscriptionPlanMenuFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>
+        }
+        findMany: {
+          args: Prisma.SubscriptionPlanMenuFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>[]
+        }
+        create: {
+          args: Prisma.SubscriptionPlanMenuCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>
+        }
+        createMany: {
+          args: Prisma.SubscriptionPlanMenuCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SubscriptionPlanMenuCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>[]
+        }
+        delete: {
+          args: Prisma.SubscriptionPlanMenuDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>
+        }
+        update: {
+          args: Prisma.SubscriptionPlanMenuUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>
+        }
+        deleteMany: {
+          args: Prisma.SubscriptionPlanMenuDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SubscriptionPlanMenuUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SubscriptionPlanMenuUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>[]
+        }
+        upsert: {
+          args: Prisma.SubscriptionPlanMenuUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanMenuPayload>
+        }
+        aggregate: {
+          args: Prisma.SubscriptionPlanMenuAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSubscriptionPlanMenu>
+        }
+        groupBy: {
+          args: Prisma.SubscriptionPlanMenuGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionPlanMenuGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SubscriptionPlanMenuCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionPlanMenuCountAggregateOutputType> | number
+        }
+      }
+    }
+    SubscriptionPlanPermission: {
+      payload: Prisma.$SubscriptionPlanPermissionPayload<ExtArgs>
+      fields: Prisma.SubscriptionPlanPermissionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SubscriptionPlanPermissionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SubscriptionPlanPermissionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>
+        }
+        findFirst: {
+          args: Prisma.SubscriptionPlanPermissionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SubscriptionPlanPermissionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>
+        }
+        findMany: {
+          args: Prisma.SubscriptionPlanPermissionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>[]
+        }
+        create: {
+          args: Prisma.SubscriptionPlanPermissionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>
+        }
+        createMany: {
+          args: Prisma.SubscriptionPlanPermissionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SubscriptionPlanPermissionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>[]
+        }
+        delete: {
+          args: Prisma.SubscriptionPlanPermissionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>
+        }
+        update: {
+          args: Prisma.SubscriptionPlanPermissionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>
+        }
+        deleteMany: {
+          args: Prisma.SubscriptionPlanPermissionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SubscriptionPlanPermissionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SubscriptionPlanPermissionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>[]
+        }
+        upsert: {
+          args: Prisma.SubscriptionPlanPermissionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPlanPermissionPayload>
+        }
+        aggregate: {
+          args: Prisma.SubscriptionPlanPermissionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSubscriptionPlanPermission>
+        }
+        groupBy: {
+          args: Prisma.SubscriptionPlanPermissionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionPlanPermissionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SubscriptionPlanPermissionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubscriptionPlanPermissionCountAggregateOutputType> | number
         }
       }
     }
@@ -2051,7 +2351,9 @@ export const SubscriptionPlanScalarFieldEnum = {
   priceMonthly: 'priceMonthly',
   propertyLimit: 'propertyLimit',
   unitLimit: 'unitLimit',
+  unitLimitPerProperty: 'unitLimitPerProperty',
   tenantLimit: 'tenantLimit',
+  accessPolicyVersion: 'accessPolicyVersion',
   version: 'version',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
@@ -2059,6 +2361,66 @@ export const SubscriptionPlanScalarFieldEnum = {
 } as const
 
 export type SubscriptionPlanScalarFieldEnum = (typeof SubscriptionPlanScalarFieldEnum)[keyof typeof SubscriptionPlanScalarFieldEnum]
+
+
+export const FeatureMenuScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  label: 'label',
+  routePattern: 'routePattern',
+  sortOrder: 'sortOrder',
+  isActive: 'isActive',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type FeatureMenuScalarFieldEnum = (typeof FeatureMenuScalarFieldEnum)[keyof typeof FeatureMenuScalarFieldEnum]
+
+
+export const FeaturePermissionScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  moduleCode: 'moduleCode',
+  action: 'action',
+  description: 'description',
+  isActive: 'isActive',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type FeaturePermissionScalarFieldEnum = (typeof FeaturePermissionScalarFieldEnum)[keyof typeof FeaturePermissionScalarFieldEnum]
+
+
+export const SubscriptionPlanMenuScalarFieldEnum = {
+  id: 'id',
+  subscriptionPlanId: 'subscriptionPlanId',
+  menuId: 'menuId',
+  isEnabled: 'isEnabled',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type SubscriptionPlanMenuScalarFieldEnum = (typeof SubscriptionPlanMenuScalarFieldEnum)[keyof typeof SubscriptionPlanMenuScalarFieldEnum]
+
+
+export const SubscriptionPlanPermissionScalarFieldEnum = {
+  id: 'id',
+  subscriptionPlanId: 'subscriptionPlanId',
+  permissionId: 'permissionId',
+  isEnabled: 'isEnabled',
+  version: 'version',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type SubscriptionPlanPermissionScalarFieldEnum = (typeof SubscriptionPlanPermissionScalarFieldEnum)[keyof typeof SubscriptionPlanPermissionScalarFieldEnum]
 
 
 export const SubscriptionScalarFieldEnum = {
@@ -2815,6 +3177,10 @@ export type GlobalOmitConfig = {
   orgRole?: Prisma.OrgRoleOmit
   propertyGroupMember?: Prisma.PropertyGroupMemberOmit
   subscriptionPlan?: Prisma.SubscriptionPlanOmit
+  featureMenu?: Prisma.FeatureMenuOmit
+  featurePermission?: Prisma.FeaturePermissionOmit
+  subscriptionPlanMenu?: Prisma.SubscriptionPlanMenuOmit
+  subscriptionPlanPermission?: Prisma.SubscriptionPlanPermissionOmit
   subscription?: Prisma.SubscriptionOmit
   property?: Prisma.PropertyOmit
   unit?: Prisma.UnitOmit

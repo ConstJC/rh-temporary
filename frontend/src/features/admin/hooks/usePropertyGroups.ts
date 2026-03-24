@@ -1,11 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { adminApi, type PropertyGroupFilters } from '@/lib/api/admin.api';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { adminApi, type PropertyGroupFilters } from "@/lib/api/admin.api";
 
 export const adminPropertyGroupKeys = {
-  all: () => ['adminPropertyGroups'] as const,
-  list: (f: PropertyGroupFilters) => ['adminPropertyGroups', 'list', f] as const,
-  details: (id: string) => ['adminPropertyGroups', 'details', id] as const,
+  all: () => ["adminPropertyGroups"] as const,
+  list: (f: PropertyGroupFilters) =>
+    ["adminPropertyGroups", "list", f] as const,
+  details: (id: string) => ["adminPropertyGroups", "details", id] as const,
 };
 
 export function useAdminPropertyGroups(filters: PropertyGroupFilters) {
@@ -20,19 +21,33 @@ export function useAdminPropertyGroups(filters: PropertyGroupFilters) {
 export function useUpdatePropertyGroupStatus() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status, notes }: { id: string; status: 'ACTIVE' | 'SUSPENDED'; notes?: string }) =>
-      adminApi.updatePropertyGroup(id, { status, notes }),
+    mutationFn: ({
+      id,
+      status,
+      notes,
+    }: {
+      id: string;
+      status: "ACTIVE" | "SUSPENDED";
+      notes?: string;
+    }) => adminApi.updatePropertyGroup(id, { status, notes }),
     onSuccess: (_, { status }) => {
       qc.invalidateQueries({ queryKey: adminPropertyGroupKeys.all() });
-      toast.success(status === 'SUSPENDED' ? 'Property group suspended' : 'Property group reactivated');
+      toast.success(
+        status === "SUSPENDED"
+          ? "Property group suspended"
+          : "Property group reactivated",
+      );
     },
-    onError: () => toast.error('Failed to update property group'),
+    onError: () => toast.error("Failed to update property group"),
   });
 }
 
-export function useAdminPropertyGroupDetails(id?: string, enabled: boolean = true) {
+export function useAdminPropertyGroupDetails(
+  id?: string,
+  enabled: boolean = true,
+) {
   return useQuery({
-    queryKey: adminPropertyGroupKeys.details(id ?? ''),
+    queryKey: adminPropertyGroupKeys.details(id ?? ""),
     queryFn: () => adminApi.getPropertyGroupDetails(id as string),
     enabled: Boolean(id) && enabled,
     staleTime: 30_000,
@@ -51,9 +66,11 @@ export function useUpdatePropertyGroup() {
     }) => adminApi.updatePropertyGroup(id, data),
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: adminPropertyGroupKeys.all() });
-      qc.invalidateQueries({ queryKey: adminPropertyGroupKeys.details(vars.id) });
-      toast.success('Property group updated');
+      qc.invalidateQueries({
+        queryKey: adminPropertyGroupKeys.details(vars.id),
+      });
+      toast.success("Property group updated");
     },
-    onError: () => toast.error('Failed to update property group'),
+    onError: () => toast.error("Failed to update property group"),
   });
 }

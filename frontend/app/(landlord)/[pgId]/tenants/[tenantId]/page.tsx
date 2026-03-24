@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { use } from 'react';
-import { PageHeader } from '@/components/common/PageHeader';
-import { useTenant } from '@/features/landlord/hooks/useTenants';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatusBadge } from '@/components/common/StatusBadge';
-import { Mail, Phone, User, FileText } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { CardSkeleton } from '@/components/common/LoadingSkeleton';
+import { use } from "react";
+import { PageHeader } from "@/components/common/PageHeader";
+import { useTenant } from "@/features/landlord/hooks/useTenants";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { Mail, Phone, User, FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { CardSkeleton } from "@/components/common/LoadingSkeleton";
 
 export default function TenantDetailPage({
   params,
@@ -37,7 +37,10 @@ export default function TenantDetailPage({
         <PageHeader title="Tenant Not Found" />
         <div className="mt-6 text-center py-12 bg-white rounded-lg border border-slate-200">
           <p className="text-slate-500">Tenant not found.</p>
-          <Button onClick={() => router.push(`/${pgId}/tenants`)} className="mt-4">
+          <Button
+            onClick={() => router.push(`/${pgId}/tenants`)}
+            className="mt-4"
+          >
             Back to Tenants
           </Button>
         </div>
@@ -45,7 +48,7 @@ export default function TenantDetailPage({
     );
   }
 
-  const activeLease = tenant.leases?.find((l) => l.status === 'ACTIVE');
+  const activeLease = tenant.leases?.find((l) => l.status === "ACTIVE");
 
   return (
     <>
@@ -54,7 +57,10 @@ export default function TenantDetailPage({
         description="Tenant details and lease history"
         action={
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.push(`/${pgId}/tenants`)}>
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/${pgId}/tenants`)}
+            >
               Back
             </Button>
           </div>
@@ -72,14 +78,18 @@ export default function TenantDetailPage({
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-slate-600">Full Name</label>
+                <label className="text-sm font-medium text-slate-600">
+                  Full Name
+                </label>
                 <div className="mt-1 flex items-center text-slate-900">
                   <User className="w-4 h-4 mr-2 text-slate-400" />
                   {tenant.firstName} {tenant.lastName}
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-600">Phone</label>
+                <label className="text-sm font-medium text-slate-600">
+                  Phone
+                </label>
                 <div className="mt-1 flex items-center text-slate-900">
                   <Phone className="w-4 h-4 mr-2 text-slate-400" />
                   {tenant.phone}
@@ -87,7 +97,9 @@ export default function TenantDetailPage({
               </div>
               {tenant.email && (
                 <div>
-                  <label className="text-sm font-medium text-slate-600">Email</label>
+                  <label className="text-sm font-medium text-slate-600">
+                    Email
+                  </label>
                   <div className="mt-1 flex items-center text-slate-900">
                     <Mail className="w-4 h-4 mr-2 text-slate-400" />
                     {tenant.email}
@@ -97,8 +109,12 @@ export default function TenantDetailPage({
             </div>
             {tenant.internalNotes && (
               <div>
-                <label className="text-sm font-medium text-slate-600">Internal Notes</label>
-                <p className="mt-1 text-slate-900 whitespace-pre-wrap">{tenant.internalNotes}</p>
+                <label className="text-sm font-medium text-slate-600">
+                  Internal Notes
+                </label>
+                <p className="mt-1 text-slate-900 whitespace-pre-wrap">
+                  {tenant.internalNotes}
+                </p>
               </div>
             )}
           </CardContent>
@@ -112,19 +128,27 @@ export default function TenantDetailPage({
             <CardContent>
               <div className="space-y-2">
                 <div>
-                  <label className="text-sm font-medium text-slate-600">Property</label>
+                  <label className="text-sm font-medium text-slate-600">
+                    Property
+                  </label>
                   <p className="mt-1 text-slate-900">
                     {activeLease.unit.property.propertyName}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-slate-600">Unit</label>
-                  <p className="mt-1 text-slate-900">{activeLease.unit.unitName}</p>
+                  <label className="text-sm font-medium text-slate-600">
+                    Unit
+                  </label>
+                  <p className="mt-1 text-slate-900">
+                    {activeLease.unit.unitName}
+                  </p>
                 </div>
                 <div className="pt-4">
                   <Button
                     variant="outline"
-                    onClick={() => router.push(`/${pgId}/leases/${activeLease.id}`)}
+                    onClick={() =>
+                      router.push(`/${pgId}/leases/${activeLease.id}`)
+                    }
                   >
                     <FileText className="w-4 h-4 mr-2" />
                     View Lease Details
@@ -150,7 +174,8 @@ export default function TenantDetailPage({
                   >
                     <div>
                       <p className="font-medium text-slate-900">
-                        {lease.unit.property.propertyName} - {lease.unit.unitName}
+                        {lease.unit.property.propertyName} -{" "}
+                        {lease.unit.unitName}
                       </p>
                       <p className="text-sm text-slate-500">
                         Status: {lease.status}

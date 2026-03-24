@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useQuery } from '@tanstack/react-query';
-import { landlordApi } from '@/lib/api/landlord.api';
-import { landlordKeys } from './landlord-keys';
+import { useQuery } from "@tanstack/react-query";
+import { landlordApi } from "@/lib/api/landlord.api";
+import { landlordKeys } from "./landlord-keys";
 
 export function useOverviewStats(pgId: string) {
   return useQuery({

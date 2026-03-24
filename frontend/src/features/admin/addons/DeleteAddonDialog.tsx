@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { useDeleteAddon } from '@/features/admin/hooks/useAdminAddons';
-import type { AddonCatalog } from '@/types/domain.types';
+import { ConfirmDialog } from "@/components/common/ConfirmDialog";
+import { useDeleteAddon } from "@/features/admin/hooks/useAdminAddons";
+import type { AddonCatalog } from "@/types/domain.types";
 
 interface Props {
   addon: AddonCatalog | null;

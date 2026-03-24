@@ -1,43 +1,68 @@
-'use client';
+"use client";
 
-import { useCallback, useMemo, useState } from 'react';
-import { PageHeader } from '@/components/common/PageHeader';
-import { usePropertyGroup } from '@/hooks/usePropertyGroup';
-import { useTenants } from '@/features/landlord/hooks/useTenants';
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Plus, Mail, Phone, Users, Search, ArrowUpDown, ChevronUp, ChevronDown, RefreshCw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { TableSkeleton } from '@/components/common/LoadingSkeleton';
-import { EmptyState } from '@/components/common/EmptyState';
-import { StatusBadge } from '@/components/common/StatusBadge';
-import { Input } from '@/components/ui/input';
-import type { Tenant } from '@/types/domain.types';
+import { useCallback, useMemo, useState } from "react";
+import { PageHeader } from "@/components/common/PageHeader";
+import { usePropertyGroup } from "@/hooks/usePropertyGroup";
+import { useTenants } from "@/features/landlord/hooks/useTenants";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Plus,
+  Mail,
+  Phone,
+  Users,
+  Search,
+  ArrowUpDown,
+  ChevronUp,
+  ChevronDown,
+  RefreshCw,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { TableSkeleton } from "@/components/common/LoadingSkeleton";
+import { EmptyState } from "@/components/common/EmptyState";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { Input } from "@/components/ui/input";
+import type { Tenant } from "@/types/domain.types";
 
-const TENANT_STATUS_OPTIONS = ['ALL', 'ACTIVE', 'MOVED_OUT', 'BLACKLISTED'] as const;
-type TenantSortColumn = 'name' | 'email' | 'phone' | 'status' | 'lease';
+const TENANT_STATUS_OPTIONS = [
+  "ALL",
+  "ACTIVE",
+  "MOVED_OUT",
+  "BLACKLISTED",
+] as const;
+type TenantSortColumn = "name" | "email" | "phone" | "status" | "lease";
 
 export default function TenantsPage() {
   const { pgId } = usePropertyGroup();
   const { data: tenants, isLoading, isFetching, refetch } = useTenants(pgId);
   const router = useRouter();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<(typeof TENANT_STATUS_OPTIONS)[number]>('ALL');
-  const [sortColumn, setSortColumn] = useState<TenantSortColumn>('name');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] =
+    useState<(typeof TENANT_STATUS_OPTIONS)[number]>("ALL");
+  const [sortColumn, setSortColumn] = useState<TenantSortColumn>("name");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const getActiveLease = useCallback(
-    (tenant: Tenant) => tenant?.leases?.find((l) => l?.status === 'ACTIVE'),
-    []
+    (tenant: Tenant) => tenant?.leases?.find((l) => l?.status === "ACTIVE"),
+    [],
   );
 
   const filteredTenants = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return (tenants ?? []).filter((tenant) => {
-      const matchesStatus = statusFilter === 'ALL' || tenant.status === statusFilter;
+      const matchesStatus =
+        statusFilter === "ALL" || tenant.status === statusFilter;
       const latestLease = tenant.leases?.[0];
-      const searchable = `${tenant.firstName} ${tenant.lastName} ${tenant.email ?? ''} ${tenant.phone ?? ''} ${tenant.status} ${latestLease?.unit?.property?.propertyName ?? ''} ${latestLease?.unit?.unitName ?? ''}`.toLowerCase();
+      const searchable =
+        `${tenant.firstName} ${tenant.lastName} ${tenant.email ?? ""} ${tenant.phone ?? ""} ${tenant.status} ${latestLease?.unit?.property?.propertyName ?? ""} ${latestLease?.unit?.unitName ?? ""}`.toLowerCase();
       const matchesSearch = q.length === 0 || searchable.includes(q);
       return matchesStatus && matchesSearch;
     });
@@ -45,15 +70,16 @@ export default function TenantsPage() {
 
   const sortedTenants = useMemo(() => {
     const rows = [...filteredTenants];
-    const dir = sortDirection === 'asc' ? 1 : -1;
+    const dir = sortDirection === "asc" ? 1 : -1;
     rows.sort((a, b) => {
       const getVal = (tenant: Tenant): string => {
-        if (sortColumn === 'name') return `${tenant.firstName} ${tenant.lastName}`.toLowerCase();
-        if (sortColumn === 'email') return (tenant.email ?? '').toLowerCase();
-        if (sortColumn === 'phone') return (tenant.phone ?? '').toLowerCase();
-        if (sortColumn === 'status') return tenant.status.toLowerCase();
+        if (sortColumn === "name")
+          return `${tenant.firstName} ${tenant.lastName}`.toLowerCase();
+        if (sortColumn === "email") return (tenant.email ?? "").toLowerCase();
+        if (sortColumn === "phone") return (tenant.phone ?? "").toLowerCase();
+        if (sortColumn === "status") return tenant.status.toLowerCase();
         const latestLease = tenant.leases?.[0];
-        return `${latestLease?.unit?.property?.propertyName ?? ''} ${latestLease?.unit?.unitName ?? ''}`.toLowerCase();
+        return `${latestLease?.unit?.property?.propertyName ?? ""} ${latestLease?.unit?.unitName ?? ""}`.toLowerCase();
       };
       return getVal(a).localeCompare(getVal(b)) * dir;
     });
@@ -62,18 +88,21 @@ export default function TenantsPage() {
 
   const toggleSort = (column: TenantSortColumn) => {
     if (sortColumn === column) {
-      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
       return;
     }
     setSortColumn(column);
-    setSortDirection('asc');
+    setSortDirection("asc");
   };
 
   const renderSortIcon = (column: TenantSortColumn) => {
-    if (sortColumn !== column) return <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />;
-    return sortDirection === 'asc'
-      ? <ChevronUp className="h-3.5 w-3.5 text-slate-700" />
-      : <ChevronDown className="h-3.5 w-3.5 text-slate-700" />;
+    if (sortColumn !== column)
+      return <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />;
+    return sortDirection === "asc" ? (
+      <ChevronUp className="h-3.5 w-3.5 text-slate-700" />
+    ) : (
+      <ChevronDown className="h-3.5 w-3.5 text-slate-700" />
+    );
   };
 
   if (isLoading) {
@@ -102,7 +131,9 @@ export default function TenantsPage() {
               }}
               disabled={isFetching}
             >
-              <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`}
+              />
               Refresh
             </Button>
             <Button onClick={() => router.push(`/${pgId}/tenants/new`)}>
@@ -139,18 +170,28 @@ export default function TenantsPage() {
               />
             </div>
             <div className="flex items-center gap-2 self-end sm:self-auto">
-              <label htmlFor="tenant-status-filter" className="text-xs font-medium uppercase tracking-wide text-slate-500">
+              <label
+                htmlFor="tenant-status-filter"
+                className="text-xs font-medium uppercase tracking-wide text-slate-500"
+              >
                 Status
               </label>
               <select
                 id="tenant-status-filter"
                 value={statusFilter}
-                onChange={(event) => setStatusFilter(event.target.value as (typeof TENANT_STATUS_OPTIONS)[number])}
+                onChange={(event) =>
+                  setStatusFilter(
+                    event.target
+                      .value as (typeof TENANT_STATUS_OPTIONS)[number],
+                  )
+                }
                 className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
               >
                 {TENANT_STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
-                    {status === 'ALL' ? 'All statuses' : status.replace(/_/g, ' ')}
+                    {status === "ALL"
+                      ? "All statuses"
+                      : status.replace(/_/g, " ")}
                   </option>
                 ))}
               </select>
@@ -159,10 +200,10 @@ export default function TenantsPage() {
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  setSearchQuery('');
-                  setStatusFilter('ALL');
+                  setSearchQuery("");
+                  setStatusFilter("ALL");
                 }}
-                disabled={searchQuery.length === 0 && statusFilter === 'ALL'}
+                disabled={searchQuery.length === 0 && statusFilter === "ALL"}
               >
                 Reset
               </Button>
@@ -174,23 +215,39 @@ export default function TenantsPage() {
               <TableHeader>
                 <TableRow className="bg-slate-50 hover:bg-slate-50">
                   <TableHead>
-                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('name')}>
-                      Name {renderSortIcon('name')}
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1"
+                      onClick={() => toggleSort("name")}
+                    >
+                      Name {renderSortIcon("name")}
                     </button>
                   </TableHead>
                   <TableHead>
-                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('email')}>
-                      Contact {renderSortIcon('email')}
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1"
+                      onClick={() => toggleSort("email")}
+                    >
+                      Contact {renderSortIcon("email")}
                     </button>
                   </TableHead>
                   <TableHead>
-                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('status')}>
-                      Status {renderSortIcon('status')}
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1"
+                      onClick={() => toggleSort("status")}
+                    >
+                      Status {renderSortIcon("status")}
                     </button>
                   </TableHead>
                   <TableHead>
-                    <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('lease')}>
-                      Property & Unit {renderSortIcon('lease')}
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1"
+                      onClick={() => toggleSort("lease")}
+                    >
+                      Property & Unit {renderSortIcon("lease")}
                     </button>
                   </TableHead>
                   <TableHead className="text-center">Actions</TableHead>
@@ -204,7 +261,9 @@ export default function TenantsPage() {
                     <TableRow
                       key={tenant.id}
                       className="cursor-pointer"
-                      onClick={() => router.push(`/${pgId}/tenants/${tenant.id}`)}
+                      onClick={() =>
+                        router.push(`/${pgId}/tenants/${tenant.id}`)
+                      }
                     >
                       <TableCell className="font-medium">
                         {tenant.firstName} {tenant.lastName}
@@ -219,7 +278,7 @@ export default function TenantsPage() {
                           )}
                           <div className="flex items-center text-sm text-slate-600">
                             <Phone className="w-3 h-3 mr-1" />
-                            {tenant.phone ?? '—'}
+                            {tenant.phone ?? "—"}
                           </div>
                         </div>
                       </TableCell>
@@ -229,11 +288,18 @@ export default function TenantsPage() {
                       <TableCell>
                         {leaseToDisplay ? (
                           <div className="text-sm">
-                            <div className="font-medium">{leaseToDisplay.unit?.property?.propertyName ?? 'Unknown Property'}</div>
-                            <div className="text-slate-500">{leaseToDisplay.unit?.unitName ?? 'Unknown Unit'}</div>
+                            <div className="font-medium">
+                              {leaseToDisplay.unit?.property?.propertyName ??
+                                "Unknown Property"}
+                            </div>
+                            <div className="text-slate-500">
+                              {leaseToDisplay.unit?.unitName ?? "Unknown Unit"}
+                            </div>
                           </div>
                         ) : (
-                          <span className="text-sm text-slate-500">No lease</span>
+                          <span className="text-sm text-slate-500">
+                            No lease
+                          </span>
                         )}
                       </TableCell>
                       <TableCell className="text-center">

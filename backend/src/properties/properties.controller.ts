@@ -26,6 +26,11 @@ import type { JwtPayload } from '../auth/types';
 import { OrgMemberGuard } from '../property-groups/guards/org-member.guard';
 import { OrgRoleGuard } from '../property-groups/guards/org-role.guard';
 import { OrgRoles } from '../property-groups/decorators/org-roles.decorator';
+import { PlanAccessGuard } from '../access-control/plan-access.guard';
+import { RequireMenu } from '../access-control/decorators/require-menu.decorator';
+import { RequirePermission } from '../access-control/decorators/require-permission.decorator';
+import { MENU_CODES } from '../access-control/constants/menu-codes';
+import { PERMISSION_CODES } from '../access-control/constants/permission-codes';
 import { PropertiesService } from './properties.service';
 import { CreatePropertyDto } from './dto/create-property.dto';
 import { UpdatePropertyDto } from './dto/update-property.dto';
@@ -44,7 +49,9 @@ export class PropertiesController {
 
   // Nested under property-groups
   @Post('property-groups/:pgId/properties')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.PROPERTY_CREATE)
   @ApiOperation({ summary: 'Create a property' })
   @ApiResponse({ status: 201, description: 'Property created' })
   @ApiResponse({ status: 402, description: 'Plan limit exceeded' })
@@ -58,7 +65,9 @@ export class PropertiesController {
   }
 
   @Get('property-groups/:pgId/properties')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.PROPERTY_VIEW)
   @ApiOperation({ summary: 'List properties with unit count summary' })
   @ApiResponse({ status: 200, description: 'Paginated list' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -70,7 +79,9 @@ export class PropertiesController {
   }
 
   @Get('property-groups/:pgId/properties/:id')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.PROPERTY_VIEW)
   @ApiOperation({ summary: 'Get property detail' })
   @ApiResponse({ status: 200, description: 'Property detail with unit count' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -83,7 +94,9 @@ export class PropertiesController {
   }
 
   @Patch('property-groups/:pgId/properties/:id')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.PROPERTY_UPDATE)
   @ApiOperation({ summary: 'Update a property' })
   @ApiResponse({ status: 200, description: 'Updated' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -103,8 +116,10 @@ export class PropertiesController {
   }
 
   @Delete('property-groups/:pgId/properties/:id')
-  @UseGuards(OrgMemberGuard, OrgRoleGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard, OrgRoleGuard)
   @OrgRoles('OWNER')
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.PROPERTY_DELETE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a property (OWNER only)' })
   @ApiResponse({ status: 204, description: 'Deleted' })
@@ -122,7 +137,9 @@ export class PropertiesController {
   }
 
   @Post('properties/:propId/units')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.UNIT_CREATE)
   @ApiOperation({ summary: 'Create a unit' })
   @ApiResponse({ status: 201, description: 'Unit created' })
   @ApiResponse({ status: 402, description: 'Plan limit exceeded' })
@@ -136,7 +153,9 @@ export class PropertiesController {
   }
 
   @Get('properties/:propId/units')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.UNIT_VIEW)
   @ApiOperation({ summary: 'List units (optional status filter)' })
   @ApiResponse({ status: 200, description: 'Paginated list' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -153,7 +172,9 @@ export class PropertiesController {
   }
 
   @Get('property-groups/:pgId/units')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.UNIT_VIEW)
   @ApiOperation({
     summary: 'List units across property group (optional status filter)',
   })
@@ -172,7 +193,9 @@ export class PropertiesController {
   }
 
   @Get('units/:unitId')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.UNIT_VIEW)
   @ApiOperation({ summary: 'Get unit detail' })
   @ApiResponse({ status: 200, description: 'Unit detail' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -182,7 +205,9 @@ export class PropertiesController {
   }
 
   @Patch('units/:unitId')
-  @UseGuards(OrgMemberGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard)
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.UNIT_UPDATE)
   @ApiOperation({ summary: 'Update a unit' })
   @ApiResponse({ status: 200, description: 'Updated' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -199,8 +224,10 @@ export class PropertiesController {
   }
 
   @Delete('units/:unitId')
-  @UseGuards(OrgMemberGuard, OrgRoleGuard)
+  @UseGuards(OrgMemberGuard, PlanAccessGuard, OrgRoleGuard)
   @OrgRoles('OWNER')
+  @RequireMenu(MENU_CODES.LANDLORD_PROPERTIES)
+  @RequirePermission(PERMISSION_CODES.UNIT_DELETE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a unit (OWNER only)' })
   @ApiResponse({ status: 204, description: 'Deleted' })

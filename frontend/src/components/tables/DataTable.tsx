@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   getSortedRowModel,
@@ -7,10 +7,10 @@ import {
   useReactTable,
   type SortingState,
   type ColumnDef,
-} from '@tanstack/react-table';
-import { ArrowUpDown, ChevronDown, ChevronUp } from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+} from "@tanstack/react-table";
+import { ArrowUpDown, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export function DataTable<TData>({
   columns,
@@ -25,6 +25,7 @@ export function DataTable<TData>({
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
     data,
     columns,
@@ -35,16 +36,23 @@ export function DataTable<TData>({
   });
 
   function alignClass(columnId: string, meta?: unknown) {
-    const resolvedMeta = (meta ?? {}) as { align?: 'left' | 'center' | 'right' };
-    if (resolvedMeta.align === 'center') return 'text-center';
-    if (resolvedMeta.align === 'right') return 'text-right';
-    if (resolvedMeta.align === 'left') return 'text-left';
-    if (columnId === 'actions') return 'text-center';
-    return 'text-left';
+    const resolvedMeta = (meta ?? {}) as {
+      align?: "left" | "center" | "right";
+    };
+    if (resolvedMeta.align === "center") return "text-center";
+    if (resolvedMeta.align === "right") return "text-right";
+    if (resolvedMeta.align === "left") return "text-left";
+    if (columnId === "actions") return "text-center";
+    return "text-left";
   }
 
   return (
-    <div className={cn('overflow-hidden rounded-lg border border-slate-200 bg-white', className)}>
+    <div
+      className={cn(
+        "overflow-hidden rounded-lg border border-slate-200 bg-white",
+        className,
+      )}
+    >
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="bg-slate-50">
@@ -54,28 +62,35 @@ export function DataTable<TData>({
                   <th
                     key={header.id}
                     className={cn(
-                      'whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500',
-                      alignClass(header.column.id, header.column.columnDef.meta),
+                      "whitespace-nowrap px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500",
+                      alignClass(
+                        header.column.id,
+                        header.column.columnDef.meta,
+                      ),
                     )}
                   >
-                    {header.isPlaceholder ? null : (
-                      header.column.getCanSort() ? (
-                        <button
-                          type="button"
-                          onClick={header.column.getToggleSortingHandler()}
-                          className="inline-flex items-center gap-1.5"
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                          {header.column.getIsSorted() === 'asc' ? (
-                            <ChevronUp className="h-3.5 w-3.5" />
-                          ) : header.column.getIsSorted() === 'desc' ? (
-                            <ChevronDown className="h-3.5 w-3.5" />
-                          ) : (
-                            <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
-                          )}
-                        </button>
-                      ) : (
-                        flexRender(header.column.columnDef.header, header.getContext())
+                    {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                      <button
+                        type="button"
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="inline-flex items-center gap-1.5"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                        {header.column.getIsSorted() === "asc" ? (
+                          <ChevronUp className="h-3.5 w-3.5" />
+                        ) : header.column.getIsSorted() === "desc" ? (
+                          <ChevronDown className="h-3.5 w-3.5" />
+                        ) : (
+                          <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />
+                        )}
+                      </button>
+                    ) : (
+                      flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
                       )
                     )}
                   </th>
@@ -87,17 +102,19 @@ export function DataTable<TData>({
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                onClick={onRowClick ? () => onRowClick(row.original) : undefined}
+                onClick={
+                  onRowClick ? () => onRowClick(row.original) : undefined
+                }
                 className={cn(
-                  'transition-colors hover:bg-slate-50',
-                  onRowClick && 'cursor-pointer'
+                  "transition-colors hover:bg-slate-50",
+                  onRowClick && "cursor-pointer",
                 )}
               >
                 {row.getVisibleCells().map((cell) => (
                   <td
                     key={cell.id}
                     className={cn(
-                      'px-4 py-3 align-middle text-slate-700',
+                      "px-4 py-3 align-middle text-slate-700",
                       alignClass(cell.column.id, cell.column.columnDef.meta),
                     )}
                   >

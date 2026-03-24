@@ -21,6 +21,11 @@ import { UserType } from '../generated/prisma/client';
 import type { JwtPayload } from '../auth/types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OrgMemberGuard } from '../property-groups/guards/org-member.guard';
+import { PlanAccessGuard } from '../access-control/plan-access.guard';
+import { RequireMenu } from '../access-control/decorators/require-menu.decorator';
+import { RequirePermission } from '../access-control/decorators/require-permission.decorator';
+import { MENU_CODES } from '../access-control/constants/menu-codes';
+import { PERMISSION_CODES } from '../access-control/constants/permission-codes';
 import { LeasesService } from './leases.service';
 import { CreateLeaseDto } from './dto/create-lease.dto';
 import { UpdateLeaseDto } from './dto/update-lease.dto';
@@ -35,8 +40,10 @@ export class LeasesController {
   constructor(private readonly leasesService: LeasesService) {}
 
   @Post('property-groups/:pgId/leases')
-  @UseGuards(UserTypeGuard, OrgMemberGuard)
+  @UseGuards(UserTypeGuard, OrgMemberGuard, PlanAccessGuard)
   @UserTypes(UserType.LANDLORD, UserType.SYSTEM_ADMIN)
+  @RequireMenu(MENU_CODES.LANDLORD_LEASES)
+  @RequirePermission(PERMISSION_CODES.LEASE_CREATE)
   @ApiOperation({
     summary:
       'Create a lease (activates unit, creates advance + deposit payments)',
@@ -56,8 +63,10 @@ export class LeasesController {
   }
 
   @Get('property-groups/:pgId/leases')
-  @UseGuards(UserTypeGuard, OrgMemberGuard)
+  @UseGuards(UserTypeGuard, OrgMemberGuard, PlanAccessGuard)
   @UserTypes(UserType.LANDLORD, UserType.SYSTEM_ADMIN)
+  @RequireMenu(MENU_CODES.LANDLORD_LEASES)
+  @RequirePermission(PERMISSION_CODES.LEASE_VIEW)
   @ApiOperation({ summary: 'List leases for property group' })
   @ApiResponse({
     status: 200,
@@ -94,8 +103,10 @@ export class LeasesController {
   }
 
   @Patch('leases/:leaseId')
-  @UseGuards(UserTypeGuard)
+  @UseGuards(UserTypeGuard, PlanAccessGuard)
   @UserTypes(UserType.LANDLORD, UserType.SYSTEM_ADMIN)
+  @RequireMenu(MENU_CODES.LANDLORD_LEASES)
+  @RequirePermission(PERMISSION_CODES.LEASE_UPDATE)
   @ApiOperation({ summary: 'Update lease (landlord)' })
   @ApiResponse({ status: 200, description: 'Updated' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -108,8 +119,10 @@ export class LeasesController {
   }
 
   @Post('leases/:leaseId/close')
-  @UseGuards(UserTypeGuard)
+  @UseGuards(UserTypeGuard, PlanAccessGuard)
   @UserTypes(UserType.LANDLORD, UserType.SYSTEM_ADMIN)
+  @RequireMenu(MENU_CODES.LANDLORD_LEASES)
+  @RequirePermission(PERMISSION_CODES.LEASE_CLOSE)
   @ApiOperation({
     summary:
       'Close lease (unit AVAILABLE, tenant MOVED_OUT, future payments CANCELLED)',

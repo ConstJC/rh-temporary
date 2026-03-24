@@ -1,10 +1,13 @@
-import Link from 'next/link';
-import { PageHeader } from '@/components/common/PageHeader';
+import Link from "next/link";
+import { PageHeader } from "@/components/common/PageHeader";
 
 export default function AdminDashboardSettingsPage() {
   return (
     <>
-      <PageHeader title="Settings" description="Platform settings and administration controls." />
+      <PageHeader
+        title="Settings"
+        description="Platform settings and administration controls."
+      />
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Link
           href="/dashboard/settings/roles"

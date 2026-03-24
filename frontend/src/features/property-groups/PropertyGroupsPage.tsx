@@ -1,28 +1,32 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { Plus, Building2 } from 'lucide-react';
-import { ROUTES } from '@/lib/constants';
-import { SlideOver } from '@/components/common/SlideOver';
-import { EmptyState } from '@/components/common/EmptyState';
-import { TableSkeleton } from '@/components/common/LoadingSkeleton';
-import { usePropertyGroups, useCreatePropertyGroup, useUpdatePropertyGroup } from '@/features/property-groups/hooks/usePropertyGroups';
+import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Plus, Building2 } from "lucide-react";
+import { ROUTES } from "@/lib/constants";
+import { SlideOver } from "@/components/common/SlideOver";
+import { EmptyState } from "@/components/common/EmptyState";
+import { TableSkeleton } from "@/components/common/LoadingSkeleton";
+import {
+  usePropertyGroups,
+  useCreatePropertyGroup,
+  useUpdatePropertyGroup,
+} from "@/features/property-groups/hooks/usePropertyGroups";
 import {
   propertyGroupSchema,
   type PropertyGroupFormValues,
-} from '@/lib/validations/property-group.schema';
-import type { PropertyGroupSummary } from '@/types/domain.types';
+} from "@/lib/validations/property-group.schema";
+import type { PropertyGroupSummary } from "@/types/domain.types";
 
-type Mode = 'create' | 'edit';
+type Mode = "create" | "edit";
 
 export function PropertyGroupsPage() {
   const router = useRouter();
   const { data, isLoading, isError } = usePropertyGroups();
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState<Mode>('create');
+  const [mode, setMode] = useState<Mode>("create");
   const [selected, setSelected] = useState<PropertyGroupSummary | null>(null);
 
   const groups = data ?? [];
@@ -35,9 +39,9 @@ export function PropertyGroupsPage() {
   } = useForm<PropertyGroupFormValues>({
     resolver: zodResolver(propertyGroupSchema),
     defaultValues: {
-      name: '',
-      currencyCode: 'PHP',
-      timezone: 'Asia/Manila',
+      name: "",
+      currencyCode: "PHP",
+      timezone: "Asia/Manila",
     },
   });
 
@@ -47,19 +51,19 @@ export function PropertyGroupsPage() {
   const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
   function openCreate() {
-    setMode('create');
+    setMode("create");
     setSelected(null);
-    reset({ name: '', currencyCode: 'PHP', timezone: 'Asia/Manila' });
+    reset({ name: "", currencyCode: "PHP", timezone: "Asia/Manila" });
     setOpen(true);
   }
 
   function openEdit(group: PropertyGroupSummary) {
-    setMode('edit');
+    setMode("edit");
     setSelected(group);
     reset({
       name: group.name,
-      currencyCode: group.currencyCode ?? 'PHP',
-      timezone: group.timezone ?? 'Asia/Manila',
+      currencyCode: group.currencyCode ?? "PHP",
+      timezone: group.timezone ?? "Asia/Manila",
     });
     setOpen(true);
   }
@@ -69,7 +73,7 @@ export function PropertyGroupsPage() {
   }
 
   async function onSubmit(values: PropertyGroupFormValues) {
-    if (mode === 'create') {
+    if (mode === "create") {
       const created = await createMutation.mutateAsync(values);
       setOpen(false);
       if (created?.id) {
@@ -90,7 +94,7 @@ export function PropertyGroupsPage() {
   const hasGroups = groups.length > 0;
 
   const headerTitle = useMemo(
-    () => (mode === 'create' ? 'Create Property Group' : 'Edit Property Group'),
+    () => (mode === "create" ? "Create Property Group" : "Edit Property Group"),
     [mode],
   );
 
@@ -115,18 +119,20 @@ export function PropertyGroupsPage() {
         </button>
       </div>
 
-      {isLoading && (
-        <TableSkeleton rows={4} />
-      )}
+      {isLoading && <TableSkeleton rows={4} />}
 
       {!isLoading && (isError || !hasGroups) && (
         <EmptyState
           icon={<Building2 className="h-8 w-8" />}
-          title={isError ? 'Failed to load property groups' : 'No property groups yet'}
+          title={
+            isError
+              ? "Failed to load property groups"
+              : "No property groups yet"
+          }
           description={
             isError
-              ? 'There was a problem loading your organizations. Please try again.'
-              : 'Create your first property group to start managing properties, tenants, and leases.'
+              ? "There was a problem loading your organizations. Please try again."
+              : "Create your first property group to start managing properties, tenants, and leases."
           }
           action={
             <button
@@ -154,9 +160,9 @@ export function PropertyGroupsPage() {
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-md bg-primary-50 text-xs font-bold uppercase text-primary-700">
                     {group.name
-                      .split(' ')
+                      .split(" ")
                       .map((p) => p[0])
-                      .join('')
+                      .join("")
                       .slice(0, 3)}
                   </div>
                   <div>
@@ -164,7 +170,8 @@ export function PropertyGroupsPage() {
                       {group.name}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {group.currencyCode ?? 'PHP'} · {group.timezone ?? 'Asia/Manila'}
+                      {group.currencyCode ?? "PHP"} ·{" "}
+                      {group.timezone ?? "Asia/Manila"}
                     </p>
                   </div>
                 </div>
@@ -181,7 +188,7 @@ export function PropertyGroupsPage() {
               </div>
               {group.subscription && (
                 <p className="mt-1 text-xs text-slate-500">
-                  Subscription status:{' '}
+                  Subscription status:{" "}
                   <span className="font-semibold text-slate-700">
                     {group.subscription.status}
                   </span>
@@ -198,18 +205,23 @@ export function PropertyGroupsPage() {
       <SlideOver open={open} onClose={close} title={headerTitle}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
-            <label htmlFor="name" className="mb-1 block text-sm font-medium text-slate-700">
+            <label
+              htmlFor="name"
+              className="mb-1 block text-sm font-medium text-slate-700"
+            >
               Organization name
             </label>
             <input
               id="name"
               type="text"
               autoComplete="organization"
-              {...register('name')}
+              {...register("name")}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
             />
             {errors.name && (
-              <p className="mt-1 text-xs text-danger-600">{errors.name.message}</p>
+              <p className="mt-1 text-xs text-danger-600">
+                {errors.name.message}
+              </p>
             )}
           </div>
 
@@ -223,7 +235,7 @@ export function PropertyGroupsPage() {
             <input
               id="currencyCode"
               type="text"
-              {...register('currencyCode')}
+              {...register("currencyCode")}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
             />
             {errors.currencyCode && (
@@ -243,7 +255,7 @@ export function PropertyGroupsPage() {
             <input
               id="timezone"
               type="text"
-              {...register('timezone')}
+              {...register("timezone")}
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
             />
             {errors.timezone && (
@@ -266,7 +278,11 @@ export function PropertyGroupsPage() {
               disabled={isSubmitting}
               className="inline-flex items-center justify-center rounded-md bg-primary-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 disabled:opacity-60"
             >
-              {isSubmitting ? 'Saving…' : mode === 'create' ? 'Create group' : 'Save changes'}
+              {isSubmitting
+                ? "Saving…"
+                : mode === "create"
+                  ? "Create group"
+                  : "Save changes"}
             </button>
           </div>
         </form>
@@ -274,4 +290,3 @@ export function PropertyGroupsPage() {
     </div>
   );
 }
-

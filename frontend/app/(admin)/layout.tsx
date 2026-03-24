@@ -1,7 +1,7 @@
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth.config';
-import { AppShell } from '@/components/layout/AppShell';
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth.config";
+import { AppShell } from "@/components/layout/AppShell";
 
 export default async function AdminLayout({
   children,
@@ -9,10 +9,13 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  const user = session?.user as { userType?: string; role?: string } | undefined;
-  const isSystemAdmin = user?.role === 'ADMIN' && user?.userType === 'SYSTEM_ADMIN';
+  const user = session?.user as
+    | { userType?: string; role?: string }
+    | undefined;
+  const isSystemAdmin =
+    user?.role === "ADMIN" && user?.userType === "SYSTEM_ADMIN";
   if (!session?.user || !isSystemAdmin) {
-    redirect('/login');
+    redirect("/login");
   }
   return <AppShell isAdmin>{children}</AppShell>;
 }

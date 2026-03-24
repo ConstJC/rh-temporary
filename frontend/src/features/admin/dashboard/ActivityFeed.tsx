@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { StatusBadge } from '@/components/common/StatusBadge';
-import { formatDate } from '@/lib/utils';
-import type { AuditLogEntry } from '@/types/domain.types';
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { formatDate } from "@/lib/utils";
+import type { AuditLogEntry } from "@/types/domain.types";
 
 function actionKey(action: string) {
   return `AUDIT_${action}`.toUpperCase();
@@ -22,13 +22,18 @@ export function ActivityFeed({ entries }: { entries: AuditLogEntry[] }) {
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <StatusBadge status={actionKey(e.action)} />
-                  <span className="truncate text-sm font-semibold text-slate-900">{e.tableName}</span>
+                  <span className="truncate text-sm font-semibold text-slate-900">
+                    {e.tableName}
+                  </span>
                 </div>
                 <p className="mt-1 truncate text-xs text-slate-500">
-                  {e.performedBy ? e.performedBy.email : 'System'} · record {e.recordId}
+                  {e.performedBy ? e.performedBy.email : "System"} · record{" "}
+                  {e.recordId}
                 </p>
               </div>
-              <span className="shrink-0 text-xs text-slate-500">{formatDate(e.createdAt)}</span>
+              <span className="shrink-0 text-xs text-slate-500">
+                {formatDate(e.createdAt)}
+              </span>
             </div>
           </li>
         ))}
@@ -36,4 +41,3 @@ export function ActivityFeed({ entries }: { entries: AuditLogEntry[] }) {
     </div>
   );
 }
-

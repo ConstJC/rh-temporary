@@ -175,7 +175,12 @@ export class LeasesService {
               id: true,
               unitName: true,
               floorNumber: true,
-              property: { select: { propertyName: true } },
+              property: {
+                select: {
+                  id: true,
+                  propertyName: true,
+                },
+              },
             },
           },
         },

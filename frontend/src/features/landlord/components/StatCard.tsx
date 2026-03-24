@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon } from "lucide-react";
 
 interface StatCardProps {
   title: string;
@@ -13,7 +13,13 @@ interface StatCardProps {
   subtitle?: string;
 }
 
-export function StatCard({ title, value, icon: Icon, trend, subtitle }: StatCardProps) {
+export function StatCard({
+  title,
+  value,
+  icon: Icon,
+  trend,
+  subtitle,
+}: StatCardProps) {
   return (
     <div className="bg-white rounded-lg border border-slate-200 p-6">
       <div className="flex items-center justify-between">
@@ -34,10 +40,11 @@ export function StatCard({ title, value, icon: Icon, trend, subtitle }: StatCard
         <div className="mt-4 flex items-center">
           <span
             className={`text-sm font-medium ${
-              trend.isPositive ? 'text-green-600' : 'text-red-600'
+              trend.isPositive ? "text-green-600" : "text-red-600"
             }`}
           >
-            {trend.isPositive ? '+' : ''}{trend.value}%
+            {trend.isPositive ? "+" : ""}
+            {trend.value}%
           </span>
           <span className="text-sm text-slate-500 ml-2">vs last month</span>
         </div>

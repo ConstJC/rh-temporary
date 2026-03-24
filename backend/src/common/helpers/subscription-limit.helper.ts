@@ -4,7 +4,8 @@ import type { PrismaClient } from '../../generated/prisma/client';
 export async function checkSubscriptionLimit(
   prisma: PrismaClient,
   propertyGroupId: string,
-  type: 'property' | 'unit' | 'tenant',
+  type: 'property' | 'unit' | 'tenant' | 'unit_per_property',
+  options?: { propertyId?: string },
 ): Promise<void> {
   const sub = await prisma.subscription.findFirst({
     where: { propertyGroupId, status: 'ACTIVE', deletedAt: null },
@@ -19,6 +20,7 @@ export async function checkSubscriptionLimit(
   const plan = sub.subscriptionPlan as {
     propertyLimit: number;
     unitLimit: number;
+    unitLimitPerProperty: number;
     tenantLimit: number;
   };
   const limit =
@@ -26,7 +28,9 @@ export async function checkSubscriptionLimit(
       ? plan.propertyLimit
       : type === 'unit'
         ? plan.unitLimit
-        : plan.tenantLimit;
+        : type === 'tenant'
+          ? plan.tenantLimit
+          : plan.unitLimitPerProperty;
   if (limit === 0) return; // unlimited
 
   let count: number;
@@ -37,6 +41,22 @@ export async function checkSubscriptionLimit(
   } else if (type === 'unit') {
     count = await prisma.unit.count({
       where: { property: { propertyGroupId }, deletedAt: null },
+    });
+  } else if (type === 'unit_per_property') {
+    if (!options?.propertyId) {
+      throw new HttpException(
+        {
+          error: {
+            code: 'PLAN_LIMIT_CONFIG_ERROR',
+            message:
+              'propertyId is required for unit_per_property limit checks',
+          },
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    count = await prisma.unit.count({
+      where: { propertyId: options.propertyId, deletedAt: null },
     });
   } else {
     count = (
@@ -56,7 +76,10 @@ export async function checkSubscriptionLimit(
       {
         error: {
           code: 'PLAN_LIMIT_EXCEEDED',
-          message: `${type} limit reached`,
+          message:
+            type === 'unit_per_property'
+              ? 'unit per property limit reached'
+              : `${type} limit reached`,
         },
       },
       HttpStatus.PAYMENT_REQUIRED,

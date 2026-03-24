@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1b456f",
+                        "background-light": "#fafaf9",
+                        "background-dark": "#121921",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style type="text/tailwindcss">
+        .ios-blur {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        body {
+            min-height: 100dvh;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-gray-900 dark:text-gray-100 antialiased overflow-hidden">
+<div class="relative flex h-screen w-full flex-col">
+<div class="absolute inset-0 z-0">
+<div class="h-[55%] w-full bg-cover bg-center opacity-40" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDrCZmTr8iB_ESYVtQ-V9IP0U7NrhdnPznEWu-4ZereW0BYnvbhntV--cHrwJL7--yuR46aKueu1B2ig__8pVBQ4wvTLVpDuOcnMmxLCOtuspcx6N5fLJzPqX6boEtGPMcMfTuRetp-57uCWKL3XUvZAg4Nc5vy8eKDVf1r21B_T2GBGECuYVUI-BsbNDajQqiMQDLAIOSFoNZnVOirKX3-uaexzObCrWDVwdiFZTo2CxJWDh_IfEeGo_tSXC4VZVLnbmirPuv1yDyl');">
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-background-light/80 to-background-light dark:via-background-dark/80 dark:to-background-dark"></div>
+</div>
+</div>
+<div class="relative z-10 flex flex-col h-full px-8 pt-16 pb-12">
+<div class="flex items-center justify-center mb-6">
+<div class="flex items-center gap-2">
+<div class="bg-primary p-1.5 rounded-lg shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white text-xl">home_work</span>
+</div>
+<span class="text-xl font-extrabold tracking-tight text-primary dark:text-white">RentHub</span>
+</div>
+</div>
+<div class="flex-1 flex flex-col items-center justify-center text-center">
+<div class="mb-10 relative">
+<div class="absolute inset-0 bg-primary/10 blur-3xl rounded-full"></div>
+<div class="relative w-32 h-32 bg-white dark:bg-gray-800 rounded-full flex items-center justify-center shadow-xl border border-gray-100 dark:border-gray-700">
+<span class="material-symbols-outlined text-primary text-6xl font-light">check_circle</span>
+</div>
+</div>
+<h1 class="text-gray-900 dark:text-white tracking-tight text-3xl font-extrabold leading-tight mb-4">
+                    Everything You Need,<br/>In One App
+                </h1>
+<p class="text-gray-500 dark:text-gray-400 text-lg font-medium leading-relaxed max-w-[280px]">
+                    Fast. Secure. Built for landlords and tenants.
+                </p>
+</div>
+<div class="w-full space-y-4">
+<button class="w-full bg-primary hover:bg-primary/95 text-white h-16 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 flex items-center justify-center transition-all active:scale-[0.98]">
+                    Continue
+                </button>
+<button class="w-full bg-transparent border-2 border-primary/20 text-primary dark:text-white dark:border-white/20 h-16 rounded-2xl font-bold text-lg flex items-center justify-center transition-all active:bg-gray-50 dark:active:bg-white/5">
+                    Login
+                </button>
+<div class="pt-6 flex justify-center gap-2.5">
+<div class="w-2 h-2 rounded-full bg-primary/20 dark:bg-white/20"></div>
+<div class="w-2 h-2 rounded-full bg-primary/20 dark:bg-white/20"></div>
+<div class="w-6 h-2 rounded-full bg-primary dark:bg-white transition-all duration-300"></div>
+</div>
+</div>
+<div class="mt-8 mx-auto w-32 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
+</div>
+</div>
+
+</body></html>

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { listPropertyGroups } from '@/lib/api/property-groups.api';
-import type { PropertyGroupSummary } from '@/types/domain.types';
+import { createContext, useContext, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { listPropertyGroups } from "@/lib/api/property-groups.api";
+import type { PropertyGroupSummary } from "@/types/domain.types";
 
 interface PropertyGroupContextValue {
   pgId: string;
@@ -13,7 +13,9 @@ interface PropertyGroupContextValue {
   refetch: () => void;
 }
 
-const PropertyGroupContext = createContext<PropertyGroupContextValue | null>(null);
+const PropertyGroupContext = createContext<PropertyGroupContextValue | null>(
+  null,
+);
 
 export function PropertyGroupProvider({
   pgId,
@@ -22,13 +24,18 @@ export function PropertyGroupProvider({
   pgId: string;
   children: React.ReactNode;
 }) {
-  const { data: groups, isLoading, error, refetch } = useQuery({
-    queryKey: ['property-groups'],
+  const {
+    data: groups,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["property-groups"],
     queryFn: listPropertyGroups,
   });
   const group = useMemo(
     () => groups?.find((g) => g.id === pgId) ?? null,
-    [groups, pgId]
+    [groups, pgId],
   );
 
   const value = useMemo<PropertyGroupContextValue>(
@@ -39,7 +46,7 @@ export function PropertyGroupProvider({
       error: error ?? null,
       refetch,
     }),
-    [pgId, group, isLoading, error, refetch]
+    [pgId, group, isLoading, error, refetch],
   );
 
   return (
@@ -51,7 +58,10 @@ export function PropertyGroupProvider({
 
 export function usePropertyGroup(): PropertyGroupContextValue {
   const ctx = useContext(PropertyGroupContext);
-  if (!ctx) throw new Error('usePropertyGroup must be used within PropertyGroupProvider');
+  if (!ctx)
+    throw new Error(
+      "usePropertyGroup must be used within PropertyGroupProvider",
+    );
   return ctx;
 }
 

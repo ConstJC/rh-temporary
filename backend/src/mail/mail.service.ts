@@ -181,4 +181,55 @@ export class MailService {
       throw error;
     }
   }
+
+  async sendPropertyGroupMemberInvite(params: {
+    email: string;
+    invitedFirstName: string;
+    invitedByName: string;
+    propertyGroupName: string;
+    roleCode: string;
+    setupToken: string;
+  }) {
+    const {
+      email,
+      invitedFirstName,
+      invitedByName,
+      propertyGroupName,
+      roleCode,
+      setupToken,
+    } = params;
+
+    const frontendUrl =
+      this.configService.get<string>('app.frontendUrl') ||
+      this.configService.get<string>('app.url');
+    const setupLink = `${frontendUrl}/reset-password?token=${setupToken}`;
+
+    const mailOptions = {
+      from: this.configService.get<string>('smtp.from'),
+      to: email,
+      subject: `You're invited to join ${propertyGroupName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #333;">Hello ${invitedFirstName},</h2>
+          <p>${invitedByName} invited you to join <strong>${propertyGroupName}</strong> as <strong>${roleCode}</strong>.</p>
+          <p>Your account has been created. Set your password using the link below:</p>
+          <a href="${setupLink}" style="background-color: #1d4ed8; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Set account password</a>
+          <p style="margin-top: 16px;">If the button does not work, copy and paste this link into your browser:</p>
+          <p style="word-break: break-all; color: #666;">${setupLink}</p>
+          <p>This setup link will expire in 24 hours.</p>
+        </div>
+      `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      this.logger.log(`Property-group invite email sent to ${email}`);
+    } catch (error) {
+      this.logger.error(
+        `Failed to send property-group invite email to ${email}:`,
+        error,
+      );
+      throw error;
+    }
+  }
 }

@@ -1,31 +1,31 @@
-'use client';
+"use client";
 
-import { FormEvent, use, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { useCreateUnit } from '@/features/landlord/hooks/useUnits';
-import { useProperty } from '@/features/landlord/hooks/useProperties';
-import { toast } from 'sonner';
-import type { UnitType } from '@/types/domain.types';
+import { FormEvent, use, useState } from "react";
+import { useRouter } from "next/navigation";
+import { PageHeader } from "@/components/common/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useCreateUnit } from "@/features/landlord/hooks/useUnits";
+import { useProperty } from "@/features/landlord/hooks/useProperties";
+import { toast } from "sonner";
+import type { UnitType } from "@/types/domain.types";
 
 const unitTypeOptions: Array<{ value: UnitType; label: string }> = [
-  { value: 'STUDIO', label: 'Studio' },
-  { value: 'BEDROOM', label: 'Bedroom' },
-  { value: 'ENTIRE_UNIT', label: 'Entire Unit' },
-  { value: 'SHARED_ROOM', label: 'Shared Room' },
-  { value: 'DORM', label: 'Dorm' },
-  { value: 'OTHER', label: 'Other' },
+  { value: "STUDIO", label: "Studio" },
+  { value: "BEDROOM", label: "Bedroom" },
+  { value: "ENTIRE_UNIT", label: "Entire Unit" },
+  { value: "SHARED_ROOM", label: "Shared Room" },
+  { value: "DORM", label: "Dorm" },
+  { value: "OTHER", label: "Other" },
 ];
 
 function getErrorMessage(error: unknown) {
-  if (error && typeof error === 'object' && 'message' in error) {
+  if (error && typeof error === "object" && "message" in error) {
     const message = (error as { message?: unknown }).message;
-    if (typeof message === 'string') return message;
+    if (typeof message === "string") return message;
   }
-  return 'Unable to create unit. Please try again.';
+  return "Unable to create unit. Please try again.";
 }
 
 export default function NewUnitPage({
@@ -39,17 +39,17 @@ export default function NewUnitPage({
   const { data: property } = useProperty(pgId, propertyId);
   const createUnit = useCreateUnit(pgId, propertyId);
 
-  const [unitType, setUnitType] = useState<UnitType>('BEDROOM');
-  const [unitName, setUnitName] = useState('');
-  const [monthlyRent, setMonthlyRent] = useState('');
-  const [floorNumber, setFloorNumber] = useState('');
-  const [maxOccupants, setMaxOccupants] = useState('');
+  const [unitType, setUnitType] = useState<UnitType>("BEDROOM");
+  const [unitName, setUnitName] = useState("");
+  const [monthlyRent, setMonthlyRent] = useState("");
+  const [floorNumber, setFloorNumber] = useState("");
+  const [maxOccupants, setMaxOccupants] = useState("");
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const monthlyRentValue = Number(monthlyRent);
     if (!Number.isFinite(monthlyRentValue) || monthlyRentValue < 0) {
-      toast.error('Monthly rent must be a valid non-negative amount.');
+      toast.error("Monthly rent must be a valid non-negative amount.");
       return;
     }
 
@@ -61,7 +61,7 @@ export default function NewUnitPage({
         floorNumber: floorNumber ? Number(floorNumber) : undefined,
         maxOccupants: maxOccupants ? Number(maxOccupants) : undefined,
       });
-      toast.success('Unit created');
+      toast.success("Unit created");
       router.push(`/${pgId}/units/${created.id}`);
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -72,7 +72,11 @@ export default function NewUnitPage({
     <>
       <PageHeader
         title="Add Unit"
-        description={property ? `Create a unit for ${property.propertyName}` : 'Create a unit'}
+        description={
+          property
+            ? `Create a unit for ${property.propertyName}`
+            : "Create a unit"
+        }
         action={
           <Button
             variant="outline"
@@ -91,13 +95,18 @@ export default function NewUnitPage({
           <form className="space-y-5" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="unitType">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="unitType"
+                >
                   Unit Type
                 </label>
                 <select
                   id="unitType"
                   value={unitType}
-                  onChange={(event) => setUnitType(event.target.value as UnitType)}
+                  onChange={(event) =>
+                    setUnitType(event.target.value as UnitType)
+                  }
                   className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                   required
                 >
@@ -110,7 +119,10 @@ export default function NewUnitPage({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="unitName">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="unitName"
+                >
                   Unit Name / Number
                 </label>
                 <Input
@@ -123,7 +135,10 @@ export default function NewUnitPage({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="monthlyRent">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="monthlyRent"
+                >
                   Monthly Rent
                 </label>
                 <Input
@@ -139,7 +154,10 @@ export default function NewUnitPage({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="floorNumber">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="floorNumber"
+                >
                   Floor Number (Optional)
                 </label>
                 <Input
@@ -152,7 +170,10 @@ export default function NewUnitPage({
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="maxOccupants">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="maxOccupants"
+                >
                   Maximum Occupants (Optional)
                 </label>
                 <Input
@@ -175,7 +196,7 @@ export default function NewUnitPage({
                 Cancel
               </Button>
               <Button type="submit" disabled={createUnit.isPending}>
-                {createUnit.isPending ? 'Saving...' : 'Create Unit'}
+                {createUnit.isPending ? "Saving..." : "Create Unit"}
               </Button>
             </div>
           </form>

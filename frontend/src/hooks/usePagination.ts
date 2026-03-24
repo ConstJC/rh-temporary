@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState } from "react";
 
 export function usePagination(initial?: { page?: number; limit?: number }) {
   const [page, setPage] = useState(initial?.page ?? 1);
@@ -19,4 +19,3 @@ export function usePagination(initial?: { page?: number; limit?: number }) {
     reset,
   };
 }
-

@@ -1,9 +1,10 @@
 import { Transform } from 'class-transformer';
 import {
+  ArrayUnique,
+  IsArray,
   IsInt,
   IsNumber,
   IsOptional,
-  IsPositive,
   IsString,
   Min,
 } from 'class-validator';
@@ -16,7 +17,7 @@ export class UpdateSubscriptionPlanDto {
 
   @IsOptional()
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   priceMonthly?: number;
 
   @IsOptional()
@@ -28,4 +29,26 @@ export class UpdateSubscriptionPlanDto {
   @IsInt()
   @Min(0)
   maxProperties?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  maxUnitsPerProperty?: number;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  maxTenants?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsString({ each: true })
+  menuCodes?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @ArrayUnique()
+  @IsString({ each: true })
+  permissionCodes?: string[];
 }

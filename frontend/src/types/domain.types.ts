@@ -3,28 +3,55 @@
  * Keep in sync with backend generated enums.
  */
 
-export type UserRole = 'ADMIN' | 'USER';
-export type UserType = 'SYSTEM_ADMIN' | 'LANDLORD' | 'TENANT';
-export type OrgRole = 'OWNER' | 'ADMIN' | 'STAFF';
+export type UserRole = "ADMIN" | "USER";
+export type UserType = "SYSTEM_ADMIN" | "LANDLORD" | "TENANT";
+export type OrgRole = "OWNER" | "ADMIN" | "STAFF";
 
 export type PropertyType =
-  | 'BOARDING_HOUSE'
-  | 'APARTMENT_BUILDING'
-  | 'CONDO'
-  | 'SINGLE_FAMILY'
-  | 'COMMERCIAL_MIXED'
-  | 'OTHER';
-export type UnitType = 'STUDIO' | 'BEDROOM' | 'ENTIRE_UNIT' | 'SHARED_ROOM' | 'DORM' | 'OTHER';
-export type UnitStatus = 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE' | 'NOT_AVAILABLE';
-export type TenantStatus = 'ACTIVE' | 'MOVED_OUT' | 'BLACKLISTED';
-export type LeaseType = 'MONTHLY' | 'DAILY' | 'FIXED';
-export type LeaseStatus = 'ACTIVE' | 'EXPIRED' | 'CLOSED';
-export type PaymentStatus = 'UNPAID' | 'PAID' | 'OVERDUE' | 'PARTIAL' | 'CANCELLED';
-export type PaymentMethod = 'CASH' | 'GCASH' | 'BANK_TRANSFER' | 'CARD' | 'OTHER';
-export type SubscriptionStatus = 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
-export type AddonBillingType = 'FLAT_FEE' | 'METERED' | 'FIXED_AMENITY';
-export type AddonCategory = 'internet' | 'utility' | 'parking' | 'laundry' | 'security' | 'pet' | 'amenity';
-export type OrgStatus = 'ACTIVE' | 'SUSPENDED';
+  | "BOARDING_HOUSE"
+  | "APARTMENT_BUILDING"
+  | "CONDO"
+  | "SINGLE_FAMILY"
+  | "COMMERCIAL_MIXED"
+  | "OTHER";
+export type UnitType =
+  | "STUDIO"
+  | "BEDROOM"
+  | "ENTIRE_UNIT"
+  | "SHARED_ROOM"
+  | "DORM"
+  | "OTHER";
+export type UnitStatus =
+  | "AVAILABLE"
+  | "OCCUPIED"
+  | "MAINTENANCE"
+  | "NOT_AVAILABLE";
+export type TenantStatus = "ACTIVE" | "MOVED_OUT" | "BLACKLISTED";
+export type LeaseType = "MONTHLY" | "DAILY" | "FIXED";
+export type LeaseStatus = "ACTIVE" | "EXPIRED" | "CLOSED";
+export type PaymentStatus =
+  | "UNPAID"
+  | "PAID"
+  | "OVERDUE"
+  | "PARTIAL"
+  | "CANCELLED";
+export type PaymentMethod =
+  | "CASH"
+  | "GCASH"
+  | "BANK_TRANSFER"
+  | "CARD"
+  | "OTHER";
+export type SubscriptionStatus = "ACTIVE" | "EXPIRED" | "CANCELLED";
+export type AddonBillingType = "FLAT_FEE" | "METERED" | "FIXED_AMENITY";
+export type AddonCategory =
+  | "internet"
+  | "utility"
+  | "parking"
+  | "laundry"
+  | "security"
+  | "pet"
+  | "amenity";
+export type OrgStatus = "ACTIVE" | "SUSPENDED";
 
 // ── Shared pagination helpers ────────────────────────────────────────────────
 
@@ -35,8 +62,8 @@ export interface PaginatedResponse<T> {
 
 // ── Admin portal enums/types (SYSTEM_ADMIN) ──────────────────────────────────
 
-export type SubStatus = 'ACTIVE' | 'TRIAL' | 'EXPIRED' | 'CANCELLED';
-export type AuditAction = 'INSERT' | 'UPDATE' | 'DELETE';
+export type SubStatus = "ACTIVE" | "TRIAL" | "EXPIRED" | "CANCELLED";
+export type AuditAction = "INSERT" | "UPDATE" | "DELETE";
 
 export interface AdminPropertyGroup {
   id: string;
@@ -45,7 +72,7 @@ export interface AdminPropertyGroup {
   groupName: string;
   currencyCode: string;
   timezone: string;
-  status?: 'ACTIVE' | 'SUSPENDED';
+  status?: "ACTIVE" | "SUSPENDED";
   createdAt: string;
   owner: {
     id: string;
@@ -105,7 +132,9 @@ export interface AdminSubscription {
     name: string;
     priceMonthly: number;
     maxUnits: number;
+    maxUnitsPerProperty?: number;
     maxProperties: number;
+    maxTenants?: number;
   };
 }
 
@@ -114,9 +143,12 @@ export interface AdminSubscriptionPlan {
   name: string;
   priceMonthly: number;
   maxUnits: number;
+  maxUnitsPerProperty: number;
   maxProperties: number;
-  maxTenants?: number;
-  status: 'ACTIVE' | 'SUSPENDED';
+  maxTenants: number;
+  menuCodes: string[];
+  permissionCodes: string[];
+  status: "ACTIVE" | "SUSPENDED";
   createdAt: string;
   updatedAt: string;
 }
@@ -193,7 +225,12 @@ export interface PropertyGroupSummary {
       planName?: string;
       propertyLimit?: number;
       unitLimit?: number;
+      unitLimitPerProperty?: number;
       tenantLimit?: number;
+      access?: {
+        menus: string[];
+        permissions: string[];
+      };
     };
   };
 }
@@ -219,7 +256,12 @@ export interface PropertyGroupSubscription {
     planName: string;
     propertyLimit: number;
     unitLimit: number;
+    unitLimitPerProperty: number;
     tenantLimit: number;
+    access: {
+      menus: string[];
+      permissions: string[];
+    };
   };
   usage: {
     properties: number;
@@ -237,7 +279,7 @@ export interface Property {
   city: string;
   province?: string;
   postalCode?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   _count?: {
@@ -255,7 +297,7 @@ export interface Unit {
   maxOccupants?: number;
   status: UnitStatus;
   isFeatured: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   property?: {
@@ -281,7 +323,7 @@ export interface Tenant {
   phone: string;
   email?: string;
   internalNotes?: string;
-  emergencyContact?: Record<string, any>;
+  emergencyContact?: Record<string, unknown>;
   status: TenantStatus;
   createdAt: string;
   updatedAt: string;
@@ -350,7 +392,7 @@ export interface Payment {
   datePaid?: string;
   paymentMethod?: PaymentMethod;
   status: PaymentStatus;
-  paymentDetails?: Record<string, any>;
+  paymentDetails?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   lease: {
@@ -380,7 +422,7 @@ export interface CreatePropertyDto {
   city: string;
   province?: string;
   postalCode?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateUnitDto {
@@ -391,7 +433,7 @@ export interface CreateUnitDto {
   maxOccupants?: number;
   status?: UnitStatus;
   isFeatured?: boolean;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface CreateTenantDto {
@@ -400,7 +442,7 @@ export interface CreateTenantDto {
   phone: string;
   email: string;
   internalNotes?: string;
-  emergencyContact?: Record<string, any>;
+  emergencyContact?: Record<string, unknown>;
 }
 
 export interface CreateLeaseDto {
@@ -420,5 +462,5 @@ export interface RecordPaymentDto {
   amountPaid: number;
   datePaid: string;
   paymentMethod: PaymentMethod;
-  paymentDetails?: Record<string, any>;
+  paymentDetails?: Record<string, unknown>;
 }

@@ -20,6 +20,11 @@ import { UserType } from '../generated/prisma/client';
 import type { JwtPayload } from '../auth/types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OrgMemberGuard } from '../property-groups/guards/org-member.guard';
+import { PlanAccessGuard } from '../access-control/plan-access.guard';
+import { RequireMenu } from '../access-control/decorators/require-menu.decorator';
+import { RequirePermission } from '../access-control/decorators/require-permission.decorator';
+import { MENU_CODES } from '../access-control/constants/menu-codes';
+import { PERMISSION_CODES } from '../access-control/constants/permission-codes';
 import { PaymentsService } from './payments.service';
 import { ListPaymentsQueryDto } from './dto/list-payments-query.dto';
 import { RecordManualPaymentDto } from './dto/record-manual-payment.dto';
@@ -32,8 +37,10 @@ export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Get('property-groups/:pgId/payments')
-  @UseGuards(UserTypeGuard, OrgMemberGuard)
+  @UseGuards(UserTypeGuard, OrgMemberGuard, PlanAccessGuard)
   @UserTypes(UserType.LANDLORD, UserType.SYSTEM_ADMIN)
+  @RequireMenu(MENU_CODES.LANDLORD_PAYMENTS)
+  @RequirePermission(PERMISSION_CODES.PAYMENT_VIEW)
   @ApiOperation({ summary: 'List payments for property group' })
   @ApiResponse({ status: 200, description: 'Paginated list' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -62,8 +69,10 @@ export class PaymentsController {
   }
 
   @Patch('payments/:id/manual')
-  @UseGuards(UserTypeGuard)
+  @UseGuards(UserTypeGuard, PlanAccessGuard)
   @UserTypes(UserType.LANDLORD, UserType.SYSTEM_ADMIN)
+  @RequireMenu(MENU_CODES.LANDLORD_PAYMENTS)
+  @RequirePermission(PERMISSION_CODES.PAYMENT_RECORD_MANUAL)
   @ApiOperation({ summary: 'Record manual payment (landlord)' })
   @ApiResponse({ status: 200, description: 'Payment updated' })
   @ApiResponse({ status: 403, description: 'Forbidden' })

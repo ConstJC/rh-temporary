@@ -1,5 +1,5 @@
-import { PageHeader } from '@/components/common/PageHeader';
-import { SubscriptionPlansTable } from '@/features/admin/subscription-plans/SubscriptionPlansTable';
+import { PageHeader } from "@/components/common/PageHeader";
+import { SubscriptionPlansTable } from "@/features/admin/subscription-plans/SubscriptionPlansTable";
 
 export default function SubscriptionPlansPage() {
   return (

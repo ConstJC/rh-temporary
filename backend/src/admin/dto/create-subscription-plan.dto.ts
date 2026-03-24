@@ -1,5 +1,12 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsNumber, IsPositive, IsString, Min } from 'class-validator';
+import {
+  ArrayUnique,
+  IsArray,
+  IsInt,
+  IsNumber,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateSubscriptionPlanDto {
   @IsString()
@@ -7,7 +14,7 @@ export class CreateSubscriptionPlanDto {
   name!: string;
 
   @IsNumber()
-  @IsPositive()
+  @Min(0)
   priceMonthly!: number;
 
   @IsInt()
@@ -17,4 +24,22 @@ export class CreateSubscriptionPlanDto {
   @IsInt()
   @Min(0)
   maxProperties!: number;
+
+  @IsInt()
+  @Min(0)
+  maxUnitsPerProperty!: number;
+
+  @IsInt()
+  @Min(0)
+  maxTenants!: number;
+
+  @IsArray()
+  @ArrayUnique()
+  @IsString({ each: true })
+  menuCodes!: string[];
+
+  @IsArray()
+  @ArrayUnique()
+  @IsString({ each: true })
+  permissionCodes!: string[];
 }

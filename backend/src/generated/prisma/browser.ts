@@ -53,6 +53,26 @@ export type PropertyGroupMember = Prisma.PropertyGroupMemberModel
  */
 export type SubscriptionPlan = Prisma.SubscriptionPlanModel
 /**
+ * Model FeatureMenu
+ * 
+ */
+export type FeatureMenu = Prisma.FeatureMenuModel
+/**
+ * Model FeaturePermission
+ * 
+ */
+export type FeaturePermission = Prisma.FeaturePermissionModel
+/**
+ * Model SubscriptionPlanMenu
+ * 
+ */
+export type SubscriptionPlanMenu = Prisma.SubscriptionPlanMenuModel
+/**
+ * Model SubscriptionPlanPermission
+ * 
+ */
+export type SubscriptionPlanPermission = Prisma.SubscriptionPlanPermissionModel
+/**
  * Model Subscription
  * 
  */

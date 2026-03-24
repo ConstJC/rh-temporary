@@ -1,17 +1,17 @@
-'use client';
+"use client";
 
-import { PageHeader } from '@/components/common/PageHeader';
-import { usePropertyGroup } from '@/hooks/usePropertyGroup';
-import { useOverviewStats } from '@/features/landlord/hooks/useOverviewStats';
-import { useLeases } from '@/features/landlord/hooks/useLeases';
-import { StatCard } from '@/features/landlord/components/StatCard';
-import { AlertCard } from '@/features/landlord/components/AlertCard';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Building2, Users, Home, DollarSign } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { CardSkeleton } from '@/components/common/LoadingSkeleton';
-import { format } from 'date-fns';
-import { formatPeso, toDateOrNull, toFiniteNumber } from '@/lib/utils';
+import { PageHeader } from "@/components/common/PageHeader";
+import { usePropertyGroup } from "@/hooks/usePropertyGroup";
+import { useOverviewStats } from "@/features/landlord/hooks/useOverviewStats";
+import { useLeases } from "@/features/landlord/hooks/useLeases";
+import { StatCard } from "@/features/landlord/components/StatCard";
+import { AlertCard } from "@/features/landlord/components/AlertCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Building2, Users, Home, DollarSign } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { CardSkeleton } from "@/components/common/LoadingSkeleton";
+import { format } from "date-fns";
+import { formatPeso, toDateOrNull, toFiniteNumber } from "@/lib/utils";
 
 export default function OverviewPage() {
   const { pgId, group } = usePropertyGroup();
@@ -19,13 +19,14 @@ export default function OverviewPage() {
   const { data: leases } = useLeases(pgId);
   const router = useRouter();
 
-  const groupName = (group as { groupName?: string; name?: string } | null)?.groupName
-    ?? (group as { name?: string } | null)?.name
-    ?? 'Property Group';
+  const groupName =
+    (group as { groupName?: string; name?: string } | null)?.groupName ??
+    (group as { name?: string } | null)?.name ??
+    "Property Group";
   const groupCode =
-    (group as { pgCode?: string } | null)?.pgCode
-    ?? (typeof (group as { pgNumber?: number } | null)?.pgNumber === 'number'
-      ? `PG-${String((group as { pgNumber?: number }).pgNumber).padStart(3, '0')}`
+    (group as { pgCode?: string } | null)?.pgCode ??
+    (typeof (group as { pgNumber?: number } | null)?.pgNumber === "number"
+      ? `PG-${String((group as { pgNumber?: number }).pgNumber).padStart(3, "0")}`
       : null);
 
   const recentLeases = [...(leases ?? [])]
@@ -39,7 +40,10 @@ export default function OverviewPage() {
   if (isLoading) {
     return (
       <>
-        <PageHeader title="Overview" description="KPIs, occupancy, and recent activity" />
+        <PageHeader
+          title="Overview"
+          description="KPIs, occupancy, and recent activity"
+        />
         <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {[1, 2, 3, 4].map((i) => (
             <CardSkeleton key={i} />
@@ -54,13 +58,19 @@ export default function OverviewPage() {
       <PageHeader
         title="Overview"
         description="KPIs, occupancy, and recent activity"
-        action={(
+        action={
           <div className="min-w-[260px] rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 sm:text-right">
-            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Organization</p>
-            <p className="mt-1 text-base font-semibold text-slate-900 capitalize">{groupName}</p>
-            <p className="text-xs text-slate-500">Property Group ID: {groupCode ?? pgId}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Organization
+            </p>
+            <p className="mt-1 text-base font-semibold text-slate-900 capitalize">
+              {groupName}
+            </p>
+            <p className="text-xs text-slate-500">
+              Property Group ID: {groupCode ?? pgId}
+            </p>
           </div>
-        )}
+        }
       />
 
       <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -97,7 +107,9 @@ export default function OverviewPage() {
           </CardHeader>
           <CardContent>
             {recentLeases.length === 0 ? (
-              <p className="text-sm text-slate-500">No recent lease records yet.</p>
+              <p className="text-sm text-slate-500">
+                No recent lease records yet.
+              </p>
             ) : (
               <div className="space-y-3">
                 {recentLeases.map((lease) => {
@@ -114,12 +126,15 @@ export default function OverviewPage() {
                           {lease.tenant.firstName} {lease.tenant.lastName}
                         </p>
                         <p className="text-sm text-slate-600">
-                          {lease.unit.property.propertyName} • {lease.unit.unitName}
+                          {lease.unit.property.propertyName} •{" "}
+                          {lease.unit.unitName}
                         </p>
                       </div>
                       <div className="text-right text-xs text-slate-500">
                         <p>{lease.status}</p>
-                        <p>{createdAt ? format(createdAt, 'MMM dd, yyyy') : '—'}</p>
+                        <p>
+                          {createdAt ? format(createdAt, "MMM dd, yyyy") : "—"}
+                        </p>
                       </div>
                     </button>
                   );
@@ -130,15 +145,17 @@ export default function OverviewPage() {
         </Card>
 
         <div>
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Alerts & Notifications</h2>
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">
+            Alerts & Notifications
+          </h2>
           <div className="space-y-4">
             {stats && toFiniteNumber(stats.overduePayments) > 0 && (
               <AlertCard
                 type="error"
                 title="Overdue Payments"
-                message={`${toFiniteNumber(stats.overduePayments)} payment${toFiniteNumber(stats.overduePayments) > 1 ? 's are' : ' is'} overdue and require immediate attention.`}
+                message={`${toFiniteNumber(stats.overduePayments)} payment${toFiniteNumber(stats.overduePayments) > 1 ? "s are" : " is"} overdue and require immediate attention.`}
                 action={{
-                  label: 'View Payments',
+                  label: "View Payments",
                   onClick: () => router.push(`/${pgId}/payments`),
                 }}
               />
@@ -147,9 +164,9 @@ export default function OverviewPage() {
               <AlertCard
                 type="warning"
                 title="Pending Payments"
-                message={`${toFiniteNumber(stats.pendingPayments)} payment${toFiniteNumber(stats.pendingPayments) > 1 ? 's are' : ' is'} pending.`}
+                message={`${toFiniteNumber(stats.pendingPayments)} payment${toFiniteNumber(stats.pendingPayments) > 1 ? "s are" : " is"} pending.`}
                 action={{
-                  label: 'View Payments',
+                  label: "View Payments",
                   onClick: () => router.push(`/${pgId}/payments`),
                 }}
               />
@@ -158,20 +175,22 @@ export default function OverviewPage() {
               <AlertCard
                 type="info"
                 title="Available Units"
-                message={`${toFiniteNumber(stats.availableUnits)} unit${toFiniteNumber(stats.availableUnits) > 1 ? 's are' : ' is'} available for lease.`}
+                message={`${toFiniteNumber(stats.availableUnits)} unit${toFiniteNumber(stats.availableUnits) > 1 ? "s are" : " is"} available for lease.`}
                 action={{
-                  label: 'View Properties',
+                  label: "View Properties",
                   onClick: () => router.push(`/${pgId}/properties`),
                 }}
               />
             )}
-            {stats && toFiniteNumber(stats.overduePayments) === 0 && toFiniteNumber(stats.pendingPayments) === 0 && (
-              <AlertCard
-                type="info"
-                title="All Clear"
-                message="No urgent items require your attention at this time."
-              />
-            )}
+            {stats &&
+              toFiniteNumber(stats.overduePayments) === 0 &&
+              toFiniteNumber(stats.pendingPayments) === 0 && (
+                <AlertCard
+                  type="info"
+                  title="All Clear"
+                  message="No urgent items require your attention at this time."
+                />
+              )}
           </div>
         </div>
       </div>

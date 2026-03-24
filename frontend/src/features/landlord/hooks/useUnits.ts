@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { landlordApi } from '@/lib/api/landlord.api';
-import { landlordKeys } from './landlord-keys';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { landlordApi } from "@/lib/api/landlord.api";
+import { landlordKeys } from "./landlord-keys";
 
 export interface Unit {
   id: string;
@@ -65,8 +65,10 @@ export function useCreateUnit(pgId: string, propertyId: string) {
     mutationFn: (dto: Parameters<typeof landlordApi.createUnit>[2]) =>
       landlordApi.createUnit(pgId, propertyId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['landlord', 'units', pgId] });
-      queryClient.invalidateQueries({ queryKey: landlordKeys.property(pgId, propertyId) });
+      queryClient.invalidateQueries({ queryKey: ["landlord", "units", pgId] });
+      queryClient.invalidateQueries({
+        queryKey: landlordKeys.property(pgId, propertyId),
+      });
       queryClient.invalidateQueries({ queryKey: landlordKeys.overview(pgId) });
     },
   });
@@ -79,8 +81,10 @@ export function useUpdateUnit(pgId: string, unitId: string) {
     mutationFn: (dto: Parameters<typeof landlordApi.updateUnit>[2]) =>
       landlordApi.updateUnit(pgId, unitId, dto),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['landlord', 'units', pgId] });
-      queryClient.invalidateQueries({ queryKey: landlordKeys.unit(pgId, unitId) });
+      queryClient.invalidateQueries({ queryKey: ["landlord", "units", pgId] });
+      queryClient.invalidateQueries({
+        queryKey: landlordKeys.unit(pgId, unitId),
+      });
       queryClient.invalidateQueries({ queryKey: landlordKeys.overview(pgId) });
     },
   });
@@ -92,7 +96,7 @@ export function useDeleteUnit(pgId: string) {
   return useMutation({
     mutationFn: (unitId: string) => landlordApi.deleteUnit(pgId, unitId),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['landlord', 'units', pgId] });
+      queryClient.invalidateQueries({ queryKey: ["landlord", "units", pgId] });
       queryClient.invalidateQueries({ queryKey: landlordKeys.overview(pgId) });
     },
   });

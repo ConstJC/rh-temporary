@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { landlordApi } from '@/lib/api/landlord.api';
-import { landlordKeys } from './landlord-keys';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { landlordApi } from "@/lib/api/landlord.api";
+import { landlordKeys } from "./landlord-keys";
 
 export function usePayments(pgId: string) {
   return useQuery({
@@ -28,7 +28,9 @@ export function useRecordPayment(pgId: string, paymentId: string) {
       landlordApi.recordPayment(pgId, paymentId, dto),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: landlordKeys.payments(pgId) });
-      queryClient.invalidateQueries({ queryKey: landlordKeys.payment(pgId, paymentId) });
+      queryClient.invalidateQueries({
+        queryKey: landlordKeys.payment(pgId, paymentId),
+      });
       queryClient.invalidateQueries({ queryKey: landlordKeys.overview(pgId) });
     },
   });

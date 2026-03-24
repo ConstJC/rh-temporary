@@ -1,6 +1,6 @@
-import type { UserType } from './domain.types';
+import type { UserType } from "./domain.types";
 
-declare module 'next-auth' {
+declare module "next-auth" {
   interface User {
     id?: string;
     role?: string;
@@ -18,7 +18,7 @@ declare module 'next-auth' {
   }
 }
 
-declare module 'next-auth/jwt' {
+declare module "next-auth/jwt" {
   interface JWT {
     accessToken?: string;
     refreshToken?: string;

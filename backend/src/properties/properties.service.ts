@@ -184,6 +184,12 @@ export class PropertiesService {
       throw new NotFoundException('Property not found');
     }
     await checkSubscriptionLimit(this.prisma, property.propertyGroupId, 'unit');
+    await checkSubscriptionLimit(
+      this.prisma,
+      property.propertyGroupId,
+      'unit_per_property',
+      { propertyId },
+    );
     const unit = await this.prisma.unit.create({
       data: {
         propertyId,

@@ -1,17 +1,31 @@
-'use client';
+"use client";
 
-import { FormEvent, use, useMemo, useState } from 'react';
-import { PageHeader } from '@/components/common/PageHeader';
-import { useProperty } from '@/features/landlord/hooks/useProperties';
-import { useCreateUnit, useUnit, useUnits } from '@/features/landlord/hooks/useUnits';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Plus, Home, Search, ArrowUpDown, ChevronUp, ChevronDown, User, RefreshCw } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { formatPeso, toFiniteNumber } from '@/lib/utils';
-import { Input } from '@/components/ui/input';
-import { StatusBadge } from '@/components/common/StatusBadge';
+import { FormEvent, use, useMemo, useState } from "react";
+import { PageHeader } from "@/components/common/PageHeader";
+import { useProperty } from "@/features/landlord/hooks/useProperties";
+import {
+  useCreateUnit,
+  useUnit,
+  useUnits,
+} from "@/features/landlord/hooks/useUnits";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  MapPin,
+  Plus,
+  Home,
+  Search,
+  ArrowUpDown,
+  ChevronUp,
+  ChevronDown,
+  User,
+  RefreshCw,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { formatPeso, toFiniteNumber } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { StatusBadge } from "@/components/common/StatusBadge";
 import {
   Table,
   TableBody,
@@ -19,29 +33,41 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { SlideOver } from '@/components/common/SlideOver';
-import { toast } from 'sonner';
-import type { UnitType } from '@/types/domain.types';
+} from "@/components/ui/table";
+import { SlideOver } from "@/components/common/SlideOver";
+import { toast } from "sonner";
+import type { UnitType } from "@/types/domain.types";
 
-const UNIT_STATUS_OPTIONS = ['ALL', 'AVAILABLE', 'OCCUPIED', 'MAINTENANCE', 'NOT_AVAILABLE'] as const;
+const UNIT_STATUS_OPTIONS = [
+  "ALL",
+  "AVAILABLE",
+  "OCCUPIED",
+  "MAINTENANCE",
+  "NOT_AVAILABLE",
+] as const;
 const UNIT_TYPE_OPTIONS: Array<{ value: UnitType; label: string }> = [
-  { value: 'STUDIO', label: 'Studio' },
-  { value: 'BEDROOM', label: 'Bedroom' },
-  { value: 'ENTIRE_UNIT', label: 'Entire Unit' },
-  { value: 'SHARED_ROOM', label: 'Shared Room' },
-  { value: 'DORM', label: 'Dorm' },
-  { value: 'OTHER', label: 'Other' },
+  { value: "STUDIO", label: "Studio" },
+  { value: "BEDROOM", label: "Bedroom" },
+  { value: "ENTIRE_UNIT", label: "Entire Unit" },
+  { value: "SHARED_ROOM", label: "Shared Room" },
+  { value: "DORM", label: "Dorm" },
+  { value: "OTHER", label: "Other" },
 ];
 
-type UnitSortColumn = 'unitName' | 'unitType' | 'monthlyRent' | 'floorNumber' | 'maxOccupants' | 'status';
+type UnitSortColumn =
+  | "unitName"
+  | "unitType"
+  | "monthlyRent"
+  | "floorNumber"
+  | "maxOccupants"
+  | "status";
 
 function getErrorMessage(error: unknown) {
-  if (error && typeof error === 'object' && 'message' in error) {
+  if (error && typeof error === "object" && "message" in error) {
     const message = (error as { message?: unknown }).message;
-    if (typeof message === 'string') return message;
+    if (typeof message === "string") return message;
   }
-  return 'Unable to process request. Please try again.';
+  return "Unable to process request. Please try again.";
 }
 
 export default function PropertyDetailPage({
@@ -50,35 +76,50 @@ export default function PropertyDetailPage({
   params: Promise<{ pgId: string; propertyId: string }>;
 }) {
   const { pgId, propertyId } = use(params);
-  const { data: property, isLoading: propertyLoading } = useProperty(pgId, propertyId);
-  const { data: units, isLoading: unitsLoading, isFetching: unitsRefreshing, refetch: refetchUnits } = useUnits(pgId, propertyId);
+  const { data: property, isLoading: propertyLoading } = useProperty(
+    pgId,
+    propertyId,
+  );
+  const {
+    data: units,
+    isLoading: unitsLoading,
+    isFetching: unitsRefreshing,
+    refetch: refetchUnits,
+  } = useUnits(pgId, propertyId);
   const createUnit = useCreateUnit(pgId, propertyId);
   const router = useRouter();
 
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<(typeof UNIT_STATUS_OPTIONS)[number]>('ALL');
-  const [sortColumn, setSortColumn] = useState<UnitSortColumn>('unitName');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] =
+    useState<(typeof UNIT_STATUS_OPTIONS)[number]>("ALL");
+  const [sortColumn, setSortColumn] = useState<UnitSortColumn>("unitName");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
   const [unitSheetOpen, setUnitSheetOpen] = useState(false);
-  const [unitSheetMode, setUnitSheetMode] = useState<'add' | 'view'>('add');
+  const [unitSheetMode, setUnitSheetMode] = useState<"add" | "view">("add");
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
 
-  const { data: selectedUnit, isLoading: selectedUnitLoading } = useUnit(pgId, selectedUnitId ?? '');
+  const { data: selectedUnit, isLoading: selectedUnitLoading } = useUnit(
+    pgId,
+    selectedUnitId ?? "",
+  );
 
-  const [unitType, setUnitType] = useState<UnitType>('BEDROOM');
-  const [unitName, setUnitName] = useState('');
-  const [monthlyRent, setMonthlyRent] = useState('');
-  const [floorNumber, setFloorNumber] = useState('');
-  const [maxOccupants, setMaxOccupants] = useState('');
+  const [unitType, setUnitType] = useState<UnitType>("BEDROOM");
+  const [unitName, setUnitName] = useState("");
+  const [monthlyRent, setMonthlyRent] = useState("");
+  const [floorNumber, setFloorNumber] = useState("");
+  const [maxOccupants, setMaxOccupants] = useState("");
 
   const filteredUnits = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLowerCase();
 
     return (units ?? []).filter((unit) => {
-      const matchesStatus = statusFilter === 'ALL' || unit.status === statusFilter;
-      const searchable = `${unit.unitName} ${unit.unitType} ${unit.status} ${unit.floorNumber ?? ''} ${unit.maxOccupants ?? ''} ${unit.monthlyRent ?? ''}`.toLowerCase();
-      const matchesSearch = normalizedQuery.length === 0 || searchable.includes(normalizedQuery);
+      const matchesStatus =
+        statusFilter === "ALL" || unit.status === statusFilter;
+      const searchable =
+        `${unit.unitName} ${unit.unitType} ${unit.status} ${unit.floorNumber ?? ""} ${unit.maxOccupants ?? ""} ${unit.monthlyRent ?? ""}`.toLowerCase();
+      const matchesSearch =
+        normalizedQuery.length === 0 || searchable.includes(normalizedQuery);
       return matchesStatus && matchesSearch;
     });
   }, [searchQuery, statusFilter, units]);
@@ -87,21 +128,26 @@ export default function PropertyDetailPage({
     const sorted = [...filteredUnits];
 
     sorted.sort((a, b) => {
-      const directionFactor = sortDirection === 'asc' ? 1 : -1;
+      const directionFactor = sortDirection === "asc" ? 1 : -1;
 
-      const readValue = (unit: (typeof filteredUnits)[number]): string | number => {
-        if (sortColumn === 'monthlyRent') return toFiniteNumber(unit.monthlyRent);
-        if (sortColumn === 'floorNumber') return unit.floorNumber ?? Number.POSITIVE_INFINITY;
-        if (sortColumn === 'maxOccupants') return unit.maxOccupants ?? Number.POSITIVE_INFINITY;
-        if (sortColumn === 'unitName') return unit.unitName.toLowerCase();
-        if (sortColumn === 'unitType') return unit.unitType.toLowerCase();
+      const readValue = (
+        unit: (typeof filteredUnits)[number],
+      ): string | number => {
+        if (sortColumn === "monthlyRent")
+          return toFiniteNumber(unit.monthlyRent);
+        if (sortColumn === "floorNumber")
+          return unit.floorNumber ?? Number.POSITIVE_INFINITY;
+        if (sortColumn === "maxOccupants")
+          return unit.maxOccupants ?? Number.POSITIVE_INFINITY;
+        if (sortColumn === "unitName") return unit.unitName.toLowerCase();
+        if (sortColumn === "unitType") return unit.unitType.toLowerCase();
         return unit.status.toLowerCase();
       };
 
       const aValue = readValue(a);
       const bValue = readValue(b);
 
-      if (typeof aValue === 'number' && typeof bValue === 'number') {
+      if (typeof aValue === "number" && typeof bValue === "number") {
         return (aValue - bValue) * directionFactor;
       }
 
@@ -115,50 +161,56 @@ export default function PropertyDetailPage({
     return (units ?? []).reduce(
       (acc, unit) => {
         acc.total += 1;
-        if (unit.status === 'AVAILABLE') acc.available += 1;
+        if (unit.status === "AVAILABLE") acc.available += 1;
         return acc;
       },
-      { total: 0, available: 0 }
+      { total: 0, available: 0 },
     );
   }, [units]);
 
   const averageRent = useMemo(() => {
     if (!units || units.length === 0) return 0;
-    const totalRent = units.reduce((sum, unit) => sum + toFiniteNumber(unit.monthlyRent), 0);
+    const totalRent = units.reduce(
+      (sum, unit) => sum + toFiniteNumber(unit.monthlyRent),
+      0,
+    );
     return totalRent / units.length;
   }, [units]);
 
   const toggleSort = (column: UnitSortColumn) => {
     if (sortColumn === column) {
-      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
       return;
     }
 
     setSortColumn(column);
-    setSortDirection('asc');
+    setSortDirection("asc");
   };
 
   const renderSortIcon = (column: UnitSortColumn) => {
-    if (sortColumn !== column) return <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />;
+    if (sortColumn !== column)
+      return <ArrowUpDown className="h-3.5 w-3.5 text-slate-400" />;
 
-    return sortDirection === 'asc'
-      ? <ChevronUp className="h-3.5 w-3.5 text-slate-700" />
-      : <ChevronDown className="h-3.5 w-3.5 text-slate-700" />;
+    return sortDirection === "asc" ? (
+      <ChevronUp className="h-3.5 w-3.5 text-slate-700" />
+    ) : (
+      <ChevronDown className="h-3.5 w-3.5 text-slate-700" />
+    );
   };
 
   const openAddUnitSheet = () => {
-    setUnitSheetMode('add');
+    setUnitSheetMode("add");
     setSelectedUnitId(null);
-    setUnitType('BEDROOM');
-    setUnitName('');
-    setMonthlyRent('');
-    setFloorNumber('');
-    setMaxOccupants('');
+    setUnitType("BEDROOM");
+    setUnitName("");
+    setMonthlyRent("");
+    setFloorNumber("");
+    setMaxOccupants("");
     setUnitSheetOpen(true);
   };
 
   const openViewUnitSheet = (unitId: string) => {
-    setUnitSheetMode('view');
+    setUnitSheetMode("view");
     setSelectedUnitId(unitId);
     setUnitSheetOpen(true);
   };
@@ -172,7 +224,7 @@ export default function PropertyDetailPage({
     event.preventDefault();
     const monthlyRentValue = Number(monthlyRent);
     if (!Number.isFinite(monthlyRentValue) || monthlyRentValue < 0) {
-      toast.error('Monthly rent must be a valid non-negative amount.');
+      toast.error("Monthly rent must be a valid non-negative amount.");
       return;
     }
 
@@ -184,7 +236,7 @@ export default function PropertyDetailPage({
         floorNumber: floorNumber ? Number(floorNumber) : undefined,
         maxOccupants: maxOccupants ? Number(maxOccupants) : undefined,
       });
-      toast.success('Unit created');
+      toast.success("Unit created");
       closeUnitSheet();
     } catch (error) {
       toast.error(getErrorMessage(error));
@@ -209,7 +261,10 @@ export default function PropertyDetailPage({
         <PageHeader title="Property Not Found" />
         <div className="mt-6 text-center py-12 bg-white rounded-lg border border-slate-200">
           <p className="text-slate-500">Property not found.</p>
-          <Button onClick={() => router.push(`/${pgId}/properties`)} className="mt-4">
+          <Button
+            onClick={() => router.push(`/${pgId}/properties`)}
+            className="mt-4"
+          >
             Back to Properties
           </Button>
         </div>
@@ -224,7 +279,10 @@ export default function PropertyDetailPage({
         description="Property details and units"
         action={
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => router.push(`/${pgId}/properties`)}>
+            <Button
+              variant="outline"
+              onClick={() => router.push(`/${pgId}/properties`)}
+            >
               Back
             </Button>
           </div>
@@ -239,27 +297,39 @@ export default function PropertyDetailPage({
           <CardContent className="space-y-5">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
               <div>
-                <label className="text-sm font-medium text-slate-600">Property Type</label>
+                <label className="text-sm font-medium text-slate-600">
+                  Property Type
+                </label>
                 <div className="mt-1">
                   <Badge variant="secondary">
-                    {property.propertyType.replace(/_/g, ' ')}
+                    {property.propertyType.replace(/_/g, " ")}
                   </Badge>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-600">Total Units</label>
+                <label className="text-sm font-medium text-slate-600">
+                  Total Units
+                </label>
                 <p className="mt-1 text-slate-900">{units?.length ?? 0}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-600">Available Units</label>
+                <label className="text-sm font-medium text-slate-600">
+                  Available Units
+                </label>
                 <p className="mt-1 text-slate-900">{unitStats.available}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-slate-600">Average Rent</label>
-                <p className="mt-1 text-slate-900">{formatPeso(averageRent)}/month</p>
+                <label className="text-sm font-medium text-slate-600">
+                  Average Rent
+                </label>
+                <p className="mt-1 text-slate-900">
+                  {formatPeso(averageRent)}/month
+                </p>
               </div>
               <div className="md:col-span-2">
-                <label className="text-sm font-medium text-slate-600">Address</label>
+                <label className="text-sm font-medium text-slate-600">
+                  Address
+                </label>
                 <div className="mt-1 flex items-start text-slate-900">
                   <MapPin className="w-4 h-4 mr-2 mt-0.5 shrink-0 text-slate-400" />
                   <span>
@@ -277,7 +347,10 @@ export default function PropertyDetailPage({
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle>
-                Units <span className="text-sm font-normal text-slate-500">({filteredUnits.length}/{unitStats.total})</span>
+                Units{" "}
+                <span className="text-sm font-normal text-slate-500">
+                  ({filteredUnits.length}/{unitStats.total})
+                </span>
               </CardTitle>
               <div className="flex items-center gap-2">
                 <Button
@@ -289,7 +362,9 @@ export default function PropertyDetailPage({
                   }}
                   disabled={unitsRefreshing}
                 >
-                  <RefreshCw className={`mr-2 h-4 w-4 ${unitsRefreshing ? 'animate-spin' : ''}`} />
+                  <RefreshCw
+                    className={`mr-2 h-4 w-4 ${unitsRefreshing ? "animate-spin" : ""}`}
+                  />
                   Refresh
                 </Button>
                 <Button size="sm" onClick={openAddUnitSheet}>
@@ -321,12 +396,19 @@ export default function PropertyDetailPage({
                 <select
                   id="unit-status-filter"
                   value={statusFilter}
-                  onChange={(event) => setStatusFilter(event.target.value as (typeof UNIT_STATUS_OPTIONS)[number])}
+                  onChange={(event) =>
+                    setStatusFilter(
+                      event.target
+                        .value as (typeof UNIT_STATUS_OPTIONS)[number],
+                    )
+                  }
                   className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   {UNIT_STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status}>
-                      {status === 'ALL' ? 'All statuses' : status.replace(/_/g, ' ')}
+                      {status === "ALL"
+                        ? "All statuses"
+                        : status.replace(/_/g, " ")}
                     </option>
                   ))}
                 </select>
@@ -335,10 +417,10 @@ export default function PropertyDetailPage({
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setSearchQuery('');
-                    setStatusFilter('ALL');
+                    setSearchQuery("");
+                    setStatusFilter("ALL");
                   }}
-                  disabled={searchQuery.length === 0 && statusFilter === 'ALL'}
+                  disabled={searchQuery.length === 0 && statusFilter === "ALL"}
                 >
                   Reset
                 </Button>
@@ -350,7 +432,9 @@ export default function PropertyDetailPage({
             ) : units && units.length === 0 ? (
               <div className="text-center py-8">
                 <Home className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-500 mb-4">No units yet. Add your first unit.</p>
+                <p className="text-slate-500 mb-4">
+                  No units yet. Add your first unit.
+                </p>
                 <Button size="sm" onClick={openAddUnitSheet}>
                   <Plus className="w-4 h-4 mr-2" />
                   Add Unit
@@ -358,8 +442,12 @@ export default function PropertyDetailPage({
               </div>
             ) : filteredUnits.length === 0 ? (
               <div className="rounded-lg border border-dashed border-slate-300 bg-white px-4 py-10 text-center">
-                <p className="text-sm font-medium text-slate-700">No units match your filters.</p>
-                <p className="mt-1 text-sm text-slate-500">Try changing the search term or selecting a different status.</p>
+                <p className="text-sm font-medium text-slate-700">
+                  No units match your filters.
+                </p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Try changing the search term or selecting a different status.
+                </p>
               </div>
             ) : (
               <div className="overflow-hidden rounded-lg border border-slate-200 bg-white">
@@ -367,33 +455,57 @@ export default function PropertyDetailPage({
                   <TableHeader>
                     <TableRow className="bg-slate-50 hover:bg-slate-50">
                       <TableHead>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('unitName')}>
-                          Unit {renderSortIcon('unitName')}
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort("unitName")}
+                        >
+                          Unit {renderSortIcon("unitName")}
                         </button>
                       </TableHead>
                       <TableHead>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('unitType')}>
-                          Type {renderSortIcon('unitType')}
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort("unitType")}
+                        >
+                          Type {renderSortIcon("unitType")}
                         </button>
                       </TableHead>
                       <TableHead>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('monthlyRent')}>
-                          Monthly Rent {renderSortIcon('monthlyRent')}
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort("monthlyRent")}
+                        >
+                          Monthly Rent {renderSortIcon("monthlyRent")}
                         </button>
                       </TableHead>
                       <TableHead>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('floorNumber')}>
-                          Floor {renderSortIcon('floorNumber')}
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort("floorNumber")}
+                        >
+                          Floor {renderSortIcon("floorNumber")}
                         </button>
                       </TableHead>
                       <TableHead>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('maxOccupants')}>
-                          Max Occupants {renderSortIcon('maxOccupants')}
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort("maxOccupants")}
+                        >
+                          Max Occupants {renderSortIcon("maxOccupants")}
                         </button>
                       </TableHead>
                       <TableHead>
-                        <button type="button" className="inline-flex items-center gap-1" onClick={() => toggleSort('status')}>
-                          Status {renderSortIcon('status')}
+                        <button
+                          type="button"
+                          className="inline-flex items-center gap-1"
+                          onClick={() => toggleSort("status")}
+                        >
+                          Status {renderSortIcon("status")}
                         </button>
                       </TableHead>
                       <TableHead className="text-center">Action</TableHead>
@@ -402,11 +514,17 @@ export default function PropertyDetailPage({
                   <TableBody>
                     {sortedUnits.map((unit) => (
                       <TableRow key={unit.id}>
-                        <TableCell className="font-medium text-slate-900">{unit.unitName}</TableCell>
-                        <TableCell>{unit.unitType.replace(/_/g, ' ')}</TableCell>
-                        <TableCell>{formatPeso(unit.monthlyRent)}/month</TableCell>
-                        <TableCell>{unit.floorNumber ?? '—'}</TableCell>
-                        <TableCell>{unit.maxOccupants ?? '—'}</TableCell>
+                        <TableCell className="font-medium text-slate-900">
+                          {unit.unitName}
+                        </TableCell>
+                        <TableCell>
+                          {unit.unitType.replace(/_/g, " ")}
+                        </TableCell>
+                        <TableCell>
+                          {formatPeso(unit.monthlyRent)}/month
+                        </TableCell>
+                        <TableCell>{unit.floorNumber ?? "—"}</TableCell>
+                        <TableCell>{unit.maxOccupants ?? "—"}</TableCell>
                         <TableCell>
                           <StatusBadge status={unit.status} />
                         </TableCell>
@@ -435,23 +553,34 @@ export default function PropertyDetailPage({
       <SlideOver
         open={unitSheetOpen}
         onClose={closeUnitSheet}
-        title={unitSheetMode === 'add' ? 'Add Unit' : (selectedUnit?.unitName ?? 'Unit Details')}
+        title={
+          unitSheetMode === "add"
+            ? "Add Unit"
+            : (selectedUnit?.unitName ?? "Unit Details")
+        }
       >
-        {unitSheetMode === 'add' ? (
+        {unitSheetMode === "add" ? (
           <form className="space-y-5" onSubmit={handleCreateUnit}>
             <p className="text-sm text-slate-500">
-              {property ? `Create a unit for ${property.propertyName}` : 'Create a new unit'}
+              {property
+                ? `Create a unit for ${property.propertyName}`
+                : "Create a new unit"}
             </p>
 
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="sheet-unitType">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="sheet-unitType"
+                >
                   Unit Type
                 </label>
                 <select
                   id="sheet-unitType"
                   value={unitType}
-                  onChange={(event) => setUnitType(event.target.value as UnitType)}
+                  onChange={(event) =>
+                    setUnitType(event.target.value as UnitType)
+                  }
                   className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
                   required
                 >
@@ -464,7 +593,10 @@ export default function PropertyDetailPage({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="sheet-unitName">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="sheet-unitName"
+                >
                   Unit Name / Number
                 </label>
                 <Input
@@ -477,7 +609,10 @@ export default function PropertyDetailPage({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="sheet-monthlyRent">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="sheet-monthlyRent"
+                >
                   Monthly Rent
                 </label>
                 <Input
@@ -493,7 +628,10 @@ export default function PropertyDetailPage({
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="sheet-floorNumber">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="sheet-floorNumber"
+                >
                   Floor Number (Optional)
                 </label>
                 <Input
@@ -506,7 +644,10 @@ export default function PropertyDetailPage({
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-medium text-slate-700" htmlFor="sheet-maxOccupants">
+                <label
+                  className="text-sm font-medium text-slate-700"
+                  htmlFor="sheet-maxOccupants"
+                >
                   Maximum Occupants (Optional)
                 </label>
                 <Input
@@ -525,7 +666,7 @@ export default function PropertyDetailPage({
                 Cancel
               </Button>
               <Button type="submit" disabled={createUnit.isPending}>
-                {createUnit.isPending ? 'Saving...' : 'Create Unit'}
+                {createUnit.isPending ? "Saving..." : "Create Unit"}
               </Button>
             </div>
           </form>
@@ -548,23 +689,33 @@ export default function PropertyDetailPage({
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div>
                     <p className="text-sm text-slate-500">Property</p>
-                    <p className="mt-1 font-medium text-slate-900">{selectedUnit.property?.propertyName ?? 'N/A'}</p>
+                    <p className="mt-1 font-medium text-slate-900">
+                      {selectedUnit.property?.propertyName ?? "N/A"}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-slate-500">Unit Type</p>
-                    <p className="mt-1 font-medium text-slate-900">{selectedUnit.unitType.replace(/_/g, ' ')}</p>
+                    <p className="mt-1 font-medium text-slate-900">
+                      {selectedUnit.unitType.replace(/_/g, " ")}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-slate-500">Monthly Rent</p>
-                    <p className="mt-1 font-medium text-slate-900">{formatPeso(selectedUnit.monthlyRent)}/month</p>
+                    <p className="mt-1 font-medium text-slate-900">
+                      {formatPeso(selectedUnit.monthlyRent)}/month
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-slate-500">Floor Number</p>
-                    <p className="mt-1 font-medium text-slate-900">{selectedUnit.floorNumber ?? 'N/A'}</p>
+                    <p className="mt-1 font-medium text-slate-900">
+                      {selectedUnit.floorNumber ?? "N/A"}
+                    </p>
                   </div>
                   <div>
                     <p className="text-sm text-slate-500">Max Occupants</p>
-                    <p className="mt-1 font-medium text-slate-900">{selectedUnit.maxOccupants ?? 'N/A'}</p>
+                    <p className="mt-1 font-medium text-slate-900">
+                      {selectedUnit.maxOccupants ?? "N/A"}
+                    </p>
                   </div>
                 </div>
               </CardContent>
@@ -575,12 +726,22 @@ export default function PropertyDetailPage({
                 <CardTitle className="text-lg">Occupancy</CardTitle>
               </CardHeader>
               <CardContent>
-                {selectedUnit.leases?.find((lease) => lease.status === 'ACTIVE') ? (
+                {selectedUnit.leases?.find(
+                  (lease) => lease.status === "ACTIVE",
+                ) ? (
                   <div className="space-y-2">
                     <div className="flex items-center text-slate-900">
                       <User className="mr-2 h-4 w-4 text-slate-400" />
-                      {selectedUnit.leases.find((lease) => lease.status === 'ACTIVE')?.tenant.firstName}{' '}
-                      {selectedUnit.leases.find((lease) => lease.status === 'ACTIVE')?.tenant.lastName}
+                      {
+                        selectedUnit.leases.find(
+                          (lease) => lease.status === "ACTIVE",
+                        )?.tenant.firstName
+                      }{" "}
+                      {
+                        selectedUnit.leases.find(
+                          (lease) => lease.status === "ACTIVE",
+                        )?.tenant.lastName
+                      }
                     </div>
                   </div>
                 ) : (

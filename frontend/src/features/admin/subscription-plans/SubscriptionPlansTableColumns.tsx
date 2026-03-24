@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import type { ColumnDef } from '@tanstack/react-table';
-import { StatusBadge } from '@/components/common/StatusBadge';
-import { formatCurrency, formatDate } from '@/lib/utils';
-import type { AdminSubscriptionPlan } from '@/types/domain.types';
+import type { ColumnDef } from "@tanstack/react-table";
+import { StatusBadge } from "@/components/common/StatusBadge";
+import { formatCurrency, formatDate } from "@/lib/utils";
+import type { AdminSubscriptionPlan } from "@/types/domain.types";
 
 export function getSubscriptionPlansColumns({
   onEdit,
@@ -14,46 +14,78 @@ export function getSubscriptionPlansColumns({
 }): ColumnDef<AdminSubscriptionPlan>[] {
   return [
     {
-      header: 'Plan Name',
-      id: 'name',
-      accessorKey: 'name',
-      cell: ({ row }) => <span className="font-semibold text-slate-900">{row.original.name}</span>,
-    },
-    {
-      header: 'Price / mo',
-      id: 'priceMonthly',
-      accessorKey: 'priceMonthly',
+      header: "Plan Name",
+      id: "name",
+      accessorKey: "name",
       cell: ({ row }) => (
-        <span className="text-slate-700">{formatCurrency(row.original.priceMonthly, 'PHP')}</span>
+        <span className="font-semibold text-slate-900">
+          {row.original.name}
+        </span>
       ),
     },
     {
-      header: 'Max Units',
-      id: 'maxUnits',
-      accessorKey: 'maxUnits',
-      cell: ({ row }) => <span className="text-slate-700">{row.original.maxUnits}</span>,
+      header: "Price / mo",
+      id: "priceMonthly",
+      accessorKey: "priceMonthly",
+      cell: ({ row }) => (
+        <span className="text-slate-700">
+          {formatCurrency(row.original.priceMonthly, "PHP")}
+        </span>
+      ),
     },
     {
-      header: 'Max Properties',
-      id: 'maxProperties',
-      accessorKey: 'maxProperties',
-      cell: ({ row }) => <span className="text-slate-700">{row.original.maxProperties}</span>,
+      header: "Max Units",
+      id: "maxUnits",
+      accessorKey: "maxUnits",
+      cell: ({ row }) => (
+        <span className="text-slate-700">{row.original.maxUnits}</span>
+      ),
     },
     {
-      header: 'Status',
-      id: 'status',
-      accessorKey: 'status',
+      header: "Max Units / Property",
+      id: "maxUnitsPerProperty",
+      accessorKey: "maxUnitsPerProperty",
+      cell: ({ row }) => (
+        <span className="text-slate-700">
+          {row.original.maxUnitsPerProperty ?? 0}
+        </span>
+      ),
+    },
+    {
+      header: "Max Properties",
+      id: "maxProperties",
+      accessorKey: "maxProperties",
+      cell: ({ row }) => (
+        <span className="text-slate-700">{row.original.maxProperties}</span>
+      ),
+    },
+    {
+      header: "Max Tenants",
+      id: "maxTenants",
+      accessorKey: "maxTenants",
+      cell: ({ row }) => (
+        <span className="text-slate-700">{row.original.maxTenants ?? 0}</span>
+      ),
+    },
+    {
+      header: "Status",
+      id: "status",
+      accessorKey: "status",
       cell: ({ row }) => <StatusBadge status={row.original.status} />,
     },
     {
-      header: 'Created',
-      id: 'createdAt',
-      accessorKey: 'createdAt',
-      cell: ({ row }) => <span className="text-slate-600">{formatDate(row.original.createdAt)}</span>,
+      header: "Created",
+      id: "createdAt",
+      accessorKey: "createdAt",
+      cell: ({ row }) => (
+        <span className="text-slate-600">
+          {formatDate(row.original.createdAt)}
+        </span>
+      ),
     },
     {
-      header: 'Actions',
-      id: 'actions',
+      header: "Actions",
+      id: "actions",
       enableSorting: false,
       cell: ({ row }) => (
         <div className="flex justify-center gap-2">
@@ -69,7 +101,7 @@ export function getSubscriptionPlansColumns({
             onClick={() => onToggleStatus(row.original)}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50"
           >
-            {row.original.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
+            {row.original.status === "ACTIVE" ? "Deactivate" : "Activate"}
           </button>
         </div>
       ),

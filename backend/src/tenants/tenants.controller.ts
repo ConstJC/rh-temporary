@@ -24,6 +24,11 @@ import { UserType } from '../generated/prisma/client';
 import type { JwtPayload } from '../auth/types';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OrgMemberGuard } from '../property-groups/guards/org-member.guard';
+import { PlanAccessGuard } from '../access-control/plan-access.guard';
+import { RequireMenu } from '../access-control/decorators/require-menu.decorator';
+import { RequirePermission } from '../access-control/decorators/require-permission.decorator';
+import { MENU_CODES } from '../access-control/constants/menu-codes';
+import { PERMISSION_CODES } from '../access-control/constants/permission-codes';
 import { TenantsService } from './tenants.service';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
@@ -31,14 +36,15 @@ import { ListTenantsQueryDto } from './dto/list-tenants-query.dto';
 
 @ApiTags('Tenants')
 @Controller('property-groups/:pgId/tenants')
-@UseGuards(JwtAuthGuard, UserTypeGuard)
+@UseGuards(JwtAuthGuard, UserTypeGuard, OrgMemberGuard, PlanAccessGuard)
 @UserTypes(UserType.LANDLORD, UserType.SYSTEM_ADMIN)
-@UseGuards(OrgMemberGuard)
 @ApiBearerAuth('JWT-auth')
 export class TenantsController {
   constructor(private readonly tenantsService: TenantsService) {}
 
   @Post()
+  @RequireMenu(MENU_CODES.LANDLORD_TENANTS)
+  @RequirePermission(PERMISSION_CODES.TENANT_CREATE)
   @ApiOperation({ summary: 'Create a tenant' })
   @ApiResponse({ status: 201, description: 'Tenant created' })
   @ApiResponse({ status: 402, description: 'Plan limit exceeded' })
@@ -52,6 +58,8 @@ export class TenantsController {
   }
 
   @Get()
+  @RequireMenu(MENU_CODES.LANDLORD_TENANTS)
+  @RequirePermission(PERMISSION_CODES.TENANT_VIEW)
   @ApiOperation({ summary: 'List tenants' })
   @ApiResponse({ status: 200, description: 'Paginated list with active lease' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -64,6 +72,8 @@ export class TenantsController {
   }
 
   @Get(':id')
+  @RequireMenu(MENU_CODES.LANDLORD_TENANTS)
+  @RequirePermission(PERMISSION_CODES.TENANT_VIEW)
   @ApiOperation({ summary: 'Get tenant detail with payment summary' })
   @ApiResponse({
     status: 200,
@@ -76,6 +86,8 @@ export class TenantsController {
   }
 
   @Patch(':id')
+  @RequireMenu(MENU_CODES.LANDLORD_TENANTS)
+  @RequirePermission(PERMISSION_CODES.TENANT_UPDATE)
   @ApiOperation({ summary: 'Update tenant' })
   @ApiResponse({ status: 200, description: 'Updated' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
@@ -90,6 +102,8 @@ export class TenantsController {
   }
 
   @Delete(':id')
+  @RequireMenu(MENU_CODES.LANDLORD_TENANTS)
+  @RequirePermission(PERMISSION_CODES.TENANT_DELETE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Soft delete a tenant' })
   @ApiResponse({ status: 204, description: 'Deleted' })

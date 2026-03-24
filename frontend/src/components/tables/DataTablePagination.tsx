@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
+import { cn } from "@/lib/utils";
 
 export function DataTablePagination({
   page,
@@ -22,13 +22,13 @@ export function DataTablePagination({
   return (
     <div
       className={cn(
-        'mt-3 flex flex-col gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between',
+        "mt-3 flex flex-col gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between",
         className,
       )}
     >
       <p className="text-xs text-slate-500">
-        Page <span className="font-semibold text-slate-700">{page}</span> of{' '}
-        <span className="font-semibold text-slate-700">{totalPages}</span> ·{' '}
+        Page <span className="font-semibold text-slate-700">{page}</span> of{" "}
+        <span className="font-semibold text-slate-700">{totalPages}</span> ·{" "}
         <span className="font-semibold text-slate-700">{total}</span> total
       </p>
 
@@ -53,4 +53,3 @@ export function DataTablePagination({
     </div>
   );
 }
-

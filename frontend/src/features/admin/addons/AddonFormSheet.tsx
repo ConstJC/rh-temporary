@@ -1,21 +1,24 @@
-'use client';
+"use client";
 
-import { useForm, useWatch } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { addonSchema, type AddonDto } from '@/lib/validations/admin.schema';
-import { useCreateAddon, useUpdateAddon } from '@/features/admin/hooks/useAdminAddons';
-import { SlideOver } from '@/components/common/SlideOver';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { addonSchema, type AddonDto } from "@/lib/validations/admin.schema";
+import {
+  useCreateAddon,
+  useUpdateAddon,
+} from "@/features/admin/hooks/useAdminAddons";
+import { SlideOver } from "@/components/common/SlideOver";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import type { AddonCatalog } from '@/types/domain.types';
+} from "@/components/ui/select";
+import type { AddonCatalog } from "@/types/domain.types";
 
 interface Props {
   addon?: AddonCatalog | null;
@@ -48,9 +51,9 @@ export function AddonFormSheet({ addon, isOpen, onClose }: Props) {
       : undefined,
   });
 
-  const billingType = useWatch({ control, name: 'billingType' });
-  const showRate = billingType === 'FLAT_FEE' || billingType === 'METERED';
-  const showUnit = billingType === 'METERED';
+  const billingType = useWatch({ control, name: "billingType" });
+  const showRate = billingType === "FLAT_FEE" || billingType === "METERED";
+  const showUnit = billingType === "METERED";
 
   const onSubmit = (data: AddonDto) => {
     if (isEdit) {
@@ -69,19 +72,27 @@ export function AddonFormSheet({ addon, isOpen, onClose }: Props) {
     <SlideOver
       open={isOpen}
       onClose={handleClose}
-      title={isEdit ? 'Edit Add-on' : 'Create Add-on'}
+      title={isEdit ? "Edit Add-on" : "Create Add-on"}
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <div className="space-y-1.5">
           <Label htmlFor="name">Add-on Name</Label>
-          <Input id="name" placeholder="e.g. WiFi, Water, Parking" {...register('name')} />
-          {errors.name && <p className="text-xs text-danger-600">{errors.name.message}</p>}
+          <Input
+            id="name"
+            placeholder="e.g. WiFi, Water, Parking"
+            {...register("name")}
+          />
+          {errors.name && (
+            <p className="text-xs text-danger-600">{errors.name.message}</p>
+          )}
         </div>
 
         <div className="space-y-1.5">
           <Label>Category</Label>
           <Select
-            onValueChange={(v: string) => setValue('category', v as AddonDto['category'])}
+            onValueChange={(v: string) =>
+              setValue("category", v as AddonDto["category"])
+            }
             defaultValue={addon?.category}
           >
             <SelectTrigger>
@@ -105,20 +116,26 @@ export function AddonFormSheet({ addon, isOpen, onClose }: Props) {
         <div className="space-y-1.5">
           <Label>Billing Type</Label>
           <Select
-            onValueChange={(v: string) => setValue('billingType', v as AddonDto['billingType'])}
+            onValueChange={(v: string) =>
+              setValue("billingType", v as AddonDto["billingType"])
+            }
             defaultValue={addon?.billingType}
           >
             <SelectTrigger>
               <SelectValue placeholder="Select billing type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="FIXED_AMENITY">Fixed Amenity (Included)</SelectItem>
+              <SelectItem value="FIXED_AMENITY">
+                Fixed Amenity (Included)
+              </SelectItem>
               <SelectItem value="FLAT_FEE">Flat Fee (Monthly)</SelectItem>
               <SelectItem value="METERED">Metered (Usage-based)</SelectItem>
             </SelectContent>
           </Select>
           {errors.billingType && (
-            <p className="text-xs text-danger-600">{errors.billingType.message}</p>
+            <p className="text-xs text-danger-600">
+              {errors.billingType.message}
+            </p>
           )}
         </div>
 
@@ -130,10 +147,12 @@ export function AddonFormSheet({ addon, isOpen, onClose }: Props) {
               type="number"
               step="0.01"
               placeholder="0.00"
-              {...register('defaultRate', { valueAsNumber: true })}
+              {...register("defaultRate", { valueAsNumber: true })}
             />
             {errors.defaultRate && (
-              <p className="text-xs text-danger-600">{errors.defaultRate.message}</p>
+              <p className="text-xs text-danger-600">
+                {errors.defaultRate.message}
+              </p>
             )}
           </div>
         )}
@@ -144,20 +163,35 @@ export function AddonFormSheet({ addon, isOpen, onClose }: Props) {
             <Input
               id="unitOfMeasure"
               placeholder="e.g. kWh, cubic meter, kg"
-              {...register('unitOfMeasure')}
+              {...register("unitOfMeasure")}
             />
             {errors.unitOfMeasure && (
-              <p className="text-xs text-danger-600">{errors.unitOfMeasure.message}</p>
+              <p className="text-xs text-danger-600">
+                {errors.unitOfMeasure.message}
+              </p>
             )}
           </div>
         )}
 
         <div className="flex gap-3 pt-4">
-          <Button type="button" variant="outline" onClick={handleClose} className="flex-1">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleClose}
+            className="flex-1"
+          >
             Cancel
           </Button>
-          <Button type="submit" disabled={isCreating || isUpdating} className="flex-1">
-            {isCreating || isUpdating ? 'Saving...' : isEdit ? 'Update' : 'Create'}
+          <Button
+            type="submit"
+            disabled={isCreating || isUpdating}
+            className="flex-1"
+          >
+            {isCreating || isUpdating
+              ? "Saving..."
+              : isEdit
+                ? "Update"
+                : "Create"}
           </Button>
         </div>
       </form>

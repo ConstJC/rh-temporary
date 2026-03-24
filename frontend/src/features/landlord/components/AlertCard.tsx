@@ -1,10 +1,9 @@
-'use client';
+"use client";
 
-import { AlertCircle, AlertTriangle, Info } from 'lucide-react';
-import { StatusBadge } from '@/components/common/StatusBadge';
+import { AlertCircle, AlertTriangle, Info } from "lucide-react";
 
 interface AlertCardProps {
-  type: 'error' | 'warning' | 'info';
+  type: "error" | "warning" | "info";
   title: string;
   message: string;
   action?: {
@@ -17,31 +16,38 @@ export function AlertCard({ type, title, message, action }: AlertCardProps) {
   const config = {
     error: {
       icon: AlertCircle,
-      bgColor: 'bg-red-50',
-      borderColor: 'border-red-200',
-      iconColor: 'text-red-600',
-      titleColor: 'text-red-900',
-      messageColor: 'text-red-700',
+      bgColor: "bg-red-50",
+      borderColor: "border-red-200",
+      iconColor: "text-red-600",
+      titleColor: "text-red-900",
+      messageColor: "text-red-700",
     },
     warning: {
       icon: AlertTriangle,
-      bgColor: 'bg-yellow-50',
-      borderColor: 'border-yellow-200',
-      iconColor: 'text-yellow-600',
-      titleColor: 'text-yellow-900',
-      messageColor: 'text-yellow-700',
+      bgColor: "bg-yellow-50",
+      borderColor: "border-yellow-200",
+      iconColor: "text-yellow-600",
+      titleColor: "text-yellow-900",
+      messageColor: "text-yellow-700",
     },
     info: {
       icon: Info,
-      bgColor: 'bg-blue-50',
-      borderColor: 'border-blue-200',
-      iconColor: 'text-blue-600',
-      titleColor: 'text-blue-900',
-      messageColor: 'text-blue-700',
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      iconColor: "text-blue-600",
+      titleColor: "text-blue-900",
+      messageColor: "text-blue-700",
     },
   };
 
-  const { icon: Icon, bgColor, borderColor, iconColor, titleColor, messageColor } = config[type];
+  const {
+    icon: Icon,
+    bgColor,
+    borderColor,
+    iconColor,
+    titleColor,
+    messageColor,
+  } = config[type];
 
   return (
     <div className={`${bgColor} border ${borderColor} rounded-lg p-4`}>

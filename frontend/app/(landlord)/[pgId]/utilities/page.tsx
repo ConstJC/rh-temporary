@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { PageHeader } from '@/components/common/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { StatusBadge } from '@/components/common/StatusBadge';
+import { PageHeader } from "@/components/common/PageHeader";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { StatusBadge } from "@/components/common/StatusBadge";
 
 export default function UtilitiesPage() {
   return (
@@ -22,12 +22,16 @@ export default function UtilitiesPage() {
         <CardContent className="space-y-3 text-sm text-slate-700">
           <p>Planned backend endpoints:</p>
           <ul className="list-disc space-y-1 pl-5">
-            <li>POST/GET <code>/property-groups/:pgId/utility-readings</code></li>
-            <li>POST <code>/property-groups/:pgId/billing/generate</code></li>
+            <li>
+              POST/GET <code>/property-groups/:pgId/utility-readings</code>
+            </li>
+            <li>
+              POST <code>/property-groups/:pgId/billing/generate</code>
+            </li>
           </ul>
           <p>
-            Guardrails to enforce in backend: no negative usage, no duplicate period readings,
-            and strict org-scoped access.
+            Guardrails to enforce in backend: no negative usage, no duplicate
+            period readings, and strict org-scoped access.
           </p>
         </CardContent>
       </Card>

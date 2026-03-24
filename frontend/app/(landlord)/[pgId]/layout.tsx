@@ -1,5 +1,5 @@
-import { PropertyGroupProvider } from '@/hooks/usePropertyGroup';
-import { AppShell } from '@/components/layout/AppShell';
+import { PropertyGroupProvider } from "@/hooks/usePropertyGroup";
+import { AppShell } from "@/components/layout/AppShell";
 
 export default async function PropertyGroupLayout({
   children,

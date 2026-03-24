@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import { DataTable } from '@/components/tables/DataTable';
-import { DataTablePagination } from '@/components/tables/DataTablePagination';
-import { EmptyState } from '@/components/common/EmptyState';
-import { TableSkeleton } from '@/components/common/LoadingSkeleton';
-import { usePagination } from '@/hooks/usePagination';
-import { useAuditLog } from '@/features/admin/hooks/useAuditLog';
-import { getAuditColumns } from './AuditLogTableColumns';
-import type { AuditAction, AuditLogEntry } from '@/types/domain.types';
-import { AuditFilters } from './AuditFilters';
-import { AuditDetailSlideOver } from './AuditDetailSlideOver';
-import { Button } from '@/components/ui/button';
-import { RefreshCw } from 'lucide-react';
+import { useMemo, useState } from "react";
+import { DataTable } from "@/components/tables/DataTable";
+import { DataTablePagination } from "@/components/tables/DataTablePagination";
+import { EmptyState } from "@/components/common/EmptyState";
+import { TableSkeleton } from "@/components/common/LoadingSkeleton";
+import { usePagination } from "@/hooks/usePagination";
+import { useAuditLog } from "@/features/admin/hooks/useAuditLog";
+import { getAuditColumns } from "./AuditLogTableColumns";
+import type { AuditAction, AuditLogEntry } from "@/types/domain.types";
+import { AuditFilters } from "./AuditFilters";
+import { AuditDetailSlideOver } from "./AuditDetailSlideOver";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 
 export function AuditLogTable() {
   const pagination = usePagination({ page: 1, limit: 50 });
 
-  const [tableName, setTableName] = useState('');
-  const [action, setAction] = useState<AuditAction | ''>('');
-  const [dateFrom, setDateFrom] = useState('');
-  const [dateTo, setDateTo] = useState('');
+  const [tableName, setTableName] = useState("");
+  const [action, setAction] = useState<AuditAction | "">("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const query = useAuditLog({
     page: pagination.page,
@@ -32,7 +32,11 @@ export function AuditLogTable() {
   });
 
   const rows = query.data?.data ?? [];
-  const meta = query.data?.meta ?? { total: 0, page: pagination.page, limit: pagination.limit };
+  const meta = query.data?.meta ?? {
+    total: 0,
+    page: pagination.page,
+    limit: pagination.limit,
+  };
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [selected, setSelected] = useState<AuditLogEntry | null>(null);
@@ -73,7 +77,9 @@ export function AuditLogTable() {
           }}
           disabled={query.isFetching}
         >
-          <RefreshCw className={`mr-2 h-4 w-4 ${query.isFetching ? 'animate-spin' : ''}`} />
+          <RefreshCw
+            className={`mr-2 h-4 w-4 ${query.isFetching ? "animate-spin" : ""}`}
+          />
           Refresh
         </Button>
       </div>
@@ -81,7 +87,10 @@ export function AuditLogTable() {
       {query.isLoading ? (
         <TableSkeleton rows={8} />
       ) : rows.length === 0 ? (
-        <EmptyState title="No audit entries found" description="Try adjusting your filters." />
+        <EmptyState
+          title="No audit entries found"
+          description="Try adjusting your filters."
+        />
       ) : (
         <>
           <DataTable
@@ -102,7 +111,11 @@ export function AuditLogTable() {
         </>
       )}
 
-      <AuditDetailSlideOver entry={selected} open={detailOpen} onClose={() => setDetailOpen(false)} />
+      <AuditDetailSlideOver
+        entry={selected}
+        open={detailOpen}
+        onClose={() => setDetailOpen(false)}
+      />
     </div>
   );
 }

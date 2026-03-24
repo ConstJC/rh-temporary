@@ -1,40 +1,44 @@
-import { Suspense } from 'react';
-import { LoginForm } from '@/features/auth/LoginForm';
-import Link from 'next/link';
-import { getServerSession } from 'next-auth';
-import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth.config';
+import { Suspense } from "react";
+import { LoginForm } from "@/features/auth/LoginForm";
+import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "@/lib/auth.config";
+import { AuthSplitShell } from "@/features/auth/AuthSplitShell";
 
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
-  const user = session?.user as { role?: string; userType?: string } | undefined;
+  const user = session?.user as
+    | { role?: string; userType?: string }
+    | undefined;
 
   if (session?.user) {
-    if (user?.role === 'ADMIN' && user?.userType === 'SYSTEM_ADMIN') redirect('/dashboard');
-    if (user?.userType === 'TENANT') redirect('/tenant-use-mobile');
-    redirect('/');
+    if (user?.role === "ADMIN" && user?.userType === "SYSTEM_ADMIN")
+      redirect("/dashboard");
+    if (user?.userType === "TENANT") redirect("/tenant-use-mobile");
+    redirect("/");
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-semibold text-slate-900">RentHub</h1>
-        <p className="mt-1 text-sm text-slate-500">Sign in to your account</p>
-      </div>
-      <Suspense fallback={<div className="animate-pulse rounded bg-slate-200 py-8" />}>
+    <AuthSplitShell
+      title="Sign In"
+      description="Enter your credentials to access your rental management dashboard."
+    >
+      <Suspense
+        fallback={<div className="animate-pulse rounded bg-slate-200 py-10" />}
+      >
         <LoginForm />
       </Suspense>
-      <p className="mt-4 text-center text-sm text-slate-600">
-        Don&apos;t have an account?{' '}
-        <Link href="/register" className="font-medium text-accent-500 hover:text-accent-600 hover:underline">
-          Register
+
+      <p className="mt-6 text-center text-sm text-slate-600">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/register"
+          className="font-semibold text-primary-700 hover:text-primary-600 hover:underline"
+        >
+          Sign Up
         </Link>
       </p>
-      <p className="mt-2 text-center text-sm">
-        <Link href="/forgot-password" className="text-slate-500 hover:underline">
-          Forgot password?
-        </Link>
-      </p>
-    </div>
+    </AuthSplitShell>
   );
 }
