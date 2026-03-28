@@ -13,6 +13,8 @@ import type {
 } from "@/types/domain.types";
 import type {
   AddonDto,
+  CreateAdminPropertyGroupDto,
+  CreateAdminUserDto,
   SubscriptionPlanDto,
 } from "@/lib/validations/admin.schema";
 
@@ -88,6 +90,9 @@ export const adminApi = {
       .get<AdminPropertyGroupDetail>(`/admin/property-groups/${id}/details`)
       .then((r) => r.data),
 
+  createPropertyGroup: (data: CreateAdminPropertyGroupDto) =>
+    apiClient.post("/admin/property-groups", data).then((r) => r.data.data),
+
   updatePropertyGroup: (
     id: string,
     data: {
@@ -146,6 +151,9 @@ export const adminApi = {
     apiClient
       .get<PaginatedResponse<AdminUser>>("/admin/users", { params: filters })
       .then((r) => r.data),
+
+  createUser: (data: CreateAdminUserDto) =>
+    apiClient.post("/admin/users", data).then((r) => r.data.data),
 
   updateUser: (id: string, data: { isActive?: boolean; userType?: UserType }) =>
     apiClient.patch(`/admin/users/${id}`, data).then((r) => r.data),

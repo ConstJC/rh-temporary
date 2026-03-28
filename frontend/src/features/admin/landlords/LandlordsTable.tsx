@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
 export function LandlordsTable() {
+  const [selectedCount, setSelectedCount] = useState(0);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"ALL" | "ACTIVE" | "SUSPENDED">("ALL");
   const debouncedSearch = useDebounce(search, 300);
@@ -34,7 +35,6 @@ export function LandlordsTable() {
   });
 
   const rows = query.data?.data ?? [];
-  console.log(rows);
   const meta = query.data?.meta ?? {
     total: 0,
     page: pagination.page,
@@ -111,12 +111,18 @@ export function LandlordsTable() {
         />
       ) : (
         <>
-          <DataTable columns={columns} data={rows} />
+          <DataTable
+            columns={columns}
+            data={rows}
+            onRowSelectionChange={(selected) => setSelectedCount(selected)}
+          />
           <DataTablePagination
             page={meta.page}
             limit={meta.limit}
             total={meta.total}
             onPageChange={(p) => pagination.setPage(p)}
+            onLimitChange={(nextLimit) => pagination.setLimit(nextLimit)}
+            selectedCount={selectedCount}
           />
         </>
       )}

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { adminApi, type PropertyGroupFilters } from "@/lib/api/admin.api";
+import type { CreateAdminPropertyGroupDto } from "@/lib/validations/admin.schema";
 
 export const adminPropertyGroupKeys = {
   all: () => ["adminPropertyGroups"] as const,
@@ -72,5 +73,20 @@ export function useUpdatePropertyGroup() {
       toast.success("Property group updated");
     },
     onError: () => toast.error("Failed to update property group"),
+  });
+}
+
+export function useCreateAdminPropertyGroup() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateAdminPropertyGroupDto) =>
+      adminApi.createPropertyGroup(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: adminPropertyGroupKeys.all() });
+      qc.invalidateQueries({ queryKey: ["adminUsers"] });
+      toast.success("Property group created successfully");
+    },
+    onError: (err: Error) =>
+      toast.error(err.message || "Failed to create property group"),
   });
 }

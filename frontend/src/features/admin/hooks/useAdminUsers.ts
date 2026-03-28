@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { adminApi, type UserFilters } from "@/lib/api/admin.api";
 import type { UserType } from "@/types/domain.types";
+import type { CreateAdminUserDto } from "@/lib/validations/admin.schema";
 
 export const adminUserKeys = {
   all: () => ["adminUsers"] as const,
@@ -40,5 +41,20 @@ export function useUpdateUserType() {
       toast.success("User type updated");
     },
     onError: () => toast.error("Failed to update user type"),
+  });
+}
+
+export function useCreateAdminUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateAdminUserDto) => adminApi.createUser(data),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: adminUserKeys.all() });
+      if (vars.userType === "LANDLORD") {
+        qc.invalidateQueries({ queryKey: ["adminPropertyGroups"] });
+      }
+      toast.success("User created successfully");
+    },
+    onError: (err: Error) => toast.error(err.message || "Failed to create user"),
   });
 }

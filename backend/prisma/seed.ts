@@ -157,6 +157,21 @@ const planPermissionMatrix: Record<string, readonly string[]> = {
     Enterprise: permissionCatalogSeed.map((permission) => permission.code),
 }
 
+type BillingCycle = 'MONTHLY' | 'QUARTERLY' | 'YEARLY'
+
+const billingCycleMonths: Record<BillingCycle, number> = {
+    MONTHLY: 1,
+    QUARTERLY: 3,
+    YEARLY: 12,
+}
+
+function estimateSubscriptionEndsAt(startedAt: Date, billingCycle: BillingCycle) {
+    const endsAt = new Date(startedAt)
+    endsAt.setUTCMonth(endsAt.getUTCMonth() + billingCycleMonths[billingCycle])
+    endsAt.setUTCDate(endsAt.getUTCDate() - 1)
+    return endsAt
+}
+
 async function main() {
     console.log('🌱  Starting RentHub seed...\n')
 
@@ -364,6 +379,15 @@ async function main() {
         },
     })
 
+    const landlord3 = await prisma.user.create({
+        data: {
+            email: 'landlord3@renthub.com', password: HASH,
+            firstName: 'Carlos', lastName: 'Lim',
+            role: UserRole.USER, userType: UserType.LANDLORD,
+            phone: '09172223333', isEmailVerified: true,
+        },
+    })
+
     const staffUser = await prisma.user.create({
         data: {
             email: 'staff@renthub.com', password: HASH,
@@ -391,7 +415,7 @@ async function main() {
         },
     })
 
-    console.log('   ✓ 6 users\n')
+    console.log('   ✓ 7 users\n')
 
     // ── 5. Property Groups ─────────────────────────────────────────────────────
     console.log('🏢  Creating property groups...')
@@ -404,7 +428,11 @@ async function main() {
         data: { groupName: 'Santos Residences', currencyCode: 'PHP', timezone: 'Asia/Manila', createdBy: landlord2.id },
     })
 
-    console.log('   ✓ 2 property groups\n')
+    const pg3 = await prisma.propertyGroup.create({
+        data: { groupName: 'Lim Property Holdings', currencyCode: 'PHP', timezone: 'Asia/Manila', createdBy: landlord3.id },
+    })
+
+    console.log('   ✓ 3 property groups\n')
 
     // ── 6. Members ─────────────────────────────────────────────────────────────
     console.log('👥  Assigning members...')
@@ -414,28 +442,83 @@ async function main() {
             { propertyGroupId: pg1.id, userId: landlord1.id, roleId: roleOwner.id },
             { propertyGroupId: pg1.id, userId: staffUser.id, roleId: roleAdmin.id },
             { propertyGroupId: pg2.id, userId: landlord2.id, roleId: roleOwner.id },
+            { propertyGroupId: pg3.id, userId: landlord3.id, roleId: roleOwner.id },
         ],
     })
 
-    console.log('   ✓ 3 members\n')
+    console.log('   ✓ 4 members\n')
 
     // ── 7. Subscriptions ───────────────────────────────────────────────────────
     console.log('📋  Creating subscriptions...')
 
-    await prisma.subscription.createMany({
-        data: [
-            {
-                propertyGroupId: pg1.id, subscriptionPlanId: planBasic.id,
-                startedAt: new Date('2026-01-01'), status: SubscriptionStatus.ACTIVE,
-            },
-            {
-                propertyGroupId: pg2.id, subscriptionPlanId: planFree.id,
-                startedAt: new Date('2026-01-15'), status: SubscriptionStatus.ACTIVE,
-            },
-        ],
-    })
+    const planPro = planByName.get('Pro')
+    if (!planPro) {
+        throw new Error('Missing required seeded plan: Pro')
+    }
 
-    console.log('   ✓ 2 subscriptions\n')
+    const now = new Date()
+    const startOfCurrentMonthUtc = new Date(Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        1,
+        0,
+        0,
+        0,
+        0,
+    ))
+
+    const monthlyStartedAt = new Date(startOfCurrentMonthUtc)
+    const quarterlyStartedAt = new Date(startOfCurrentMonthUtc)
+    quarterlyStartedAt.setUTCMonth(quarterlyStartedAt.getUTCMonth() - 1)
+    const yearlyStartedAt = new Date(startOfCurrentMonthUtc)
+    yearlyStartedAt.setUTCMonth(yearlyStartedAt.getUTCMonth() - 6)
+
+    const seededSubscriptions: Array<{
+        propertyGroupId: string
+        subscriptionPlanId: string
+        billingCycle: BillingCycle
+        startedAt: Date
+    }> = [
+        {
+            propertyGroupId: pg1.id,
+            subscriptionPlanId: planFree.id,
+            billingCycle: 'MONTHLY',
+            startedAt: monthlyStartedAt,
+        },
+        {
+            propertyGroupId: pg2.id,
+            subscriptionPlanId: planBasic.id,
+            billingCycle: 'QUARTERLY',
+            startedAt: quarterlyStartedAt,
+        },
+        {
+            propertyGroupId: pg3.id,
+            subscriptionPlanId: planPro.id,
+            billingCycle: 'YEARLY',
+            startedAt: yearlyStartedAt,
+        },
+    ]
+
+    for (const subscription of seededSubscriptions) {
+        const endsAt = estimateSubscriptionEndsAt(
+            subscription.startedAt,
+            subscription.billingCycle,
+        )
+        const status =
+            endsAt >= now ? SubscriptionStatus.ACTIVE : SubscriptionStatus.EXPIRED
+
+        await prisma.subscription.create({
+            data: {
+                propertyGroupId: subscription.propertyGroupId,
+                subscriptionPlanId: subscription.subscriptionPlanId,
+                startedAt: subscription.startedAt,
+                endsAt,
+                status,
+            },
+        })
+    }
+
+    console.log('   ✓ 3 subscriptions (monthly, quarterly, yearly) with estimated endsAt\n')
 
     // ── 8. Properties ──────────────────────────────────────────────────────────
     console.log('🏠  Creating properties...')
@@ -892,6 +975,7 @@ async function main() {
     console.log('  SYSTEM_ADMIN  admin@renthub.com')
     console.log('  LANDLORD      landlord1@renthub.com')
     console.log('  LANDLORD      landlord2@renthub.com')
+    console.log('  LANDLORD      landlord3@renthub.com')
     console.log('  STAFF         staff@renthub.com')
     console.log('  TENANT        tenant1@renthub.com')
     console.log('  TENANT        tenant2@renthub.com')

@@ -57,3 +57,82 @@ export const subscriptionPlanSchema = z.object({
   permissionCodes: z.array(z.string()).default([]),
 });
 export type SubscriptionPlanDto = z.infer<typeof subscriptionPlanSchema>;
+
+export const createAdminPropertyGroupSchema = z.object({
+  groupName: z
+    .string()
+    .trim()
+    .min(2, "Property group name is required")
+    .max(255, "Property group name is too long"),
+  currencyCode: z
+    .string()
+    .trim()
+    .min(3, "Currency code must be at least 3 characters")
+    .max(10, "Currency code is too long"),
+  timezone: z
+    .string()
+    .trim()
+    .min(2, "Timezone is required")
+    .max(64, "Timezone is too long"),
+  ownerUserId: z.string().min(1, "Select a landlord owner"),
+});
+export type CreateAdminPropertyGroupDto = z.infer<
+  typeof createAdminPropertyGroupSchema
+>;
+
+const createAdminUserPropertyGroupSchema = z.object({
+  groupName: z
+    .string()
+    .trim()
+    .min(2, "Property group name is required")
+    .max(255, "Property group name is too long"),
+  currencyCode: z
+    .string()
+    .trim()
+    .min(3, "Currency code must be at least 3 characters")
+    .max(10, "Currency code is too long"),
+  timezone: z
+    .string()
+    .trim()
+    .min(2, "Timezone is required")
+    .max(64, "Timezone is too long"),
+});
+
+export const createAdminUserSchema = z
+  .object({
+    firstName: z
+      .string()
+      .trim()
+      .min(2, "First name is required")
+      .max(50, "First name is too long"),
+    lastName: z
+      .string()
+      .trim()
+      .min(2, "Last name is required")
+      .max(50, "Last name is too long"),
+    email: z.string().trim().email("Enter a valid email address"),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(128, "Password is too long"),
+    role: z.enum(["ADMIN", "USER"]),
+    userType: z.enum(["SYSTEM_ADMIN", "LANDLORD", "TENANT"]),
+    isActive: z.boolean(),
+    phone: z
+      .string()
+      .trim()
+      .max(32, "Phone number is too long")
+      .optional()
+      .or(z.literal("")),
+    propertyGroup: createAdminUserPropertyGroupSchema.optional(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.userType === "LANDLORD" && !value.propertyGroup) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Property group details are required for landlord users",
+        path: ["propertyGroup"],
+      });
+    }
+  });
+export type CreateAdminUserDto = z.infer<typeof createAdminUserSchema>;

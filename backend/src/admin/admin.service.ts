@@ -6,10 +6,12 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import {
   AuditAction,
+  UserRole,
   UserType,
   SubscriptionStatus,
 } from '../generated/prisma/client';
 import { createAuditTrail } from '../common/helpers/audit.helper';
+import * as bcrypt from 'bcrypt';
 
 type Order = 'asc' | 'desc';
 
@@ -17,9 +19,111 @@ function formatPgCode(pgNumber: number) {
   return `PG-${String(pgNumber).padStart(3, '0')}`;
 }
 
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
 @Injectable()
 export class AdminService {
   constructor(private prisma: PrismaService) {}
+
+  private async createPropertyGroupForOwnerTx(
+    tx: any,
+    params: {
+      actorUserId: string | null;
+      ownerUserId: string;
+      groupName: string;
+      currencyCode?: string;
+      timezone?: string;
+    },
+  ) {
+    const ownerRole = await tx.orgRole.findFirst({
+      where: { code: 'OWNER', deletedAt: null },
+      select: { id: true },
+    });
+    if (!ownerRole) {
+      throw new BadRequestException('OWNER org role not found. Run seed.');
+    }
+
+    const freePlan = await tx.subscriptionPlan.findFirst({
+      where: { planName: 'Free', deletedAt: null },
+      select: { id: true },
+    });
+    if (!freePlan) {
+      throw new BadRequestException(
+        'Default Free subscription plan not found. Run seed.',
+      );
+    }
+
+    const groupName = params.groupName.trim();
+    if (!groupName) {
+      throw new BadRequestException('Property group name is required');
+    }
+
+    const currencyCode = (params.currencyCode ?? 'PHP').trim().toUpperCase();
+    const timezone = (params.timezone ?? 'Asia/Manila').trim();
+
+    const existingActiveGroup = await tx.propertyGroup.findFirst({
+      where: {
+        createdBy: params.ownerUserId,
+        deletedAt: null,
+      },
+      select: { id: true },
+    });
+    if (existingActiveGroup) {
+      throw new BadRequestException(
+        'Selected landlord owner already has an active property group',
+      );
+    }
+
+    const group = await tx.propertyGroup.create({
+      data: {
+        groupName,
+        currencyCode,
+        timezone,
+        createdBy: params.ownerUserId,
+      },
+      select: {
+        id: true,
+        pgNumber: true,
+        groupName: true,
+        currencyCode: true,
+        timezone: true,
+      },
+    });
+
+    await tx.propertyGroupMember.create({
+      data: {
+        propertyGroupId: group.id,
+        userId: params.ownerUserId,
+        roleId: ownerRole.id,
+      },
+    });
+
+    await tx.subscription.create({
+      data: {
+        propertyGroupId: group.id,
+        subscriptionPlanId: freePlan.id,
+        startedAt: new Date(),
+        status: 'ACTIVE',
+      },
+    });
+
+    await createAuditTrail(tx as any, {
+      userId: params.actorUserId,
+      action: AuditAction.INSERT,
+      tableName: 'property_groups',
+      recordId: group.id,
+      newValues: {
+        groupName: group.groupName,
+        currencyCode: group.currencyCode,
+        timezone: group.timezone,
+        createdBy: params.ownerUserId,
+      } as any,
+    });
+
+    return group;
+  }
 
   private mapPropertyGroupSummary(group: {
     id: string;
@@ -281,6 +385,128 @@ export class AdminService {
     };
   }
 
+  async createUser(
+    currentUserId: string,
+    data: {
+      firstName: string;
+      lastName: string;
+      email: string;
+      password: string;
+      role?: UserRole;
+      userType: UserType;
+      isActive?: boolean;
+      phone?: string;
+      propertyGroup?: {
+        groupName: string;
+        currencyCode?: string;
+        timezone?: string;
+      };
+    },
+  ) {
+    const email = normalizeEmail(data.email);
+    const firstName = data.firstName.trim();
+    const lastName = data.lastName.trim();
+    const phone = data.phone?.trim() || null;
+    const shouldCreatePropertyGroup = data.userType === UserType.LANDLORD;
+
+    if (shouldCreatePropertyGroup && !data.propertyGroup?.groupName?.trim()) {
+      throw new BadRequestException(
+        'Property group is required when userType is LANDLORD',
+      );
+    }
+    if (!shouldCreatePropertyGroup && data.propertyGroup) {
+      throw new BadRequestException(
+        'Property group can only be provided for LANDLORD userType',
+      );
+    }
+
+    const existing = await this.prisma.user.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new BadRequestException('Email already exists');
+    }
+
+    const passwordHash = await bcrypt.hash(data.password, 12);
+
+    const created = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email,
+          password: passwordHash,
+          firstName,
+          lastName,
+          role:
+            data.role ??
+            (data.userType === UserType.SYSTEM_ADMIN
+              ? UserRole.ADMIN
+              : UserRole.USER),
+          userType: data.userType,
+          phone,
+          isActive: data.isActive ?? true,
+          isEmailVerified: true,
+        },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          role: true,
+          userType: true,
+          isActive: true,
+          isEmailVerified: true,
+          phone: true,
+          createdAt: true,
+        },
+      });
+
+      await createAuditTrail(tx as any, {
+        userId: currentUserId,
+        action: AuditAction.INSERT,
+        tableName: 'users',
+        recordId: user.id,
+        newValues: {
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          role: user.role,
+          userType: user.userType,
+          isActive: user.isActive,
+        } as any,
+      });
+
+      let propertyGroupId: string | null = null;
+      if (shouldCreatePropertyGroup) {
+        const group = await this.createPropertyGroupForOwnerTx(tx, {
+          actorUserId: currentUserId,
+          ownerUserId: user.id,
+          groupName: data.propertyGroup!.groupName,
+          currencyCode: data.propertyGroup?.currencyCode,
+          timezone: data.propertyGroup?.timezone,
+        });
+        propertyGroupId = group.id;
+      }
+
+      return { user, propertyGroupId };
+    });
+
+    return {
+      id: created.user.id,
+      email: created.user.email,
+      firstName: created.user.firstName,
+      lastName: created.user.lastName,
+      role: created.user.role,
+      userType: created.user.userType,
+      isActive: created.user.isActive,
+      isEmailVerified: created.user.isEmailVerified,
+      phone: created.user.phone,
+      createdAt: created.user.createdAt.toISOString(),
+      lastLoginAt: null,
+      _count: { propertyGroups: created.propertyGroupId ? 1 : 0 },
+    };
+  }
+
   async updateUser(
     currentUserId: string,
     id: string,
@@ -335,6 +561,101 @@ export class AdminService {
       lastLoginAt: null,
       _count: { propertyGroups },
     };
+  }
+
+  async createPropertyGroup(
+    currentUserId: string,
+    data: {
+      groupName: string;
+      currencyCode?: string;
+      timezone?: string;
+      ownerUserId: string;
+    },
+  ) {
+    const owner = await this.prisma.user.findUnique({
+      where: { id: data.ownerUserId },
+      select: {
+        id: true,
+        userType: true,
+        isActive: true,
+        deletedAt: true,
+      },
+    });
+
+    if (!owner || owner.deletedAt) {
+      throw new NotFoundException('Landlord owner not found');
+    }
+    if (owner.userType !== UserType.LANDLORD) {
+      throw new BadRequestException(
+        'Selected owner must be a LANDLORD account',
+      );
+    }
+    if (!owner.isActive) {
+      throw new BadRequestException(
+        'Selected landlord owner account is inactive',
+      );
+    }
+
+    const group = await this.prisma.$transaction(async (tx) => {
+      return this.createPropertyGroupForOwnerTx(tx, {
+        actorUserId: currentUserId,
+        ownerUserId: owner.id,
+        groupName: data.groupName,
+        currencyCode: data.currencyCode,
+        timezone: data.timezone,
+      });
+    });
+
+    const createdGroup = await this.prisma.propertyGroup.findUnique({
+      where: { id: group.id },
+      select: {
+        id: true,
+        pgNumber: true,
+        groupName: true,
+        currencyCode: true,
+        timezone: true,
+        createdAt: true,
+        deletedAt: true,
+        creator: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            isActive: true,
+          },
+        },
+        members: { where: { deletedAt: null }, select: { id: true } },
+        properties: {
+          where: { deletedAt: null },
+          select: { id: true, _count: { select: { units: true } } },
+        },
+        subscriptions: {
+          where: { deletedAt: null },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: {
+            status: true,
+            endsAt: true,
+            subscriptionPlan: {
+              select: {
+                planName: true,
+                unitLimit: true,
+                unitLimitPerProperty: true,
+                propertyLimit: true,
+                tenantLimit: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!createdGroup) {
+      throw new NotFoundException('Property group not found after creation');
+    }
+
+    return this.mapPropertyGroupSummary(createdGroup);
   }
 
   async getPropertyGroups(params: {

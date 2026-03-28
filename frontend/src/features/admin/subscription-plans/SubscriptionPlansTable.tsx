@@ -23,6 +23,7 @@ import { DeleteOrDeactivatePlanDialog } from "./DeleteOrDeactivatePlanDialog";
 import { RefreshCw } from "lucide-react";
 
 export function SubscriptionPlansTable() {
+  const [selectedCount, setSelectedCount] = useState(0);
   const [search, setSearch] = useState("");
   const [includeInactive, setIncludeInactive] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
@@ -146,12 +147,18 @@ export function SubscriptionPlansTable() {
         />
       ) : (
         <>
-          <DataTable columns={columns} data={rows} />
+          <DataTable
+            columns={columns}
+            data={rows}
+            onRowSelectionChange={(selected) => setSelectedCount(selected)}
+          />
           <DataTablePagination
             page={meta.page}
             limit={meta.limit}
             total={meta.total}
             onPageChange={(p) => pagination.setPage(p)}
+            onLimitChange={(nextLimit) => pagination.setLimit(nextLimit)}
+            selectedCount={selectedCount}
           />
         </>
       )}

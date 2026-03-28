@@ -25,6 +25,7 @@ function expiringIn7Days(expiresAt: string | null) {
 }
 
 export function SubscriptionsTable() {
+  const [selectedCount, setSelectedCount] = useState(0);
   const [status, setStatus] = useState<SubStatus | "">("");
   const [plan, setPlan] = useState("");
   const debouncedPlan = useDebounce(plan, 300);
@@ -164,12 +165,18 @@ export function SubscriptionsTable() {
               />
             ) : (
               <>
-                <DataTable columns={columns} data={rows} />
+                <DataTable
+                  columns={columns}
+                  data={rows}
+                  onRowSelectionChange={(selected) => setSelectedCount(selected)}
+                />
                 <DataTablePagination
                   page={meta.page}
                   limit={meta.limit}
                   total={meta.total}
                   onPageChange={(p) => pagination.setPage(p)}
+                  onLimitChange={(nextLimit) => pagination.setLimit(nextLimit)}
+                  selectedCount={selectedCount}
                 />
               </>
             )}

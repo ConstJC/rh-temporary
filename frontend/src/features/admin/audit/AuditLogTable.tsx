@@ -16,6 +16,7 @@ import { RefreshCw } from "lucide-react";
 
 export function AuditLogTable() {
   const pagination = usePagination({ page: 1, limit: 50 });
+  const [selectedCount, setSelectedCount] = useState(0);
 
   const [tableName, setTableName] = useState("");
   const [action, setAction] = useState<AuditAction | "">("");
@@ -96,6 +97,7 @@ export function AuditLogTable() {
           <DataTable
             columns={columns}
             data={rows}
+            onRowSelectionChange={(selected) => setSelectedCount(selected)}
             onRowClick={(r) => {
               setSelected(r);
               setDetailOpen(true);
@@ -107,6 +109,8 @@ export function AuditLogTable() {
             limit={meta.limit}
             total={meta.total}
             onPageChange={(p) => pagination.setPage(p)}
+            onLimitChange={(nextLimit) => pagination.setLimit(nextLimit)}
+            selectedCount={selectedCount}
           />
         </>
       )}

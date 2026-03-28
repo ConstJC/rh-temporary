@@ -19,6 +19,7 @@ import { RefreshCw } from "lucide-react";
 export function UsersTable() {
   const { data: session } = useSession();
   const currentUserId = session?.user?.id;
+  const [selectedCount, setSelectedCount] = useState(0);
 
   const [search, setSearch] = useState("");
   const [userType, setUserType] = useState<UserType | "">("");
@@ -136,12 +137,18 @@ export function UsersTable() {
         />
       ) : (
         <>
-          <DataTable columns={columns} data={rows} />
+          <DataTable
+            columns={columns}
+            data={rows}
+            onRowSelectionChange={(selected) => setSelectedCount(selected)}
+          />
           <DataTablePagination
             page={meta.page}
             limit={meta.limit}
             total={meta.total}
             onPageChange={(p) => pagination.setPage(p)}
+            onLimitChange={(nextLimit) => pagination.setLimit(nextLimit)}
+            selectedCount={selectedCount}
           />
         </>
       )}

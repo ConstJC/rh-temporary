@@ -19,6 +19,8 @@ import { GetUser } from '../common/decorators/get-user.decorator';
 import { AdminService } from './admin.service';
 import { AdminUpdateUserDto } from './dto/admin-update-user.dto';
 import { AdminUpdatePropertyGroupDto } from './dto/admin-update-property-group.dto';
+import { CreateAdminUserDto } from './dto/create-admin-user.dto';
+import { CreateAdminPropertyGroupDto } from './dto/create-admin-property-group.dto';
 import { CreateSubscriptionPlanDto } from './dto/create-subscription-plan.dto';
 import { UpdateSubscriptionPlanDto } from './dto/update-subscription-plan.dto';
 import { UpdateSubscriptionPlanStatusDto } from './dto/update-subscription-plan-status.dto';
@@ -62,6 +64,14 @@ export class AdminController {
     return this.adminService.updateUser(currentUserId, id, dto);
   }
 
+  @Post('users')
+  async createUser(
+    @GetUser('id') currentUserId: string,
+    @Body() dto: CreateAdminUserDto,
+  ) {
+    return this.adminService.createUser(currentUserId, dto);
+  }
+
   @Get('property-groups')
   async getPropertyGroups(
     @Query('page') page = 1,
@@ -79,6 +89,14 @@ export class AdminController {
       sort,
       order,
     });
+  }
+
+  @Post('property-groups')
+  async createPropertyGroup(
+    @GetUser('id') currentUserId: string,
+    @Body() dto: CreateAdminPropertyGroupDto,
+  ) {
+    return this.adminService.createPropertyGroup(currentUserId, dto);
   }
 
   @Patch('property-groups/:id')
